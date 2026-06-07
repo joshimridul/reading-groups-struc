@@ -1,0 +1,39 @@
+\begin{table}[!h]
+\centering\centering\centering
+\caption{Effect on Test Scores}
+\centering
+\begin{threeparttable}
+\fontsize{10}{12}\selectfont
+\begin{tabular}[t]{lccccccc}
+\toprule
+\multicolumn{1}{c}{ } & \multicolumn{7}{c}{Experiment (Liberia)} \\
+\cmidrule(l{3pt}r{3pt}){2-8}
+  & (1) & (2) & (3) & (4) & (5) & (6) & (7)\\
+\midrule
+Peer Baseline Score & -0.011 &  &  &  & -0.057 &  & -0.020\\
+ & (0.086) &  &  &  & (0.088) &  & (0.100)\\
+Dispersion in Peer Scores &  & 0.992* &  &  &  & 0.353 & 0.373\\
+ &  & (0.558) &  &  &  & (0.570) & (0.570)\\
+Distance from Median Instruction &  &  & 0.204 &  & 0.153 & 0.192 & 0.178\\
+ &  &  & (0.141) &  & (0.124) & (0.134) & (0.130)\\
+Class Size &  &  &  & 0.004 & 0.002 & 0.001 & 0.002\\
+ &  &  &  & (0.005) & (0.005) & (0.005) & (0.005)\\
+\hline
+\midrule
+Number of Students & 3905 & 3553 & 3411 & 3905 & 3411 & 3102 & 3102\\
+Number of Schools & 54 & 54 & 54 & 54 & 54 & 54 & 54\\
+Number of Test Scores & 1 & 1 & 1 & 1 & 1 & 1 & 1\\
+\bottomrule
+\end{tabular}
+\begin{tablenotes}[para]
+\item Notes:
+                      All specifications control for individual baseline test score,
+                        grade dummies and randomization strata fixed effects. Each specification
+                        also controls for the expected value of the respective independent variable
+                         used in the specification. Midline test scores are used in place of endline test scores when the latter are unavailable. 
+                         When both endline and midline test scores are available, the average of the two is used. 
+                         Standard errors are clustered at the academy-grade
+                          group level. ***, **, and * indicate significance at 1\%, 5\%, and 10\%.
+\end{tablenotes}
+\end{threeparttable}
+\end{table}

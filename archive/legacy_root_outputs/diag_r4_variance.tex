@@ -1,0 +1,15 @@
+\begin{table}[htbp]
+\centering\small
+\caption{Treatment Effect on Endline Score Variance}
+\label{tab:variance}
+\begin{tabular}{lcccccc}
+\toprule
+Study & Var(T) & Var(C) & Ratio & Sq.\ resid.\ coef & SE & Levene $p$ \\
+\midrule
+Liberia & 0.998 & 0.921 & 1.083 & 0.052 & (0.217) & 0.546 \\
+Kenya Y1 & 0.915 & 0.988 & 0.927 & 0.016 & (0.055) & 0.198 \\
+Kenya Y2 & 1.033 & 0.987 & 1.046 & -0.032 & (0.109) & 0.455 \\
+\bottomrule
+\end{tabular}
+\par\smallskip\noindent{\small Variance of standardized endline scores. Squared-residual regression: first estimate $Y_i = \alpha + \beta_1 T_i + \gamma \hat{\theta}_i + \text{strata FE} + u_i$, then regress $\hat{u}_i^2$ on treatment, ability, and strata FE with cluster-robust SEs. Levene test for equality of variances.}
+\end{table}

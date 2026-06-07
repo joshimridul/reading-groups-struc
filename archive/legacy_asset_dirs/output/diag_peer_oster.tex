@@ -1,0 +1,18 @@
+\begin{table}[htbp]
+\centering\small
+\caption{Oster (2019) Bounds: Robustness of $\hat{\beta}_P$ to Unobservables}
+\label{tab:peer_oster}
+\begin{tabular}{lccc}
+\toprule
+ & Liberia & Kenya & Kenya 2019 \\
+\midrule
+$\hat{\beta}_P$ (BH baseline) & -0.006 & -0.133 & -0.310 \\
+$\hat{\beta}_P$ (+ classroom controls) & 0.011 & -0.160 & -0.319 \\
+$R^2$ (BH baseline) & 0.083 & 0.528 & 0.299 \\
+$R^2$ (+ classroom controls) & 0.103 & 0.529 & 0.306 \\
+$R^2_{\max}$ ($1.3 \times R^2_{\text{long}}$) & 0.134 & 0.688 & 0.397 \\
+$\delta^*$ & -1.0 & $\infty$ & -447.3 \\
+\bottomrule
+\end{tabular}
+\par\smallskip\noindent{\small BH baseline: peer EB + decile$\times$T FE + strata FE. Classroom controls: + within-class peer SD + class size + teacher attendance. $\delta^* > 1$ means unobservable confounding must exceed all observable classroom-level confounders to explain $\hat{\beta}_P$. $\infty$ indicates $\hat{\beta}_P$ barely moves with additional controls.}
+\end{table}

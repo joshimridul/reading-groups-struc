@@ -1,0 +1,20 @@
+{\def\sym#1{\ifmmode^{#1}\else\(^{#1}\)\fi}                 \begin{tabular}{@{\hskip\tabcolsep\extracolsep\fill}l*{5}{>{\centering\arraybackslash}m{2.5cm}}}                 \toprule \toprule \\                 \multicolumn{4}{l}{\textit{Dependent variable: Reading club endline score}} &  \\                  &  &  &  &   \\
+                    &\multicolumn{1}{c}{(1)}         &\multicolumn{1}{c}{(2)}         &\multicolumn{1}{c}{(3)}         &\multicolumn{1}{c}{(4)}         \\
+\midrule
+Avg. predicted peer score&       0.068         &                     &                     &       0.138         \\
+                    &     [0.120]         &                     &                     &     [0.190]         \\
+\addlinespace
+Level               &                     &      -0.097         &                     &      -0.055         \\
+                    &                     &     [0.170]         &                     &     [0.242]         \\
+\addlinespace
+Class size          &                     &                     &      -0.004         &      -0.004         \\
+                    &                     &                     &     [0.002]         &     [0.003]         \\
+\midrule
+Observations        &        3993         &        4000         &        4000         &        3993         \\
+Academy fixed effects&         Yes         &         Yes         &         Yes         &         Yes         \\
+Baseline score control&         Yes         &         Yes         &         Yes         &         Yes         \\
+\bottomrule
+\multicolumn{5}{l}{\footnotesize Notes: Standard errors are clustered at the academy-grade group level.}\\
+\multicolumn{5}{l}{\footnotesize * p$<$0.05, ** p$<$0.01, *** p$<$0.001}\\
+\end{tabular}
+}

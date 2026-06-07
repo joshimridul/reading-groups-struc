@@ -1,0 +1,125 @@
+\documentclass[11pt]{article}
+\usepackage{lmodern}
+\usepackage[T1]{fontenc}
+\usepackage[latin9]{inputenc}
+\usepackage{geometry}
+\geometry{verbose,tmargin=2.54cm,bmargin=2.54cm,lmargin=2.54cm,rmargin=2.54cm}
+\usepackage{color}
+\usepackage{verbatim}
+\usepackage{float}
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage{setspace}
+\usepackage[authoryear]{natbib}
+\onehalfspacing
+\usepackage[unicode=true,pdfusetitle,
+bookmarks=true,bookmarksnumbered=false,bookmarksopen=false,
+breaklinks=false,pdfborder={0 0 1},backref=false,colorlinks=true]
+{hyperref}
+\hypersetup{
+	citecolor=blue, urlcolor = brown }
+%\usepackage{breakurl}
+\usepackage{caption}
+\usepackage{pdflscape}
+\usepackage{multirow} %http://ctan.org/pkg/multirow
+\usepackage{longtable}
+\makeatletter
+\usepackage{endnotes}
+\usepackage{longtable}
+\usepackage{lscape}
+\usepackage{array}
+\usepackage{adjustbox}
+\usepackage{tabularx}
+\usepackage{threeparttable}
+\setcitestyle{citesep={;}, aysep={,}}
+\usepackage{booktabs}% Allows the use of \toprule, \midrule and \bottomrule in tables for horizontal lines
+\usepackage{float}
+\usepackage{subcaption}
+\definecolor{green}{RGB}{0, 180, 0}
+\definecolor{blue}{RGB}{0,46,180}
+\definecolor{brown}{RGB}{165,42,42}
+
+\usepackage{colortbl}
+\usepackage{ragged2e}
+\usepackage{xfp}
+% To allow textsubscript in section titles:
+
+\usepackage{stackengine}
+\usepackage{array}
+\newcolumntype{L}[1]{>{\raggedright\arraybackslash}p{#1}}
+\setstackEOL{\#}
+\setstackgap{L}{12pt}
+
+
+
+
+\title{\underline{Preliminary results} \linebreak
+	Cross-grade ability grouping in Liberia}
+\date{\today}
+
+\makeatother
+
+\begin{document}
+	\maketitle
+
+\centering
+
+\section*{Main results }
+
+\begin{table}[H]
+	\input{Liberia2024/test_score_effects_lib24}
+\end{table}
+
+\begin{table}[H]
+	\input{Liberia2024/effect_leveled_index_lib}
+\end{table}
+
+
+\begin{table}[H]
+	\input{Liberia2024/dispersion_effects_lib}
+\end{table}
+
+\begin{table}[H]
+	\input{Liberia2024/distance_median_lib}
+\end{table}
+
+\begin{figure}[ht!]
+        \centering
+       \caption{Distribution of Baseline Test Scores}        
+        \includegraphics[width = 5in]{Liberia2024/bxplt_lib.pdf}
+\end{figure}
+
+\begin{figure}[ht!]
+        \centering
+       \caption{Endline achievement by predicted ability deciles (Grades 3-4)}        
+        \includegraphics[width = 5in]{Liberia2024/q_34_lib.pdf}
+\end{figure}
+
+\begin{figure}[ht!]
+        \centering
+       \caption{Endline achievement by predicted ability deciles (Grades 1-2)}        
+        \includegraphics[width = 5in]{Liberia2024/q_12_lib.pdf}
+\end{figure}
+
+\begin{figure}[ht!]
+        \centering
+       \caption{Distribution of predicted ability (Grades 3-4)}        
+        \includegraphics[width = 5in]{Liberia2024/ability_dist34_lib.pdf}
+\end{figure}
+
+\begin{figure}[ht!]
+        \centering
+       \caption{Distribution of predicted ability (Grades 1-2)}        
+        \includegraphics[width = 5in]{Liberia2024/ability_dist12_lib.pdf}
+\end{figure}
+
+\begin{figure}[ht!]
+        \centering
+       \caption{Predicted ability (Empirical Bayes) vs. test scores}      
+        \includegraphics[width = 5in]{Liberia2024/corr_bl_eb.pdf}
+        \caption*{Notes: The predicted ability scores were estimated using an empirical bayes procedure. This procedure combined individual-level baseline scores and (control) group-level midline scores. Shrinkage weights were calculated based on the inverse variance of the baseline and control group midline test scores, assigning higher weight to the more reliable (lower variance) measure. For cases where midline scores were missing, individual baseline scores were used as a fallback.}
+\end{figure}
+
+
+
+\end{document}  

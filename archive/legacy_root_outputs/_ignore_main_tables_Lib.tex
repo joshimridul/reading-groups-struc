@@ -1,0 +1,222 @@
+\documentclass[11pt]{article}
+\usepackage{lmodern}
+\usepackage[T1]{fontenc}
+\usepackage[latin9]{inputenc}
+\usepackage{geometry}
+\geometry{verbose,tmargin=2.54cm,bmargin=2.54cm,lmargin=2.54cm,rmargin=2.54cm}
+\usepackage{color}
+\usepackage{verbatim}
+\usepackage{float}
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage{setspace}
+\usepackage[authoryear]{natbib}
+\onehalfspacing
+\usepackage[unicode=true,pdfusetitle,
+bookmarks=true,bookmarksnumbered=false,b ookmarksopen=false,
+breaklinks=false,pdfborder={0 0 1},backref=false,colorlinks=true]
+{hyperref}
+\hypersetup{
+	citecolor=blue, urlcolor = brown }
+%\usepackage{breakurl}
+\usepackage{caption}
+\usepackage{pdflscape}
+\usepackage{multirow} %http://ctan.org/pkg/multirow
+\usepackage{longtable}
+\makeatletter
+\usepackage{endnotes}
+\usepackage{longtable}
+\usepackage{lscape}
+\usepackage{array}
+\usepackage{adjustbox}
+\usepackage{tabularx}
+\usepackage{threeparttable}
+\setcitestyle{citesep={;}, aysep={,}}
+\usepackage{booktabs}% Allows the use of \toprule, \midrule and \bottomrule in tables for horizontal lines
+\usepackage{float}
+\usepackage{subcaption}
+\definecolor{green}{RGB}{0, 180, 0}
+\definecolor{blue}{RGB}{0,46,180}
+\definecolor{brown}{RGB}{165,42,42}
+
+\usepackage{colortbl}
+\usepackage{ragged2e}
+\usepackage{xfp}
+% To allow textsubscript in section titles:
+
+\usepackage{stackengine}
+\usepackage{array}
+\newcolumntype{L}[1]{>{\raggedright\arraybackslash}p{#1}}
+\setstackEOL{\#}
+\setstackgap{L}{12pt}
+
+
+%\usepackage{stackengine}
+%\usepackage{array}
+%\newcolumntype{L}[1]{>{\raggedright\arraybackslash}p{#1}}
+%\setstackEOL{\#}
+%\setstackgap{L}{12pt}
+%\graphicspath{{"C:/Users/Mridul Joshi/Dropbox/APE\_M2/AdvancedMicroeconometrics/Submission1/Output/"}}
+
+\title{\underline{Preliminary results} \linebreak
+	Cross-grade ability grouping in Liberia}
+\date{\today}
+
+\makeatother
+
+\begin{document}
+	\maketitle
+
+\centering
+
+%\section*{Baseline balance and attrition}
+
+% baseline balance 
+%\begin{table}[H]
+%	\input{Tables_Liberia/baseline_balance_bygrade.tex}
+%\end{table}
+
+% attrition 
+%\begin{table}[H]
+%	\input{Tables_Liberia/attrition_bygrade.tex}
+%\end{table}
+
+\section*{Pooled main}
+
+\begin{table}[H]
+	\caption{Pooled with academy cohort fixed effects}
+	\input{Tables_Liberia/hull_pool_coh}
+\end{table}
+
+\begin{table}[H]
+	\caption{Pooled with academy cohort and county fixed effects}
+	\input{Tables_Liberia/hull_pool_coh_cn}
+\end{table}
+
+\begin{table}[H]
+	\caption{Pooled with academy fixed effects}
+	\input{Tables_Liberia/hull_pool_acad}
+\end{table}
+
+\section*{Grades 3-4 main}
+
+\begin{table}[H]
+	\caption{Grades 3-4 with academy cohort fixed effects}
+	\input{Tables_Liberia/hull_pool_coh_34}
+\end{table}
+
+\begin{table}[H]
+	\caption{Grades 3-4 with academy cohort and county fixed effects}
+	\input{Tables_Liberia/hull_pool_coh_cn_34}
+\end{table}
+
+\begin{table}[H]
+	\caption{Grades 3-4 with academy fixed effects}
+	\input{Tables_Liberia/hull_pool_acad_34}
+\end{table}
+
+\section*{Grades 1-2 main}
+
+\begin{table}[H]
+	\caption{Grades 1-2 with academy cohort fixed effects}
+	\input{Tables_Liberia/hull_pool_coh_12}
+\end{table}
+
+\begin{table}[H]
+	\caption{Grades 1-2 with academy cohort and county fixed effects}
+	\input{Tables_Liberia/hull_pool_coh_cn_12}
+\end{table}
+
+\begin{table}[H]
+	\caption{Grades 1-2 with academy fixed effects}
+	\input{Tables_Liberia/hull_pool_acad_12}
+\end{table}
+
+\section*{Imputed missing baseline scores}
+
+\begin{table}[H]
+	\caption{Pooled with academy cohort fixed effects and imputed missing baseline scores}
+	\input{Tables_Liberia/hull_pool_coh_I}
+\end{table}
+
+\begin{table}[H]
+	\caption{Grades 3-4 with academy cohort fixed effects and imputed missing baseline scores}
+	\input{Tables_Liberia/hull_pool_coh_34_I}
+\end{table}
+
+\begin{table}[H]
+	\caption{Grades 1-2 with academy cohort fixed effects and imputed missing baseline scores}
+	\input{Tables_Liberia/hull_pool_coh_12_I}
+\end{table}
+
+
+\section{Peer score dispersion}
+
+\begin{table}[H]
+	\caption{Pooled with academy cohort fixed effects and peer scores dispersion}
+	\input{Tables_Liberia/hull_pool_coh_sd}
+\end{table}
+
+\begin{table}[H]
+	\caption{Grades 3-4 with academy cohort fixed effects and and peer scores dispersion}
+	\input{Tables_Liberia/hull_pool_coh_34_sd}
+\end{table}
+
+\begin{table}[H]
+	\caption{Grades 1-2 with academy cohort fixed effects and and peer scores dispersion}
+	\input{Tables_Liberia/hull_pool_coh_12_sd}
+\end{table}
+
+
+\section{Predicted peer scores}
+
+\begin{table}[H]
+	\caption{Pooled with academy cohort fixed effects and predicted peer scores}
+	\input{Tables_Liberia/hull_pool_coh_h}
+\end{table}
+
+\begin{table}[H]
+	\caption{Pooled with academy fixed effects and predicted peer scores}
+	\input{Tables_Liberia/hull_pool_acad_h}
+\end{table}
+
+
+\begin{table}[H]
+	\caption{Grades 3-4 with academy cohort fixed effects and predicted peer scores}
+	\input{Tables_Liberia/hull_pool_coh_34_h}
+\end{table}
+
+\begin{table}[H]
+	\caption{Grades 3-4 with academy fixed effects and predicted peer scores}
+	\input{Tables_Liberia/hull_pool_acad_34_h}
+\end{table}
+
+\begin{table}[H]
+	\caption{Grades 1-2 with academy cohort fixed effects and predicted peer scores}
+	\input{Tables_Liberia/hull_pool_coh_12_h}
+\end{table}
+
+\begin{table}[H]
+	\caption{Grades 1-2 with academy fixed effects and predicted peer scores}
+	\input{Tables_Liberia/hull_pool_acad_12_h}
+\end{table}
+
+\section{Predicted peer score dispersion}
+
+\begin{table}[H]
+	\caption{Pooled with academy cohort fixed effects and peer scores dispersion}
+	\input{Tables_Liberia/hull_pool_coh_sdh}
+\end{table}
+
+\begin{table}[H]
+	\caption{Grades 3-4 with academy cohort fixed effects and and peer scores dispersion}
+	\input{Tables_Liberia/hull_pool_coh_34_sdh}
+\end{table}
+
+\begin{table}[H]
+	\caption{Grades 1-2 with academy cohort fixed effects and and peer scores dispersion}
+	\input{Tables_Liberia/hull_pool_coh_12_sdh}
+\end{table}
+
+
+\end{document}

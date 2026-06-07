@@ -1,0 +1,1151 @@
+\documentclass[11pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[letterpaper,top=1in,right=1in,left=1in,bottom=1in]{geometry}
+\usepackage{amsmath,amsfonts,amssymb,amsthm}
+\usepackage{graphicx}
+\usepackage{placeins}
+\usepackage[capposition=top]{floatrow}
+\usepackage{subcaption}
+\usepackage{lscape}
+\usepackage{pdflscape}
+\usepackage{setspace}
+\usepackage{booktabs,caption}
+\usepackage{makecell}
+\usepackage[flushleft]{threeparttable}
+\usepackage{bbm}
+\usepackage{multirow}
+\usepackage{titlesec}
+\titleformat{\paragraph}[runin]{\normalfont\itshape}{}{0em}{}
+\titlespacing*{\paragraph}{0pt}{1ex plus 0.5ex minus 0.2ex}{0.5em}
+\usepackage{hyperref}
+\usepackage[authoryear]{natbib}
+\usepackage{float}
+\usepackage{longtable}
+\usepackage{array}
+\usepackage[page,toc,titletoc,title]{appendix}
+
+\newtheorem{assumption}{Assumption}
+\newtheorem{remark}{Remark}
+
+% Add this to the preamble if you want proposition environments:
+\newtheorem{proposition}{Proposition}
+
+\newcommand{\ind}{\mathbbm{1}}
+\newcommand{\E}{\mathbb{E}}
+\newcommand{\Var}{\operatorname{Var}}
+\newcommand{\Corr}{\operatorname{Corr}}
+\newcommand{\Longstack}[1]{\shortstack{#1}}
+\bibliographystyle{ecta}
+
+\hypersetup{
+	colorlinks=true,
+	linktoc=all,
+	linkcolor=black,
+	citecolor=black,
+    urlcolor=black
+}
+
+\title{When Does Ability Grouping Improve Learning? \\ Evidence from Three Experiments\footnote{I am grateful to Caroline Hoxby and Isaac Sorkin for helpful feedback though any errors are my own. } }
+
+\begin{document}
+
+\begin{titlepage}
+\author{Guthrie Gray-Lobe\thanks{University of Chicago, email: \protect\href{mailto:graylobe@uchicago.edu}{graylobe@uchicago.edu}} \and Mridul Joshi\thanks{Stanford University, email: \protect\href{mailto:mriduljoshi@stanford.edu}{mriduljoshi@stanford.edu}} \and Michael Kremer\thanks{University of Chicago, email: \protect\href{mailto:kremermr@uchicago.edu}{kremermr@uchicago.edu}}}
+
+\date{PRELIMINARY --- PLEASE DO NOT CIRCULATE \\ \today}
+\maketitle
+
+\begin{abstract}\noindent
+Under teacher discretion, ability grouping works through classroom homogeneity. Under scripted instruction, it works by routing students to the correct content level---shifting the mechanism from homogeneity to assignment, attenuating peer effects, and amplifying the return to accurate sorting. We test this with three randomized evaluations of cross-grade grouping by the same school operator in Kenya, Liberia, and Nigeria. The framework isolates three complementary inputs: signal quality ($\rho$), assignment execution ($\omega$), and treatment-relevant delivery fidelity ($\tau$). In Liberia (low $\rho$, low $\tau$), grouping reduces achievement by $0.21$~SD. In Kenya (high $\rho$, high $\omega$), grouping compresses within-class dispersion but the ATE is near zero; approximate peer/rank diagnostics are negative, while exact recentering checks substantially attenuate that channel, and students with larger predicted assignment gains do not benefit more. Nigeria was designed to fill the high-$\rho$, high-$\tau$ cell, but assignment execution collapsed ($\omega = 0.84$) and treatment-relevant delivery was low (26\% lesson completion)---so the intended high-input cell was not realized. A structural model, with primitives measured or calibrated from distinct data margins before the production block is estimated, disciplines the missing counterfactual: the preferred specification predicts an ATE of $+0.19$~SD under high sorting accuracy, faithful execution, and high delivery fidelity, while sensitivity checks show that positive complementarity is more stable than the exact magnitude. The results illustrate that sorting accuracy, execution, and delivery fidelity are complements, and that achieving all three requires organizational capabilities that do not automatically co-occur.
+
+\end{abstract}
+\setcounter{page}{0}
+\thispagestyle{empty}
+\end{titlepage}
+\doublespacing
+
+%% ============================================================
+\section{Introduction}
+\label{sec:intro}
+%% ============================================================
+
+Schools must assign heterogeneous students to a limited number of instructional environments. The standard rule is grade, which groups students by age and prior progression through the curriculum. Grade is simple to administer, and it carries useful information about curricular exposure and developmental stage. Yet grade can be poorly aligned with actual ability when students within the same grade differ sharply in achievement and students in adjacent grades overlap substantially in skill.
+
+This is a particular instance of a broader economic problem: how should an organization assign heterogeneous individuals to production environments when the available signals are imperfect? Schools assign students to classrooms, firms assign workers to tasks and teams, hospitals assign patients to units, and lenders assign borrowers to contracts. In each case, a new diagnostic or screening tool may improve assignment by moving beyond a coarse incumbent rule. But the value of a better signal depends on the production technology. When the production environment can adapt to the worker---when a teacher adjusts the lesson in response to who is in the room---the benefit of better assignment is partially offset by the loss of that adaptation. When production is standardized---when a script determines what gets taught regardless of who is listening---the benefit of correct assignment is amplified, because the environment cannot compensate for a mismatch.
+
+These tradeoffs are especially salient in many developing-country school systems. Within-grade achievement variance is wide, automatic promotion policies leave many students far below grade-level expectations, and multi-grade classrooms are common in small or under-resourced schools \citep{banerjee/cole/duflo/linden:2007,muralidharan2019disrupting}. In such settings, a single teacher may face a classroom in which some students cannot count while others do multiplication. Cross-grade ability grouping---reassigning students across adjacent grades into ability-based tracks for a portion of the school day---is an appealing response. It requires no new teachers, materials, or technology, only a reassignment of existing students to existing classrooms based on a diagnostic assessment. Recent evidence that aligning instruction to students' demonstrated level can improve learning reinforces the case for trying it \citep{duflo2020experimental, duflo2011peer}.
+
+But cross-grade grouping is also a demanding form of assignment. It reorganizes classrooms along several margins at once: it changes peer composition, alters students' relative standing, can increase or decrease class size, and pools students from different grades into the same instructional space \citep{betts:2011}. A reassignment rule that looks superior on paper may fail in practice if the classrooms it creates are less productive than the ones it replaces.
+
+We study this question using three randomized evaluations of cross-grade ability grouping in schools operated by NewGlobe Education, a large school network that uses scripted lesson plans delivered via digital tablets. The three experiments span three countries (Kenya, Liberia, and Nigeria), two subject domains (literacy and numeracy), and two design variants (two-track and three-track systems). Crucially, they take place within the same institutional architecture---the same scripted instructional model, the same digital delivery platform, the same supervisory structure---but in settings that differ on three dimensions our framework highlights: signal quality ($\rho$, how well the diagnostic predicts ability), assignment execution ($\omega$, how faithfully intended group assignments are realized in practice), and treatment-relevant delivery fidelity ($\tau$, how faithfully the assigned track's curriculum is actually delivered). Signal quality and delivery fidelity are properties of the measurement system and instructional technology, respectively; assignment execution is a distinct organizational capability---the capacity to form the intended groups, administer binding placement tests, and route students to the correct classrooms.
+
+The results are strikingly heterogeneous. In Liberia ($K = G = 2$ within each of two grade-pair sub-experiments, literacy), grouping reduces achievement by $0.21$ SD ($p = 0.12$). The baseline assessment explains less than 7\% of endline variation ($\rho = 0.055$), so sorting is near-random and generates minimal assignment gains. In Kenya ($K = G = 2$, literacy), the effect is near zero ($0.031$ SD, $p = 0.56$). Here the diagnostic is highly predictive ($\rho = 0.53$), assignment is executed faithfully ($\omega = 1$), and sorting substantially compresses within-class dispersion---the sorting rule works as intended---but average achievement does not rise, and students with larger predicted assignment gains do not benefit more. Approximate peer specifications are negative enough to matter, while exact control-function and recentered specifications are close to zero. In Nigeria ($K = G = 3$, numeracy), the point estimates are positive but imprecise: the pooled average treatment effect is $+0.075$ SD and the top-track effect is $+0.225$ SD, but with academy-level clustering that respects the randomization design, neither is statistically significant at conventional levels. Phone-call audits and roster records reveal substantial implementation frictions: the placement test was weakly related to realized groups, assignment records are missing for about one-third of treated students, and teachers frequently delivered content for the wrong track. The treatment-relevant curriculum---the DI numeracy programme through which the assignment-rule difference operates---was delivered in only 26\% of scheduled lessons.
+
+We develop a framework that explains why scripted instruction changes the fundamental economics of tracking, and why these three experiments produce different results despite sharing the same institutional architecture. The standard tracking model---as in \citet{duflo2011peer}---works through classroom homogeneity: tracking narrows the ability distribution within each class, allowing the teacher to target instruction to the group. The mechanism operates through teacher behavior responding to composition, so peer effects are inherently part of how tracking helps. Our setting is different. Under scripted instruction, the teacher's content is fixed by the track's lesson plan, not by who is in the room. Tracking works by routing students to the correct content level---an \emph{assignment} mechanism rather than a \emph{homogeneity} mechanism. This distinction has two structural implications.
+
+First, scripted instruction \emph{raises the mismatch penalty} $\lambda(\tau)$. When the teacher cannot adjust to the student, being in the wrong track is more costly: a student who cannot count learns nothing from a scripted multiplication lesson. Under teacher discretion, the same student might receive partial accommodation. The return to correct assignment is therefore amplified under scripted instruction.
+
+Second, scripted instruction \emph{attenuates peer effects} $\pi(\tau)$. Peer composition affects learning through the instructional environment---teachers adjusting pace to the group, stronger students modeling skills, disruptions derailing lessons. When content is determined by script rather than composition, these channels are mechanically narrowed. As $\tau \to 1$, the teacher's behavior is fully determined by the lesson plan, and $\pi(\tau) \to 0$.
+
+These two forces make signal quality ($\rho$) and delivery fidelity ($\tau$) \emph{complements}: the return to better sorting is higher under scripted instruction, because both the mismatch amplification and the peer attenuation push in the same direction. The cross-partial $\partial^2 \text{ATE}/\partial\rho\,\partial\tau > 0$. But realizing this complementarity requires a third input---assignment execution ($\omega$)---that translates an informative signal into the intended group structure. All three must be jointly present.
+
+The framework suggests placing the three experiments in $(\rho, \omega, \tau)$ space:
+
+\begin{itemize}
+\item \emph{Liberia} (low $\rho$, high $\omega$, low $\tau$): Assignment is faithfully executed but the signal carries almost no information. Neither the assignment gain nor the peer attenuation is operative. ATE $= -0.21$ SD.
+
+\item \emph{Kenya} (high $\rho$, high $\omega$, moderate $\tau$): Accurate sorting is faithfully executed and the accounting remainder is positive ($+0.067$ SD in the accounting sample). Approximate peer/rank diagnostics are adverse ($\hat{\zeta} = -0.134$, $p = 0.02$), but exact recentering checks attenuate this channel. ATE $\approx 0$.
+
+\item \emph{Nigeria}: The operator designed this experiment to fill the high-$\rho$, high-$\omega$, high-$\tau$ cell---choosing Lagos because general delivery quality was highest there and designing placement to be score-based. But assignment execution collapsed ($\omega = 0.84$): the placement test was non-binding, most schools collapsed the three-group structure, and teachers frequently delivered content for the wrong track. Furthermore, the treatment-relevant DI numeracy curriculum was delivered in only 26\% of scheduled lessons, so treatment-relevant $\tau$ was low despite the operator's strong general delivery infrastructure. Nigeria failed on two of three dimensions: low $\omega$ and low treatment-relevant $\tau$. The gap between designed and realized conditions reveals that signal quality, assignment execution, and delivery fidelity are distinct organizational capabilities that do not automatically co-occur. ATE $= +0.075$ SD, not significant.
+\end{itemize}
+
+The cross-experiment peer-effect pattern reflects differences in identifying variation as much as differences in the underlying peer channel. In Kenya, high $\rho$ and high $\omega$ generated substantial treatment-induced reshuffling of classroom composition, and the approximate control-function specification detects an adverse composite ($\hat{\zeta} = -0.134$, $p = 0.02$). Exact control-function and recentered specifications, however, are close to zero. In Nigeria, lower $\rho$ and weaker $\omega$ generated much less actual peer reshuffling, leaving $\hat{\zeta}$ underpowered. The Nigeria null is therefore consistent with either an attenuated peer channel or insufficient identifying variation; the structural model (Section~\ref{sec:structural}) is needed to separate these interpretations. The Kenya exercise should therefore be read as evidence that the approximate peer/rank channel is potentially relevant, not as a settled causal decomposition.
+
+Because no single experiment achieves all three inputs simultaneously, the reduced-form evidence cannot answer the paper's central counterfactual question: what would the treatment effect be in a setting with high $\rho$, high $\omega$, and high $\tau$? We answer this with a structural model whose primitives are measured or calibrated in stages from distinct data margins before the production block is estimated. The model is disciplined by validation restrictions that rule out the most concerning extrapolations. In the preferred specification it predicts an ATE of $+0.19$ SD in the missing high-$\rho$, high-$\omega$, high-$\tau$ cell; across robustness checks, the more stable result is the complementarity between accurate sorting and high treatment-relevant delivery.
+
+The paper contributes to several literatures. We provide the first experimental evidence on cross-grade ability grouping---what the early American literature called the Joplin Plan \citep{floyd:1954}.\footnote{There is also a large body of research on between-school ability grouping, mainly from Europe where tracking between academic and vocational tracks is prevalent \citep{fu2018ability,lavrijsen2015new}. We focus on within-school ability grouping.} Meta-analyses of within-grade tracking generally find small or null average effects \citep{slavin:1987,slavin1990achievement,kulik1987effects,terrin2022effect}, with heterogeneous results across tracks \citep{burke2013classroom,hoxby2005taking,antecol2016peer,garlick,de2022college}. In developing countries, the benchmark is \citet{duflo2011peer}, who randomly assigned Kenyan primary schools to within-grade tracking and found average gains of $0.18$ SD. Their mechanism is teacher-mediated classroom homogeneity. Our framework complements theirs by analyzing what happens when instruction is scripted: the mechanism shifts from homogeneity to assignment, peer effects are attenuated, and the return to sorting accuracy is amplified.
+
+The three-experiment design within a common institutional structure lets us study \emph{when} and \emph{why} ability grouping has different effects. The tracking literature documents substantial heterogeneity across contexts \citep{betts:2011,card2016can,vardardottir2013peer}, but the sources are difficult to isolate because studies differ along many institutional dimensions simultaneously. Our three experiments share the same operator, the same scripted instructional model, and the same digital delivery platform, but differ in sorting accuracy and delivery fidelity. The within-operator design controls more institutional variation than any cross-study comparison in this literature. In all three settings, scripted curricula fix instructional content by track, so conditioning on baseline-score bin and treatment status approximately absorbs the instructional-targeting channel. This creates leverage to examine the peer-composition channel in isolation---a distinction that is normally confounded in tracking studies. This connects to work on how peer effects depend on group structure \citep{hoxby2005taking,rjosk2022dispersion,vigdor2007peer} and on how assignment rules change outcomes by altering interaction patterns within the assigned group \citep{carrellsacerdotewest2013,garlick}.
+
+Finally, the framework contributes to the literature on assignment rules and production environments. The Teaching at the Right Level literature asks whether instruction targeted to assessed level raises scores \citep{banerjee2017proof,duflo2020experimental}; recent work emphasizes implementation fidelity and subgrouping precision \citep{angristmeager2023}. Our framework addresses a different question: how does the production technology---the degree to which instruction is scripted versus discretionary---change the returns to ability-based assignment? Within-grade tracking in Kenya raised achievement under teacher discretion \citep{duflo2011peer}; ability grouping in Mexico generated gains concentrated among higher-achieving students \citep{bussofrisancho2023}. Our model nests these as special cases along the $\tau$ dimension and explains why the same sorting accuracy can produce different results under different production technologies.
+
+The paper proceeds as follows. Section~\ref{sec:theory} develops the theoretical framework. Section~\ref{sec:design} describes the three experiments and data. Section~\ref{sec:strategy} presents the empirical strategy. Section~\ref{sec:results} reports results. Section~\ref{sec:robustness} discusses robustness. Section~\ref{sec:conclusion} concludes.
+
+%% ============================================================
+\section{Theoretical Framework}
+\label{sec:theory}
+%% ============================================================
+
+We model cross-grade ability grouping as a reassignment of students from grade-based classrooms to ability-based tracks. The framework is organized around three primitives: signal quality ($\rho$), which determines how informative the diagnostic is about latent ability; assignment execution ($\omega$), which determines how faithfully the intended group structure is realized; and treatment-relevant delivery fidelity ($\tau$), which determines how faithfully the assigned track's curriculum is actually delivered. The central institutional dimension is $\tau \in [0,1]$: the degree to which instruction follows a standardized script rather than responding to classroom composition. The parameter generates clear qualitative predictions about how the mismatch penalty and the strength of peer effects should vary across settings, producing a complementarity among all three inputs.
+
+\subsection{Environment and Assignment}
+
+Student $i$ in grade $g(i) \in \{1, \ldots, G\}$ has latent ability
+\begin{equation}
+\label{eq:ability}
+\theta_i = \mu_{g(i)} + \nu_i,
+\end{equation}
+where $\mu_{g(i)}$ is the grade-specific mean and $\nu_i$ captures within-grade heterogeneity, with $\E[\nu_i] = 0$ and $\text{Var}(\nu_i \mid g(i)) = \sigma^2_{\nu,g}$. The school observes a noisy diagnostic score
+\begin{equation}
+\label{eq:score}
+s_i = \theta_i + u_i,
+\end{equation}
+with $\E[u_i \mid \theta_i, g(i)] = 0$ and $\text{Var}(u_i \mid g(i)) = \sigma^2_{u,g}$. The posterior expectation of ability given the signal and grade is
+\begin{equation}
+\label{eq:posterior}
+a_i \equiv \E[\theta_i \mid s_i, g(i)] = \mu_{g(i)} + \rho_g(s_i - \mu_{g(i)}),
+\end{equation}
+where
+\begin{equation}
+\label{eq:signal_quality}
+\rho_g \equiv \frac{\sigma^2_{\nu,g}}{\sigma^2_{\nu,g} + \sigma^2_{u,g}}
+\end{equation}
+is the signal quality of the diagnostic. Our empirical proxy is $R^2_g$, the within-grade $R^2$ from regressing endline scores on baseline scores in the control group.
+
+Under the status quo regime ($G$), students remain in grade-based classrooms and receive grade-level instruction $I_i^G = I_{g(i)}$. Under score-based grouping ($T$), the school assigns students to one of $K \geq 2$ instructional tracks:
+\begin{equation}
+k_i^T \in \{1, \ldots, K\}, \qquad I_i^T = I_{k_i^T},
+\end{equation}
+where $I_1 < I_2 < \cdots < I_K$ are the instructional levels associated with each track. Our experiments implement $K = 2$ (Kenya, Liberia) and $K = 3$ (Nigeria). An important special case arises when $K = G$: the number of tracks equals the number of grades, the school creates the same number of classrooms with approximately the same instructional levels, and only the assignment rule changes. The class-size margin is approximately neutralized. All three experiments implement $K = G$: Kenya and Liberia each have $K = G = 2$ (Liberia runs two parallel sub-experiments, one for Grades 1--2 and one for Grades 3--4, each with $K = G = 2$); Nigeria has $K = G = 3$.
+
+The intended track assignment $k_i^*$ is determined by the diagnostic score and a set of cutoffs. We separate this from \emph{realized} track assignment, which may differ due to implementation frictions. Let $\omega \in [0,1]$ denote assignment execution: the degree to which the intended group structure is actually realized in the classroom. In Kenya and Liberia, assignment is deterministic ($\omega = 1$): the operator's protocols translated scores into groups mechanically. In Nigeria, the intended three-group structure collapsed in the majority of treatment schools. The structural model (Section~\ref{sec:structural}) parameterizes this through a school-level implementation regime and misclassification matrix, with $\omega$ summarizing the overall execution quality. The separation of $\omega$ from $\rho$ is essential: $\rho$ measures whether the \emph{signal} contains information about ability; $\omega$ measures whether an informative signal is \emph{translated} into the intended assignment. Nigeria has moderate $\rho$ (the diagnostic has real predictive power) but low $\omega$ (that information was not used).
+
+\subsection{Achievement Under Scripted Instruction}
+
+The standard tracking model---as in \citet{duflo2011peer}---assumes that the teacher targets instruction to the class composition, typically the median student. Under this technology, tracking works by creating homogeneous classes: when the within-class distribution narrows, the teacher's targeting is closer to each student, and all students benefit. Peer effects are inherent to the mechanism, because the channel through which homogeneity helps \emph{is} the teacher's response to who is in the room.
+
+Our setting is different. All three experiments take place in schools using scripted lesson plans delivered through digital tablets. The degree of scripting varies across settings---teachers in some contexts deviate from the script more than in others---but the instructional model is designed to make content a function of track designation, not classroom composition. We parameterize this with $\tau \in [0,1]$: the fraction of instruction that follows the script rather than responding to the classroom.
+
+Endline achievement under assignment regime $a \in \{G, T\}$ is
+\begin{equation}
+\label{eq:learning}
+Y_i(a) = \theta_i + \alpha - \lambda(\tau)\big(\theta_i - I_i(a)\big)^2 + \pi(\tau)\,\bar{\theta}_{-i,c(i,a)} + \varepsilon_i(a),
+\end{equation}
+where $\bar{\theta}_{-i,c(i,a)}$ is the mean ability of student $i$'s classmates under regime $a$, and:
+
+\paragraph{Mismatch penalty $\lambda(\tau)$.} The term $(\theta_i - I_i(a))^2$ is instructional mismatch: a student whose ability is far from the instructional target learns less. The penalty $\lambda(\tau)$ is \emph{increasing in $\tau$}:
+\begin{equation}
+\label{eq:lambda_tau}
+\frac{\partial \lambda}{\partial \tau} > 0.
+\end{equation}
+The mechanism is direct. When the teacher follows the script ($\tau$ high), instruction is determined by track designation and cannot adjust to the student. A student who cannot count receives a scripted multiplication lesson and learns nothing. When the teacher exercises discretion ($\tau$ low), she may partially accommodate the student---giving simpler examples, adjusting pace, revisiting prerequisites. Teacher discretion provides a buffer against misassignment; scripted instruction removes that buffer. The return to being in the \emph{correct} track is therefore higher under scripted instruction, but so is the cost of being in the \emph{wrong} track.
+
+This has an important implication for which \emph{sufficient statistic} governs the return to tracking. Under teacher discretion (the DDK mechanism), the relevant statistic is \emph{within-class homogeneity}: tracking helps because the class is more uniform, allowing the teacher to target better. Under scripted instruction, the relevant statistic is \emph{correct assignment}: tracking helps because the student hears the right content. These are different objects. A classroom can be heterogeneous but correctly assigned (each student is in the right track even though classmates span a wide range), or homogeneous but incorrectly assigned (everyone is similar but at the wrong level).
+
+\paragraph{Peer effects $\pi(\tau)$.} Peer composition affects learning through the instructional environment: teachers adjusting pace to the group, stronger students modeling skills, disruptive students derailing lessons. When instruction is scripted, these channels narrow. The teacher's content is determined by the lesson plan, not by who is in the room. Higher $\tau$ mechanically reduces the scope for peers to affect what gets taught and how:
+\begin{equation}
+\label{eq:pi_tau}
+\frac{\partial \pi}{\partial \tau} \leq 0, \qquad \text{with } \pi(\tau) \to 0 \text{ as } \tau \to 1.
+\end{equation}
+In the limit of perfectly scripted instruction, peer ability has no effect on own learning: all instructional inputs are determined by track designation. In practice, even well-scripted systems have $\tau < 1$---teachers deviate from scripts, classroom dynamics still operate outside the scripted lesson---so some peer influence remains. The attenuation is a matter of degree.
+
+Note that equation~\eqref{eq:learning} subsumes both peer-level effects and rank effects into the $\pi(\tau)\bar{\theta}$ term. Regrouping changes both the level of peers and the student's relative standing within the classroom, and these move in opposite directions. We cannot separately identify them: the Borusyak-Hull estimate $\hat{\zeta}$ (Section~\ref{sec:bh}) captures the composite effect of peer-mean shifts, which includes any rank-mediated component.
+
+\subsection{Three-Channel Decomposition}
+
+Define student $i$'s \emph{assignment gain} as
+\begin{equation}
+\label{eq:Bi}
+B_i \equiv \big(\theta_i - I_{g(i)}\big)^2 - \big(\theta_i - I_{k_i}\big)^2.
+\end{equation}
+The treatment effect for student $i$ decomposes into three channels:
+\begin{equation}
+\label{eq:decomp_full}
+\Delta Y_i = \underbrace{\lambda(\tau)\, B_i}_{\text{assignment gain}} + \underbrace{\pi(\tau)\,\Delta\bar{\theta}_i}_{\text{peer/rank}} + \underbrace{\text{organizational costs}}_{\text{grade mixing, implementation}} + \tilde{\varepsilon}_i,
+\end{equation}
+where $\Delta\bar{\theta}_i \equiv \bar{\theta}_{-i,c(i,T)} - \bar{\theta}_{-i,c(i,G)}$. The third term collects the effects of grade mixing, implementation disruption, and any additional costs of the reorganization. Averaging over students:
+\begin{equation}
+\label{eq:ate}
+\text{ATE}(\rho, \omega, \tau) = \lambda(\tau)\,\E[B_i(\rho, \omega)] + \pi(\tau)\,\E[\Delta\bar{\theta}_i] + \E[\text{org.\ cost}_i],
+\end{equation}
+where $\omega$ governs how much of the intended assignment gain is realized: $\E[B_i(\rho, \omega)]$ is increasing in both $\rho$ (better signal) and $\omega$ (more faithful execution).
+
+\subsection{Complementarity}
+
+The expected assignment gain $\E[B_i(\rho,\omega)]$ is increasing in signal quality $\rho$: better sorting places more students in the correct track, reducing instructional mismatch. The mismatch penalty $\lambda(\tau)$ is increasing in delivery fidelity $\tau$: scripted instruction amplifies both the reward for correct placement and the cost of misplacement. Therefore:
+\begin{equation}
+\label{eq:complementarity}
+\frac{\partial^2 \text{ATE}}{\partial \rho \, \partial \tau} = \underbrace{\frac{\partial \lambda}{\partial \tau}\,\frac{\partial \E[B_i]}{\partial \rho}}_{> 0} + \underbrace{\frac{\partial \pi}{\partial \tau}\,\frac{\partial \E[\Delta\bar{\theta}_i]}{\partial \rho}}_{\text{ambiguous, typically small}} > 0.
+\end{equation}
+The first term is unambiguously positive: the return to better sorting is amplified under scripted instruction. The second term depends on how sorting changes peer composition and on $\partial\pi/\partial\tau \leq 0$; it is typically small because better sorting does not have a systematic directional effect on the \emph{average} peer shift. The dominant force is the first term: \emph{$\rho$ and $\tau$ are complements}.
+
+Assignment execution $\omega$ enters as a prerequisite for this complementarity: the cross-partial $\partial^2\text{ATE}/\partial\rho\,\partial\tau$ is zero when $\omega = 0$ (no intended assignment is realized) and increasing in $\omega$. All three inputs must be jointly present.
+
+This has three implications for tracking policy:
+
+\begin{enumerate}
+\item \emph{Scripted instruction raises the stakes of sorting.} Under scripted instruction, the return to being in the right track is higher, but so is the cost of being in the wrong track. Investing in diagnostic accuracy is more valuable when instruction is scripted; investing in scripted instruction is more valuable when the diagnostic is accurate.
+
+\item \emph{The peer channel is less of a concern under scripted instruction.} As $\tau$ rises, $\pi(\tau)$ falls. In the limit, peer composition is irrelevant: content is fixed by the script. The traditional concern that tracking harms students placed among weaker peers is attenuated.
+
+\item \emph{The sufficient statistic for tracking shifts.} Under teacher discretion, within-class homogeneity is the relevant measure of tracking's potential benefit. Under scripted instruction, correct assignment is the relevant measure. A classroom can be heterogeneous but correctly assigned, or homogeneous but at the wrong level. This distinction matters empirically: in Nigeria, within-class dispersion \emph{increases} under treatment, but point estimates are positive.
+\end{enumerate}
+
+\begin{remark}[Who benefits from $K = G$ grouping]
+\label{rem:tail_effects}
+When $K = G$ and $I_k \approx I_g$, the expected assignment gain $\E[B_i \mid k_i = k]$ is largest for extreme tracks ($k = 1$ and $k = K$) and smallest for middle tracks. This follows because extreme tracks draw disproportionately from students whose ability is most discrepant from their enrolled grade level. With $K = G = 3$, effects should be largest for the top and bottom tracks and smallest for the middle track.
+\end{remark}
+
+\subsection{Mapping the Three Experiments}
+
+The operator's pre-experiment administrative data provide an ordinal ranking of \emph{general} delivery quality across settings (Table~\ref{tab:tau_summary}): Liberia $<$ Kenya $<$ Nigeria. This is the ranking that motivated the Nigeria experiment. But the framework's $\tau$ refers specifically to treatment-relevant delivery fidelity---how faithfully the curriculum through which the assignment-rule difference operates is actually delivered. As we document in Section~\ref{sec:design}, this treatment-relevant $\tau$ does not follow the ex ante ranking: the DI numeracy curriculum in Nigeria was delivered in only 26\% of scheduled lessons, while the literacy revision in Kenya and Liberia was delivered through the established curriculum. The structural estimates (Section~\ref{sec:structural}) recover $\hat{\tau}_{\text{Kenya}} = 0.50 > \hat{\tau}_{\text{Liberia}} = 0.38 > \hat{\tau}_{\text{Nigeria}} = 0.31$.
+
+Signal quality $\rho$ is measured within each experiment by baseline predictive power: $\hat{\rho}_{\text{Kenya}} = 0.53$, $\hat{\rho}_{\text{Nigeria}} = 0.12$, $\hat{\rho}_{\text{Liberia}} = 0.055$. Assignment execution $\omega$ is deterministic in Kenya and Liberia ($\hat{\omega} = 1$) and materially lower in Nigeria ($\hat{\omega} = 0.84$).
+
+The qualitative predictions of the framework are:
+
+\begin{itemize}
+\item In the lowest-$\rho$ setting (Liberia), the model predicts that sorting generates minimal assignment gains regardless of $\tau$. With low $\tau$ as well, the ATE should be near zero or negative.
+
+\item In the high-$\rho$, high-$\omega$ setting (Kenya), the model predicts a strong reallocation first stage and potentially valuable assignment margins. But with moderate $\tau$, classroom-composition channels may still be active. The sign of the ATE depends on whether the assignment margin is converted into achievement gains once regrouping also changes peers, rank, class size, and grade composition.
+
+\item Nigeria was designed to test the high-$\rho$, high-$\omega$, high-$\tau$ case: the operator chose Lagos because general delivery quality was highest there and designed placement to be score-based. As we document in Section~\ref{sec:design}, the experiment did not deliver the intended conditions: assignment execution collapsed ($\omega = 0.84$) and treatment-relevant $\tau$ was low. The gap between designed and realized conditions reveals that $\rho$, $\omega$, and $\tau$ are distinct organizational capabilities that do not automatically co-occur. We return to this in Section~\ref{sec:results}, and the structural model (Section~\ref{sec:structural}) disciplines the missing counterfactual.
+\end{itemize}
+
+
+%% ============================================================
+\section{Experimental Design and Data}
+\label{sec:design}
+%% ============================================================
+
+\subsection{Setting}
+
+All three experiments take place in schools operated by NewGlobe Education. NewGlobe operates large networks of low-cost schools using a standardized model: scripted lesson plans delivered through digital tablets, with teacher compliance monitored by school managers. Because lesson content is scripted, instructional level is determined by track designation rather than by teacher discretion---a feature that plays a central role in the peer-effects identification strategy (Section~\ref{sec:bh}).
+
+The common institutional structure is central to our design. The three experiments share the same organizational model---scripted content, tablet-based delivery, centralized monitoring---but take place in settings that differ in how effectively this model is executed. The operator's own administrative monitoring data, collected routinely prior to the experiments, document these differences. Table~\ref{tab:tau_summary} reports the operator's pre-experiment assessment of lesson completion and teacher quality across settings, which we interpret as a proxy for $\tau$.
+
+\begin{table}[H]
+\centering
+\caption{Operator's Pre-Experiment Assessment of General Delivery Quality}
+\label{tab:tau_summary}
+\begin{threeparttable}
+\begin{tabular}[t]{lccc}
+\toprule
+ & Liberia & Kenya & Nigeria (Lagos) \\
+\midrule
+Lesson completion & Low & Medium & High \\
+Teacher quality & Low & Medium & High \\
+School audit pass rate & --- & 19\% & --- \\
+Programme quality & Status quo & Status quo & DI revamp \\
+\bottomrule
+\end{tabular}
+\begin{tablenotes}[para,flushleft]
+\footnotesize
+\item \textit{Notes:} Rankings are from the operator's internal experiment proposal (Sullivan, 2020), written before the Nigeria experiment. ``DI revamp'' indicates that both treatment and control arms in Nigeria received a newly developed Direct Instruction numeracy curriculum; prior experiments used the operator's existing (``status quo'') literacy programme. The Kenya school audit pass rate (19\% ``perfect or passing'') is from the same document. The Nigeria experiment was selected because Lagos had the highest lesson completion and teacher quality among the operator's markets. This table reports the \emph{ex ante} general delivery quality ranking. Treatment-relevant delivery fidelity ($\tau$)---the fidelity with which the curriculum carrying the assignment-rule difference is delivered---does not follow this ranking: the DI numeracy programme in Nigeria achieved only 26\% lesson completion (Table~\ref{tab:ng_operational}), well below the established curriculum's 69\%. The structural estimates (Section~\ref{sec:structural}) recover $\hat{\tau}_{\text{Kenya}} = 0.50 > \hat{\tau}_{\text{Liberia}} = 0.38 > \hat{\tau}_{\text{Nigeria}} = 0.31$.
+\end{tablenotes}
+\end{threeparttable}
+\end{table}
+
+\subsection{Experiment 1: Kenya (2018)}
+
+In August 2018, 50 out of approximately 300 NewGlobe academies in Kenya were randomized to receive the reading group intervention. In treated schools, students in Grades 1 and 2 ($G = 2$) were assigned to one of two reading groups ($K = 2$; ``Blue'' and ``Purple'') based on a combined literacy and English baseline test administered in June 2018. Grade 1 students scoring above 40 points were assigned to the Purple (upper) group; Grade 2 students above 35 points.\footnote{Cutoffs were chosen by NewGlobe before the experiment to approximate an equal split of each grade's baseline score distribution. The grade-specific thresholds reflect differences in the raw-score distributions across grades.} Treatment was stratified by constituency. Students received 90 minutes of instruction with their reading group daily for Term 3 (approximately 3 months). Because $K = G = 2$, the class-size margin is approximately neutralized.
+
+\subsection{Experiment 2: Liberia (2018)}
+
+Approximately 90 public schools in Liberia, managed by NewGlobe under the Liberia Education Advancement Program, were randomized into treatment and control. The experiment consists of two parallel sub-experiments. In the first, students in Grades 1 and 2 ($G = 2$) were pooled and sorted into two tracks ($K = 2$) based on a baseline reading assessment; the cutoff for the upper track was 23 points. In the second, students in Grades 3 and 4 ($G = 2$) were similarly pooled into two tracks with a cutoff of 14 points. Each sub-experiment has $K = G = 2$: two grades of students sorted into two ability-based tracks. Treatment was stratified by grade group and treatment probability.
+
+\subsection{Experiment 3: Nigeria (2021)}
+
+The Nigeria experiment was explicitly designed to fill the high-$\rho$, high-$\omega$, high-$\tau$ cell. The operator's internal review noted that ``operational challenges in the formal evaluations prevent us from understanding the true impact of a programme when implemented effectively and with fidelity.''\footnote{From the operator's internal experiment proposal (Sullivan, 2020). The proposal also noted that Lagos had the highest lesson completion and teacher quality among the operator's markets.} Nigeria was selected because the operator's \emph{general} delivery quality was highest there (Table~\ref{tab:tau_summary}); the placement protocol was designed to make $\rho$ and $\omega$ as high as possible, with School Supervisors administering one-on-one diagnostic exams and creating classroom rosters.
+
+In January 2021, 42 NewGlobe academies in Lagos were randomized into treatment ($n = 20$) and control ($n = 22$), stratified by constituency. Both arms received the same three-level Direct Instruction (DI) numeracy curriculum: Level~A (approximately P1 content), Level~B (approximately P2), Level~C (approximately P3). In control schools, the DI curriculum was assigned by grade. In treatment schools, students in Grades 1--3 ($G = 3$) were sorted into three ability-based tracks ($K = 3$)---Red (bottom, Level~A), Blue (middle, Level~B), and Yellow (top, Level~C)---based on an 8-question two-stage placement exam.
+
+The treatment contrast is purely the \emph{assignment rule}: ability-based versus grade-based assignment to the same set of leveled curricula. Because $K = G = 3$, the three treatment classrooms replace the three grade-level classrooms, approximately preserving total class sizes (30.2 in control, 27.2 in treatment).
+
+\paragraph{Operational data.} Table~\ref{tab:ng_operational} reports operational outcomes by treatment status.
+
+\begin{table}[H]
+\centering
+\caption{Nigeria Operational Outcomes by Treatment Status}
+\label{tab:ng_operational}
+\begin{threeparttable}
+\begin{tabular}[t]{lccl}
+\toprule
+ & Treatment & Control & $p$-value \\
+\midrule
+Teacher attendance (\%) & 93 & 92 & 0.68 \\
+Pupil attendance (\%) & 64.5 & 64.0 & 0.88 \\
+Academy manager attendance (\%) & 75 & 77 & 0.71 \\
+Pupil-teacher ratio (T2) & 20.4 & 21.8 & 0.54 \\
+Pupil-teacher ratio (T3) & 20.7 & 23.1 & 0.33 \\
+DI Numeracy lesson completion (\%) & 26.2 & 26.1 & 0.98 \\
+Math lesson completion (\%) & 69.4 & 68.7 & 0.85 \\
+\bottomrule
+\end{tabular}
+\begin{tablenotes}[para,flushleft]
+\footnotesize
+\item \textit{Notes:} Treatment-control differences in operational metrics from NewGlobe administrative data. DI Numeracy is the newly introduced Direct Instruction numeracy programme; Math is the pre-existing mathematics curriculum. Lesson completion is the fraction of scheduled lessons recorded as delivered. $p$-values are from regressions with strata fixed effects and academy-level clustering.
+\end{tablenotes}
+\end{threeparttable}
+\end{table}
+
+Two features stand out. First, operational metrics are balanced across arms: the treatment did not disrupt the school's normal operations. Second, the DI numeracy curriculum was delivered in only 26\% of scheduled lessons in both arms, while the pre-existing math curriculum maintained 69\% completion. The new curriculum had not been absorbed into regular practice. This creates an important nuance for the framework's $\tau$ parameter: Nigeria ranks highest on the operator's \emph{general} delivery-quality metrics (lesson completion and teacher quality for the existing curriculum), but the \emph{treatment-relevant} curriculum---the DI numeracy programme through which the assignment-rule difference is supposed to operate---had low realized fidelity. Both arms were equally affected, so this is not a treatment effect on delivery but a system-level constraint on the DI programme. The 26\% of lessons that were delivered provide some scope for the treatment to operate, and we exploit the remaining variation in the results.
+
+By contrast, in Kenya, lesson-completion point estimates are positive but imprecise. The largest school-clustered estimate is 2.4 percentage points (SE $=0.017$; Table~\ref{tab:lesson_completion}), so the data do not support a large delivery disruption but also do not establish a precise positive delivery effect.
+
+\paragraph{Fidelity.} The Nigeria experiment was \emph{designed} to have high sorting accuracy. Phone-call audits and roster data reveal that it did not. Audits conducted throughout the intervention (61 calls across all 20 treatment academies) document substantial departures from the three-group design, including schools operating fewer than three groups and teachers delivering content for the wrong track. The placement test was not binding in realized rosters: in the cleaned analysis data, the Spearman rank correlation between placement exam scores and realized group assignment is only 0.25, and 34\% of treatment students have no group assignment recorded. External audit summaries are even more adverse on some dimensions, reporting a Spearman correlation of 0.17 and fewer schools with a Yellow top track. Because these implementation sources conflict in levels, the structural model uses computed roster moments for estimation and keeps the external audit targets as validation moments.
+
+This implementation evidence is central to the paper's argument about complementarity. The experiment was designed to achieve high $\rho$, high $\omega$, and high $\tau$ simultaneously. It failed on two of three dimensions: assignment execution collapsed ($\omega = 0.84$), and treatment-relevant delivery fidelity was low ($\tau = 0.31$, reflecting the 26\% DI numeracy completion). The signal itself had moderate quality ($\rho = 0.12$), but even this was not translated into the intended group structure. The structural model (Section~\ref{sec:structural}) disentangles which failures matter most for the treatment effect.
+
+\subsection{Design Summary}
+
+\begin{table}[H]
+\centering
+\caption{Three-Experiment Design Summary}
+\label{tab:design_summary}
+\begin{threeparttable}
+\begin{tabular}[t]{lccc}
+\toprule
+ & Liberia & Kenya & Nigeria \\
+\midrule
+Year & 2018 & 2018 & 2021 \\
+Subject & Literacy & Literacy & Numeracy \\
+Grades per sub-experiment ($G$) & 2 & 2 & 3 \\
+Tracks ($K$) & 2 & 2 & 3 \\
+$K$ vs.\ $G$ & $K = G$ & $K = G$ & $K = G$ \\
+Schools (T / C) & $\sim$45 / $\sim$45 & 50 / 250 & 20 / 22 \\
+\midrule
+\multicolumn{4}{l}{\textit{Three primitives}} \\
+Signal quality ($\hat{\rho}$) & 0.055 & 0.533 & 0.121 \\
+Assignment execution ($\hat{\omega}$) & 1.00 & 1.00 & 0.84 \\
+Treatment-relevant fidelity ($\hat{\tau}$) & 0.38 & 0.50 & 0.31 \\
+Ex ante delivery ranking & Low & Medium & High \\
+\midrule
+\multicolumn{4}{l}{\textit{Sorting accuracy detail}} \\
+Incremental $R^2$ & 0.03--0.07 & 0.51--0.56 & 0.11--0.22 \\
+Placement binding & Deterministic & Deterministic & Spearman $= 0.17$ \\
+	Delivery process moment & $+1.1$pp & $+2.4$pp & 26\% DI completion \\
+\bottomrule
+\end{tabular}
+\begin{tablenotes}[para,flushleft]
+\footnotesize
+\item \textit{Notes:} Liberia runs two parallel sub-experiments (Grades 1--2 and Grades 3--4), each with $K = G = 2$. $\hat{\rho}$ is estimated from control-group baseline--endline $R^2$; $\hat{\omega}$ and $\hat{\tau}$ are from the structural model (Section~\ref{sec:structural}), estimated from audit/roster and curriculum-specific delivery moments, respectively. ``Ex ante delivery ranking'' is the operator's pre-experiment assessment based on general lesson completion and teacher quality. The delivery process moment is the treatment-control difference in lesson completion for Kenya and Liberia, and the balanced DI numeracy completion level for Nigeria, where both arms received the new curriculum. Incremental $R^2$ is the within-grade variance explained by adding baseline scores to a grade-FE-only model.
+\end{tablenotes}
+\end{threeparttable}
+\end{table}
+
+\subsection{Data}
+
+Administrative data were provided by NewGlobe for all three experiments. In Kenya, the baseline instrument is a combined literacy and English midterm examination. Administrative records also cover lesson completion rates and teacher attendance. In Liberia, the baseline is a reading pre-test. In Nigeria, the baseline is the Term~1 end-of-term maths score, and endline outcomes are percent-correct scores in maths and numeracy, standardized to mean zero and unit standard deviation in the control group. Nigeria's administrative data also include lesson-level completion records (40,692 observations), teacher attendance, pupil attendance, pupil-teacher ratios, and academy manager attendance.
+
+Endline assessments were administered after the intervention in all three experiments. We standardize all scores to mean zero and unit standard deviation in the control group within each grade.
+
+\subsection{Balance and Attrition}
+
+Covariate balance is confirmed in all three experiments (Tables~\ref{tab:balance_1do} and~\ref{tab:ng_balance}). In Kenya and Liberia, there is no differential attrition. In Nigeria, attrition is balanced at T2 but shows some imbalance at T3 endterm (treatment retains 65\% vs.\ control 51\%, $p = 0.12$); Lee bounds for the T3 endterm span $[-0.13, 0.30]$ (Table~\ref{tab:ng_lee_bounds}). The T2 endterm, with balanced attrition and tight Lee bounds of $[0.15, 0.18]$, serves as a cleaner benchmark.
+
+
+%% ============================================================
+\section{Empirical Strategy}
+\label{sec:strategy}
+%% ============================================================
+
+\subsection{Intent-to-Treat Effects}
+
+We estimate the overall treatment effect using:
+\begin{equation}
+\label{eq:itt}
+Y_i = \alpha + \beta T_j + \gamma \hat{\theta}^{EB}_i + \phi_s + \varepsilon_i
+\end{equation}
+where $Y_i$ is the standardized endline score, $T_j$ is school-level treatment assignment, $\phi_s$ are strata fixed effects, and standard errors are clustered at the randomization level. The baseline control $\hat{\theta}^{EB}_i$ is an empirical Bayes ability measure that shrinks each student's raw score toward the grade mean by the grade-specific baseline predictive power:
+\begin{equation}
+\label{eq:eb}
+\hat{\theta}^{EB}_{i} = \bar{s}_{g(i)} + \widehat{R}^2_{g(i)}\,(s_i - \bar{s}_{g(i)}),
+\end{equation}
+where $\widehat{R}^2_g$ is the within-grade baseline--endline $R^2$ in the control group. Because $R^2_g$ is attenuated by endline noise, this implemented proxy shrinks more aggressively than the latent posterior in the model; it is therefore a conservative baseline ability control.
+
+\subsection{Effect on Within-Class Dispersion}
+
+We test whether tracking compresses within-class ability heterogeneity using baseline scores (which are pre-determined and not affected by treatment):
+\begin{equation}
+|s_i - \bar{s}_{k(i)}| = \alpha + \beta T_j + \gamma \hat{\theta}^{EB}_i + \phi_s + \varepsilon_i.
+\end{equation}
+A negative $\beta$ indicates compression. Under the DDK homogeneity mechanism, this is the relevant sufficient statistic for tracking's benefit. Under the assignment mechanism in our framework, it is informative but not sufficient---what matters is whether students are in the \emph{correct} track, not whether classmates are similar.
+
+\subsection{Isolating Peer Effects}
+\label{sec:bh}
+
+When a school is randomized into tracking, everything about the classroom changes at once. A naive regression of outcomes on peer ability conflates the direct effect of peers with correlated changes in instructional match, class size, and grade mixing.
+
+The experiment provides variation in peer composition that is not driven by variation in other classroom characteristics. Consider two students in different treated schools who have the same baseline score and are therefore assigned to the same track. Their instructional targets are identical under scripted curricula (Assumption~3 below), but their classmates differ because the composition of each school differs. The problem is that exposure is nonrandom: a student's peer mean $P_i = (1/n_k) \sum_{j \neq i} s_j$ depends on her own score through track assignment. Following \citet{borusyak2023nonrandom}, we remove this bias by conditioning on the expected peer composition.
+
+Three assumptions underpin the strategy:
+
+\begin{assumption}[Random Assignment]
+$T_j \perp (\theta_i, u_i, \varepsilon_i)$ for all $i \in j$.
+\end{assumption}
+
+\begin{assumption}[Conditional Independence]
+$\{s_k\}_{k \in j, k \neq i} \perp (\theta_i, \varepsilon_i) \mid s_i, T_j$.
+\end{assumption}
+
+\begin{assumption}[Scripted Instruction]
+The instructional level $I_{kg}$ in each track $k$ is a deterministic function of the track designation and is not adjusted by the teacher in response to realized classroom composition.
+\end{assumption}
+
+\noindent Assumption~3 is central to the paper's theoretical contribution. It is the institutional feature that makes $\pi(\tau)$ small: when content is scripted, the mismatch measure $\hat{M}_i = (s_i - I_{D_i})^2$ is approximately a deterministic function of $(s_i, T_j)$ and is absorbed by score-bin $\times$ treatment fixed effects. This breaks the collinearity between peer composition and instructional match that normally confounds peer-effect estimation in tracking studies. The parameter $\tau$ governs how well Assumption~3 holds: at $\tau = 1$ it holds exactly; at $\tau < 1$ it is an approximation.
+
+We implement this using a control-function approach:
+\begin{equation}
+\label{eq:bh}
+Y_i = \zeta P_i + \sum_{d,t,g} \delta_{dtg} \cdot \ind\{D_i = d, T_j = t, G_i = g\} + \phi_s + \varepsilon_i.
+\end{equation}
+The decile$\times$treatment$\times$grade cells absorb the expected peer composition, so $\zeta$ is identified from deviations around the cell-level expectation. The estimate $\hat{\zeta}$ captures the composite of peer-level and rank effects.
+
+The model predicts that the social channel should be weaker as treatment-relevant delivery fidelity rises, but the reduced-form $\hat{\zeta}$ also depends on how much structured peer-composition variation the treatment actually creates. We therefore use the peer estimates as diagnostic moments rather than as a standalone test of $\tau$.
+
+\subsection{Accounting Decomposition}
+\label{sec:accounting}
+
+The quantity $\hat{\zeta} \cdot \E[\Delta\bar{\theta}_i]$ measures the peer/rank contribution to the overall ITT. Comparing this to the ITT reveals the ``remainder''---what must be explained by assignment gains and organizational costs. Tables~\ref{tab:suffstat}, \ref{tab:suffstat_liberia}, and~\ref{tab:ng_suffstat} report the decomposition.
+
+
+%% ============================================================
+\section{Results}
+\label{sec:results}
+%% ============================================================
+
+\subsection{Sorting Accuracy and Assignment}
+
+Table~\ref{tab:signal_quality} and Table~\ref{tab:ng_signal_quality} report baseline predictive power. In Kenya, the incremental $R^2$ is $0.52$---the diagnostic is highly informative. In Liberia, it is $0.03$--$0.07$---near zero. In Nigeria, it is $0.11$--$0.22$.
+
+Table~\ref{tab:classroom_reallocation} and Table~\ref{tab:ng_classroom_reallocation} show what reassignment does to classrooms:
+
+\begin{itemize}
+\item \emph{Kenya} ($K = G = 2$): Within-class dispersion compresses substantially ($-0.328$ SD). Class sizes fall slightly (20.9 to 18.0). The sorting channel works as designed.
+
+\item \emph{Liberia} ($K = G = 2$ within each sub-experiment): Within-class dispersion barely compresses. The diagnostic carries too little information to generate meaningful sorting. Class sizes increase from 32 to 42 students, likely reflecting unequal grade sizes within the pooled pairs and school-level constraints on classroom allocation.
+
+\item \emph{Nigeria} ($K = G = 3$): Within-class baseline dispersion \emph{increases} ($+0.104$ SD, $p = 0.07$; Table~\ref{tab:ng_dispersion}). Grade mixing dominates ability sorting because the placement test was non-binding. Class sizes fall slightly (30.2 to 27.2).
+\end{itemize}
+
+The Nigeria pattern is suggestive for distinguishing the homogeneity mechanism from the assignment mechanism. Under a pure homogeneity account, an increase in within-class dispersion should lower achievement---tracking has made classrooms \emph{more} heterogeneous, which should reduce the teacher's targeting effectiveness. Under the assignment mechanism, what matters is correct placement, not homogeneity. Nigeria's positive point estimates despite increased dispersion are harder to reconcile with a pure homogeneity account and more naturally interpreted through the assignment mechanism---though the estimates are imprecise and implementation is messy, so this comparison should be read as suggestive rather than definitive.
+
+\subsection{Peer Effects}
+
+Table~\ref{tab:peer_effects} reports the Borusyak-Hull peer-effect estimates for Kenya and Liberia; Table~\ref{tab:ng_peer_effects} reports the estimates for Nigeria.
+
+\begin{itemize}
+\item \emph{Kenya} (high $\rho$, high $\omega$): $\hat{\zeta} = -0.134$ ($p = 0.02$) in the approximate decile specification. A one-SD increase in leave-out peer mean is associated with a $0.13$ SD \emph{reduction} in own achievement. This estimate captures the composite of peer-level and rank effects under the maintained assumptions (Section~\ref{sec:bh}), but Table~\ref{tab:peer_effects_exact_kenya} shows that exact control-function and recentered specifications are close to zero.
+
+\item \emph{Nigeria} (moderate $\rho$, low $\omega$): $\hat{\zeta} = 0.087$ ($p = 0.19$) at T2 ETE; $\hat{\zeta} = -0.109$ ($p = 0.28$) at T3 ETE. Neither is significant. The point estimates switch sign across waves, inconsistent with a stable peer effect in either direction.
+
+\item \emph{Liberia} (low $\rho$, high $\omega$): $\hat{\zeta} = -0.048$ ($p = 0.66$). Near zero, but low signal quality means treatment-induced variation in peer composition is small and the estimate is underpowered.
+\end{itemize}
+
+The cross-experiment pattern in $\hat{\zeta}$ reflects differences in identifying variation as much as differences in the underlying peer channel. In Kenya, high $\rho$ and high $\omega$ generated substantial treatment-induced reshuffling of peer composition ($\Delta\bar{\theta} = +0.277$ SD in the accounting sample), providing the identifying variation to detect an adverse composite. In Nigeria, moderate $\rho$ and weaker $\omega$ meant the treatment actually \emph{decreased} peer means ($\Delta\bar{\theta} = -0.242$ SD)---the intended upward sorting of high-ability students into the Yellow track largely did not occur---and the treatment-induced variation in peer composition was less structured. In Liberia, low $\rho$ meant sorting barely changed classroom composition at all.
+
+The Nigeria null should therefore not be read as evidence that the peer channel is absent. With realized low $\tau$ but collapsed $\omega$, the treatment generated less structured peer-composition variation than the design intended. The reduced-form evidence cannot separate a weak social channel from weak identification of that channel. The structural model (Section~\ref{sec:structural}) addresses this by estimating $\tau$ from treatment-relevant delivery moments and simulating the peer channel under counterfactual assignment execution.
+
+The Kenya estimate is the most informative setting for this subsection because high $\rho$ and high $\omega$ generate substantial treatment-induced reshuffling of classroom composition. The approximate peer/rank composite is large and significant, but it is not robust to the exact control-function and recentered specifications, so the peer evidence remains diagnostic rather than definitive.
+
+\subsection{Organizational Costs}
+
+\paragraph{Liberia.} Class sizes increase from 32 to 42 students. This increase, combined with near-zero sorting gains, constitutes the bulk of the organizational cost. Table~\ref{tab:classsize_control} shows that controlling for class size does not change the upper-track harm estimate, suggesting the costs operate through channels beyond pure class size---likely grade mixing and the disruption of established classroom routines.
+
+\paragraph{Kenya.} Class sizes fall slightly. Grade mixing is limited ($K = G = 2$, so each treatment classroom draws from exactly two grades). The lesson-completion point estimates are positive but statistically imprecise with school-clustered inference (Table~\ref{tab:lesson_completion}), so the evidence does not point to a large delivery disruption. The puzzle is sharper: Kenya appears to have predictive signal, faithful assignment, and no obvious negative delivery shock, yet the assignment margin still does not produce average gains.
+
+\paragraph{Nigeria.} The organizational channel is the binding constraint. The designed three-group structure collapsed in the majority of treatment schools ($\omega = 0.84$). The placement test was non-binding. Teachers delivered wrong-level content. The DI numeracy curriculum---the vehicle for the assignment-rule difference---was delivered in only 26\% of scheduled lessons in both arms ($\tau = 0.31$). These failures collectively mean that neither the assignment execution nor the delivery fidelity conditions were met. The organizational infrastructure required to form three ability groups across three grades, administer binding placement tests, and route students to the correct classrooms exceeded the schools' capacity---even though these same schools delivered the pre-existing math curriculum at 69\% completion.
+
+This is the paper's central finding about complementarity: signal quality ($\rho$), assignment execution ($\omega$), and treatment-relevant delivery fidelity ($\tau$) are distinct organizational capabilities. Schools that could deliver scripted lessons reliably could neither execute the logistically demanding reorganization that cross-grade grouping requires nor absorb a new curriculum quickly enough for it to serve as the vehicle for the assignment-rule difference.
+
+\subsection{Overall Intent-to-Treat Effects}
+
+Table~\ref{tab:itt} presents the main ITT estimates. In Liberia, tracking reduces endline scores by $0.212$ SD ($p = 0.12$). In Kenya, the effect is near zero ($0.031$ SD, $p = 0.56$), with an upper confidence bound below the $0.18$ SD found by \citet{duflo2011peer}. In Nigeria, the pooled average ITT is $+0.075$ SD (Table~\ref{tab:ng_over_terms}); with academy-level clustering, SE $= 0.076$, $p > 0.10$.
+
+Pooling clarifies the estimand. Table~\ref{tab:pooled_power} reports three pooled summaries: a student-weighted individual-participant-data estimate, an experiment-balanced individual-participant-data estimate, and study-level meta-analytic estimates. All specifications allow country-specific baseline slopes and country-nested strata fixed effects. None reveals a hidden positive average effect. The student-weighted pooled estimate is $-0.070$ SD (SE $=0.071$), the experiment-balanced estimate is $-0.058$ SD (SE $=0.077$), and the fixed-effect meta-analytic estimate is $+0.010$ SD (SE $=0.046$). The study-level heterogeneity diagnostics are moderate rather than decisive ($Q=3.27$, $p=0.195$, $I^2=39\%$). A parsimonious interaction with the observed primitive score $\rho\omega\tau$ is positive ($0.683$, SE $=0.494$), but the highest observed score is still Kenya, where delivery fidelity is only moderate. Thus the pooled analysis sharpens the paper's interpretation: the data do not support a common positive effect across observed implementations; instead, every observed experiment is missing at least one input in the complementarity.
+
+\paragraph{Track-specific effects.} In Liberia, harm concentrates in the upper track ($-0.348$ SD, $p = 0.03$; Table~\ref{tab:upper_lower}). In Kenya, neither track shows significant effects. In Nigeria, the point estimates follow the pattern predicted by Remark~\ref{rem:tail_effects}: Yellow (top) $+0.225$ SD (SE $= 0.141$), Red (bottom) $+0.077$ SD (SE $= 0.091$), Blue (middle) $+0.037$ SD (SE $= 0.109$). None are significant with academy clustering; the Yellow estimate is identified from the minority of academies where the top track existed.
+
+\paragraph{Math vs.\ numeracy within Nigeria.} The math endline (pre-existing curriculum, 69\% completion) shows stable small positive effects: $+0.022$ SD at T2, $+0.031$ SD at T3. The numeracy endline (new DI curriculum, 26\% completion) is more volatile: $+0.042$ SD at T2, $-0.031$ SD at T3. This divergence is consistent with the framework: the assignment-rule difference has more scope to affect learning through a curriculum that is actually delivered ($\tau$ is effectively higher for the established math curriculum).
+
+In Kenya, the assignment-payoff diagnostics make the null especially informative. Table~\ref{tab:assignment_payoff_kenya} asks whether the students most directly affected by the rule benefit more. They do not: the mover ITT is 0.030 SD, the stayer ITT is 0.035 SD, and the treatment-by-mover interaction is essentially zero. Among movers, treatment effects do not rise with distance from the relevant cutoff. An omnibus predicted-assignment-gain index also has a near-zero interaction with treatment: 0.008 SD per one standard deviation of predicted assignment gain (SE $=0.068$). Thus Kenya does not merely fail to produce a positive average effect; the cross-grade assignment margin created by the cutoff rule has little revealed payoff in these data.
+
+\subsection{Accounting Decomposition}
+
+Table~\ref{tab:channel_summary} summarizes the three-channel decomposition, mapping each experiment to its position in $(\rho, \omega, \tau)$ space and identifying the binding margin.
+
+\begin{table}[H]
+\centering
+\caption{Three-Channel Decomposition and $(\rho, \omega, \tau)$ Summary}
+\label{tab:channel_summary}
+\begin{threeparttable}
+\small
+\begin{tabular}[t]{@{}>{\raggedright\arraybackslash}p{4.0cm}>{\centering\arraybackslash}p{2.3cm}>{\centering\arraybackslash}p{3.0cm}>{\centering\arraybackslash}p{3.0cm}@{}}
+\toprule
+ & Liberia & Kenya & Nigeria \\
+\midrule
+\multicolumn{4}{l}{\textit{Position in $(\rho, \omega, \tau)$ space}} \\
+\quad Signal quality ($\hat{\rho}$) & 0.055 & 0.533 & 0.121 \\
+\quad Assignment execution ($\hat{\omega}$) & 1.00 & 1.00 & 0.84 \\
+\quad Treatment-relevant $\hat{\tau}$ & 0.38 & 0.50 & 0.31 \\
+\addlinespace
+\multicolumn{4}{l}{\textit{Channel 1: Assignment gain}} \\
+\quad $\Delta$ within-class SD & small & $-0.328$ & $+0.104$ \\
+\quad $\Delta$ lesson completion & --- & $+2.4$pp & 0pp \\
+\addlinespace
+\multicolumn{4}{l}{\textit{Channel 2: Peer/rank composite}} \\
+\quad $\hat{\zeta}$ (BH estimate) & $-0.048$ & $-0.134$** & $\approx 0$ \\
+\quad $\Delta$ peer mean & $+0.041$ & $+0.277$ & $-0.242$ \\
+\quad Peer/rank contribution & $-0.002$ & $-0.037$ & $+0.026$ \\
+\addlinespace
+\multicolumn{4}{l}{\textit{Channel 3: Organizational costs}} \\
+\quad $\Delta$ class size & $+10.0$ & $-2.9$ & $-3.0$ \\
+\quad Audit: groups as designed & --- & --- & $\leq$50\% \\
+\midrule
+\textbf{Overall ITT} & $\mathbf{-0.212}$ & $\mathbf{+0.031}$ & $\mathbf{+0.075}$ \\
+Remainder (ITT $-$ peer/rank) & $-0.210$ & $+0.067$ & $+0.049$ \\
+\addlinespace
+\textbf{Binding margin} & $\rho$ (signal) & Unresolved classroom channel & $\omega$, $\tau$ (execution, delivery) \\
+\bottomrule
+\end{tabular}
+\begin{tablenotes}[para,flushleft]
+\footnotesize
+\item \textit{Notes:} Each column summarizes one experiment's position on the three channels. $\hat{\rho}$, $\hat{\omega}$, $\hat{\tau}$ are from the structural model (Section~\ref{sec:structural}). Peer/rank contribution $= \hat{\zeta} \times \Delta\bar{\theta}$. Remainder $=$ ITT $-$ peer/rank contribution in the accounting tables. Nigeria ITT is pooled across waves; peer contribution uses T3 ETE estimates. The Nigeria class-size row reports classroom-level means from Table~\ref{tab:ng_classroom_reallocation}; the student-weighted T3 accounting sample has a different class-size contrast.
+\end{tablenotes}
+\end{threeparttable}
+\end{table}
+
+The accounting is consistent with the framework's qualitative predictions:
+
+\paragraph{Liberia (low $\rho$, high $\omega$, low $\tau$).} The peer/rank contribution is negligible ($-0.002$ SD). The $-0.210$ remainder is attributable to organizational costs (class-size inflation, grade mixing) in the absence of any meaningful assignment gain. Low $\rho$ means $\E[B_i] \approx 0$; assignment is faithfully executed but there is nothing useful to execute.
+
+\paragraph{Kenya (high $\rho$, high $\omega$, moderate $\tau$).} The approximate peer/rank contribution is $-0.037$ SD, large enough to matter relative to the positive accounting remainder of $+0.067$ SD. The assignment first stage is real---sorting compresses dispersion and reduces measured mismatch. But the assignment-payoff tests show that the students who should benefit most from the cutoff rule do not in fact gain more. Because exact recentering substantially attenuates the peer coefficient, the Kenya null should be interpreted as an unresolved classroom-production puzzle rather than as proof that peers fully offset targeting gains. A stronger structural model should therefore respect both facts: the sorting first stage is large, and the revealed payoff to the implemented assignment margin is close to zero.
+
+\paragraph{Nigeria (moderate $\rho$, low $\omega$, low $\tau$).} The peer/rank contribution is small and positive ($+0.026$ SD), but the Nigeria $\hat{\zeta}$ estimates are imprecise and unstable across waves. The remainder is $+0.049$ SD, and the overall ITT is not significant. The framework interprets this as reflecting a setting where neither assignment execution nor treatment-relevant delivery fidelity reached the levels needed for the complementarity to operate. The ex ante operator ranking placed Nigeria as the highest-$\tau$ environment, but the treatment-relevant curriculum was not absorbed into routine practice. Nigeria does not sit cleanly in $(\rho, \omega, \tau)$ space in the way the designer intended. It is better understood as an attempted test of the high-$\rho$, high-$\omega$, high-$\tau$ cell that reveals the fragility of achieving all three conditions simultaneously.
+
+\subsection{Synthesis}
+
+The three experiments do not cleanly span the $(\rho, \omega, \tau)$ space---the settings differ in multiple dimensions, and Nigeria's conditions were not realized as designed. But the pattern across experiments is consistent with the framework's qualitative predictions:
+
+\begin{itemize}
+\item The assignment gain is detectable only where both signal quality and assignment execution are high (Kenya, $+0.067$ accounting remainder), not where either is low (Liberia: low $\rho$; Nigeria: low $\omega$).
+
+\item The peer/rank composite is identifiable only where treatment generates substantial reshuffling of classroom composition (Kenya: high $\rho$, high $\omega$, $\Delta\bar{\theta} = +0.277$ in the accounting sample). In Nigeria ($\Delta\bar{\theta} = -0.242$) and Liberia ($\Delta\bar{\theta} = +0.041$), the treatment-induced variation in peer composition is either small or unstructured, leaving $\hat{\zeta}$ underpowered.
+
+\item The high-$\rho$, high-$\omega$, high-$\tau$ cell---where the framework predicts the largest positive returns---was the \emph{designed} Nigeria experiment but was not realized in practice. The gap between design and implementation reveals that signal quality, assignment execution, and treatment-relevant delivery fidelity are distinct organizational capabilities that do not automatically co-occur, even within the same well-resourced operator.
+\end{itemize}
+
+The reduced-form evidence therefore cannot answer the paper's central counterfactual question: what would the treatment effect be in a setting that achieves all three inputs? Section~\ref{sec:structural} addresses this with a structural model that separates the three primitives and recombines them in configurations not observed in the data.
+
+
+%% ============================================================
+\section{Robustness}
+\label{sec:robustness}
+%% ============================================================
+
+\subsection{Specification and Inference}
+
+Table~\ref{tab:spec_robust} reports the Kenya and Liberia ITT estimates under alternative specifications---raw baseline score instead of EB ability, models without baseline controls, wild cluster bootstrap $p$-values, and permutation-based inference. The point estimates are stable.
+
+Table~\ref{tab:ng_spec_robust} reports analogous robustness for Nigeria. The wild cluster bootstrap $p$-value for the T3 ETE index is $0.42$; the permutation $p$-value is $0.49$. Table~\ref{tab:ng_lee_bounds} reports Lee bounds: T2 endterm bounds are $[0.146, 0.180]$ (entirely positive); T3 endterm bounds span $[-0.126, 0.298]$.
+
+\subsection{Peer-Effect Robustness}
+
+The Kenya peer-effect estimate is negative in the approximate decile and ventile specifications, but Table~\ref{tab:peer_effects_exact_kenya} shows that exact control-function and recentered specifications are close to zero. The peer/rank channel should therefore enter the three-country argument as a diagnostic margin, not as a settled causal explanation for Kenya's null.
+
+\subsection{Data-Driven Heterogeneity}
+
+We apply the \cite{chernozhukov2025fisher} framework. In Kenya, the spread between the top and bottom GATES quintiles is negative ($-0.418$ SD, $p < 0.10$): the group predicted to benefit most has a negative estimated effect, while the group predicted to benefit least has a positive but imprecise estimate. The BLP test does not reject constant effects at conventional levels ($p = 0.13$), so the forest is best read as a stress test showing unstable treatment-effect prediction rather than as a usable targeting rule.
+
+\subsection{Nigeria Clustering}
+
+All main Nigeria results cluster at the academy level ($42$ academies), matching the level of randomization. This is the relevant inference benchmark for the Yellow/top-track estimate: the point estimate is economically large but imprecise once academy-level clustering is used.
+
+\subsection{Measurement Concerns}
+
+Ceiling effects are ruled out (Table~\ref{tab:ceiling}). Distributional reshuffling is ruled out: tracking reduces within-class variance and increases between-class variance by equal amounts (Table~\ref{tab:score_variance}).
+
+
+
+%% ============================================================
+\section{Structural Estimation and Counterfactuals}
+\label{sec:structural}
+%% ============================================================
+
+The reduced-form results show that the three experiments occupy different parts of the implementation space. They do not, by themselves, answer the counterfactual question that motivates the paper: what would cross-grade ability grouping produce in a setting that combines an informative diagnostic, faithful assignment execution, and high treatment-relevant delivery fidelity? None of the observed experiments realizes that cell. The purpose of the structural exercise is therefore not to replace the experimental estimates, but to discipline an extrapolation across implementation regimes.
+
+The model is deliberately parsimonious. It treats signal quality, assignment execution, and delivery fidelity as separately measured primitives, estimates the production parameters conditional on those primitives, and then recombines the primitives to form counterfactuals. This structure is useful precisely because the reduced form delivers both successes and failures: Kenya identifies the value of a high-quality signal and a strong sorting first stage; Nigeria identifies the consequences of weak execution and low treatment-relevant fidelity; Liberia identifies the cost of sorting on a weak signal.
+
+\subsection{Parameterization}
+\label{subsec:struct_param}
+
+The structural model parameterizes the production function from Section~\ref{sec:theory}. Student $i$ in market $m$ has latent ability $\theta_i = \mu_{g(i),m} + \nu_i$ and observed baseline score $s_i = \theta_i + u_i$. Signal quality $\rho_{m,g} = \sigma^2_{\nu,g}/(\sigma^2_{\nu,g} + \sigma^2_{u,g})$ governs the informativeness of the diagnostic. Intended track assignment is deterministic: $k_i^* = \mathcal{A}_m(a_i; c_m)$. Realized assignment is mediated by a school-level implementation regime $R_j$ with misclassification matrix $M_{m,r}(k,\ell) = \Pr(k_i = \ell \mid k_i^* = k, R_j = r)$, summarized by assignment execution $\omega_m$.
+
+The estimable object is the market-level treatment-control contrast implied by this mechanism, not the full distribution of potential outcomes. For market $m$ and primitive vector $(\rho,\omega,\tau)$, the model-predicted ATE is
+\begin{equation}
+\label{eq:str_ate_map}
+\Delta_m(\rho,\omega,\tau)
+= \delta_m
++ \lambda \rho\omega\tau^\alpha
++ \varphi(1-\tau)\big(P_m+\omega_r R_m\big)
+- \chi_N \widetilde{N}_m
+- \chi_V V^g_m .
+\end{equation}
+Here $P_m$ is the treatment-induced peer-mean shift, $R_m$ is the rank-composition proxy, $\widetilde{N}_m$ is class-size pressure measured in 25-student units, and $V^g_m$ is the change in within-class grade dispersion. The first term after $\delta_m$ is the assignment-payoff channel: accurate sorting matters when the signal is informative, intended assignments are executed, and the assigned curriculum is delivered. The second term is the social channel. It is scaled by $(1-\tau)$, so higher treatment-relevant fidelity both raises the payoff to correct assignment and narrows the scope for peer composition to affect instruction. The remaining terms capture production costs from larger or more grade-heterogeneous classes.
+
+The model also fits the mechanical sorting first stage separately from the outcome payoff:
+\begin{equation}
+\label{eq:str_dispersion_map}
+C_m = \sigma_{\varepsilon m} + \chi_V(1-\omega_m) - \kappa\rho_m\omega_m,
+\end{equation}
+where $C_m$ is the treatment-induced change in within-class dispersion. This equation is important because Kenya mechanically compresses classrooms even though achievement does not rise. The parameter $\kappa$ lets the model match that sorting compression without forcing the achievement payoff $\lambda$ to be large at Kenya's realized fidelity.
+
+The nonlinear delivery-activation term $\tau_m^\alpha$ is disciplined by the Kenya assignment-payoff tests in Table~\ref{tab:assignment_payoff_kenya}. Those tests show that the implemented assignment margin has near-zero revealed payoff at Kenya's realized fidelity. This is an identifying restriction, not a device for raising the counterfactual: the model cannot assume a large return to correct placement at observed $\tau$. It can generate large gains only if the data support a production technology in which accurate sorting becomes valuable when the assigned curriculum is actually delivered.
+
+\subsection{Estimation and Identification}
+\label{subsec:struct_blocks}
+
+The model is estimated in four sequential blocks. The sequencing is an identification device: each primitive is measured or calibrated from the data margin that is informative about that primitive before any treatment-effect moment is fit. This prevents delivery fidelity from becoming an achievement residual and makes clear which variation identifies which parameter. Formally, let $\hat{m}_b$ denote the empirical moments assigned to block $b$ and $m_b(\Theta_b)$ the corresponding model moments. For the blocks estimated by minimum distance, the estimator solves
+\begin{equation}
+\label{eq:md_objective}
+\hat{\Theta}_b
+= \arg\min_{\Theta_b \in \mathcal{T}_b}
+\left[\hat{m}_b - m_b(\Theta_b)\right]'
+W_b
+\left[\hat{m}_b - m_b(\Theta_b)\right]
++ \mathcal{R}_b(\Theta_b),
+\end{equation}
+where $W_b$ is diagonal. Experimental coefficients use inverse estimated variances; the deterministic dispersion-compression moment uses a scale-normalizing weight; and fixed primitives enter as conditioning inputs rather than as fitted treatment-effect moments. The term $\mathcal{R}_b(\Theta_b)$ contains the scale and shrinkage restrictions described below. The first three blocks use primitive-specific evidence before any treatment-effect moment is fit: control-group predictive content for $\rho$, roster and audit implementation moments for $\omega$, and process/delivery moments for $\tau$. The fourth block estimates the common production function conditional on $(\hat{\rho},\hat{\omega},\hat{\tau})$.
+
+\paragraph{Signal quality ($\rho$).} The first block uses only control-group predictive-content moments. Within each market and grade, $\rho_{mg}$ is the squared correlation between the baseline diagnostic and the endline control outcome; the market-level $\hat{\rho}_m$ is the control-sample-weighted average across grades. Rank persistence is reported as a validation diagnostic but is not used to fit outcomes.
+
+\paragraph{Assignment execution ($\omega$).} The second block uses treatment-arm audit and roster moments: track shares, score-group rank correlation, Yellow-track formation, missing assignments, and cutoff compliance. Kenya and Liberia are deterministic by design and by realized cutoff compliance ($\omega=1$). Nigeria's execution parameter is estimated from the canonical implementation moments, with external audit targets reserved for validation when they conflict with cleaned roster moments.
+
+\paragraph{Treatment-relevant delivery fidelity ($\tau$).} The third block calibrates $\tau$ from curriculum-specific process moments only. For Kenya and Liberia, treatment-relevant lesson-completion differences are mapped into a bounded process index. For Nigeria, the index is based on DI numeracy completion in treatment and control (26\% in each arm), because this is the curriculum that carries the assignment-rule treatment; wrong-track delivery is retained as validation evidence rather than an outcome target. This block is fixed before the production block, so $\tau$ cannot absorb unexplained achievement effects.
+
+\paragraph{Production parameters.} Conditional on fixed $(\hat{\rho}, \hat{\omega}, \hat{\tau})$, the final block estimates the common production parameters $(\lambda, \alpha, \kappa, \varphi, \omega_r, \chi_N, \chi_V)$ and small market residuals $\delta_m$ by minimum distance. The fitted moments are the harmonized market-specific ITTs, the peer/rank composites $\hat{\zeta}_m$, the treatment-induced change in within-class dispersion, and the Kenya assignment-payoff slope. Other reallocation quantities---peer shifts, class-size pressure, and grade dispersion---enter equation~\eqref{eq:str_ate_map} as measured environment inputs rather than as additional fitted targets.
+
+Because the production block has only three market-level experiments and intentionally allows a common production map, the preferred estimator imposes three forms of discipline. First, market residuals are shrinkage-regularized with a prior standard deviation of 0.25, so the model is not free to match country ITTs mechanically. Second, weak scale normalizations keep the assignment-payoff and social-channel coefficients in economically plausible ranges. These normalizations are not innocuous for magnitudes: with only three implementation regimes, the data discipline the sign and complementarity of the production map more tightly than they discipline the absolute scale of the high-fidelity extrapolation. Third, hard penalties rule out counterfactual mappings that violate the model's comparative statics, such as higher delivery fidelity reducing the payoff to Kenya's sorting rule. The robustness tables below show what happens when these restrictions are relaxed. Confidence intervals in the main counterfactual table perturb the stage-4 target moments using their estimated variances and re-estimate the production block, holding the first three primitive estimates fixed; Appendix~\ref{app:struct_diagnostics} also reports an approximate combined uncertainty exercise that pairs primitive draws with the stage-4 production-parameter draws.
+
+Parameter-level identification follows from this division of moments. The dispersion equation pins down $\kappa$, because $\rho_m\omega_m$ predicts how much classroom compression the realized sorting rule should mechanically generate. The ITT moments and Kenya assignment-payoff slope jointly discipline $\lambda$ and $\alpha$: Kenya has high $\rho$ and clean $\omega$, but its realized assignment-payoff slope is near zero at moderate $\tau$, so the model cannot obtain the high-input effect by simply assigning a large payoff to correct placement at observed fidelity. The peer/rank composites discipline $\varphi$ and the rank weight $\omega_r$, but these are the least cleanly separated parameters; the preferred interpretation is therefore a composite social channel, and Appendix~\ref{app:struct_diagnostics} reports a specification fixing $\omega_r=0$. The class-size and grade-dispersion coefficients, $\chi_N$ and $\chi_V$, are cost-accounting terms identified from measured reallocation inputs and the ITT fit, not independent experimental estimates of class-size or grade-mixing effects.
+
+Table~\ref{tab:struct_target_blocks} summarizes the distinction between fitted stage-4 moments and measured inputs.
+
+\input{structural_output/tab_struct_target_blocks.tex}
+
+Appendix~\ref{app:struct_diagnostics} reports the local and numerical diagnostics behind this estimator. The weighted Jacobian for the production block has numerical rank seven for the seven common production parameters, but it is ill-conditioned. This matters for interpretation: the model is well suited to the paper's counterfactual question---how the observed implementation regimes map into the missing high-input cell---but individual production parameters should not be read as sharply estimated primitive technologies. The same appendix shows that the optimum is not being held in place by binding inequality penalties, that all 25 optimizer starts converged, that the reported conditional intervals use 49 converged parametric re-estimations of the stage-4 moments, and that the high-input counterfactual remains positive in the lower tail of an approximate combined primitive-plus-production uncertainty exercise.
+
+Table~\ref{tab:struct_primitive_moments} reports the primitive-specific moments that pin down the first three inputs before the treatment-effect fit. The table highlights two features of the design. First, signal quality is not inferred from treatment effects: it is the control-group predictive content of the baseline diagnostic. Second, Nigeria's low execution and delivery fidelity are measured on different margins. The former comes from realized rosters and group formation; the latter comes from treatment-relevant DI numeracy completion. This separation is what allows the counterfactuals below to distinguish a logistical failure to form groups from a pedagogical failure to deliver the content assigned to those groups.
+
+\input{structural_output/tab_struct_primitive_moments.tex}
+
+\subsection{Parameter Estimates}
+\label{subsec:struct_estimates}
+
+Table~\ref{tab:structural_params} reports the structural estimates.
+
+\input{structural_output/tab_structural_params.tex}
+
+Three features of the estimates merit discussion. First, the $\rho$ ranking recovers the intended ordering: Kenya's diagnostic is highly informative, Liberia's is near-random, and Nigeria's is moderate. Second, $\tau$ does \emph{not} follow the operator's ex ante general delivery ranking. The operator ranked Nigeria highest on general delivery quality (Table~\ref{tab:tau_summary}), but treatment-relevant $\tau$ is lowest in Nigeria ($0.31$) because the DI numeracy curriculum was not absorbed into routine practice. Kenya's treatment-relevant curriculum (literacy revision) was delivered through the established programme, yielding the highest $\hat{\tau}$ ($0.50$). This distinction between ex ante operator quality and realized treatment-relevant fidelity is substantively important: it means Nigeria failed on two of three dimensions, not just one. Third, the estimated activation parameter $\hat{\alpha}=4.32$ is large: assignment gains do not translate mechanically into outcomes at moderate fidelity, but their payoff rises steeply when the relevant curriculum is delivered faithfully. This is how the model reconciles Kenya's strong sorting first stage with the near-zero assignment-payoff diagnostic.
+
+The parameter uncertainty and social-channel sensitivity checks in Appendix Tables~\ref{tab:struct_stage4_param_uncertainty} and~\ref{tab:struct_social_channel_sensitivity} support the same reading. The assignment-payoff scale and social-channel scale remain positive across the stage-4 re-estimation draws, and the delivery-activation parameter remains above one even at the 5th percentile. The rank weight inside the peer/rank composite is weakly identified, but fixing it to zero leaves the high-input ATE nearly unchanged ($+0.187$ to $+0.181$ SD). The structural result is therefore not a claim about a separately identified rank effect; it is a claim about assignment payoffs that become valuable when the assigned content is actually delivered.
+
+\subsection{Model Fit}
+\label{subsec:struct_fit}
+
+Table~\ref{tab:moment_fit} compares targeted moments to model-generated moments.
+
+\input{structural_output/tab_moment_fit.tex}
+
+The model fits Kenya's ITT and within-class dispersion compression closely and keeps the Kenya assignment-payoff slope near zero. It does not exactly interpolate Liberia and Nigeria. This is intentional: a version with unrestricted market residuals can mechanically match all three ITTs, but doing so loads too much of Nigeria's observed positive point estimate onto a nuisance intercept. The preferred specification shrinkage-regularizes those residuals, fitting Liberia and Nigeria within sampling uncertainty while preserving the common production structure. Table~\ref{tab:moment_fit} reports standardized residuals and objective contributions. The largest weighted residual is the Liberia peer/rank moment ($0.63$), followed by Kenya's peer/rank moment ($-0.62$); the largest ITT residual is only $0.28$ standard errors. This pattern is useful diagnostically: the reduced-form peer/rank estimates are noisy and specification-sensitive, so the structural counterfactuals lean more heavily on the stage-specific assignment, delivery, and ITT moments than on a separately identified peer coefficient.
+
+We also use the pooled estimates in Table~\ref{tab:pooled_power} as validation rather than as additional targets, since they reuse the same country-level ITT information. The fitted model implies a fixed-effect meta-analytic observed effect of $+0.009$ SD, close to the reduced-form meta estimate of $+0.010$ SD. The student-weighted IPD estimate is more negative ($-0.070$ SD) than the model's aggregate observed-effect approximation ($-0.032$ SD), reflecting that the IPD estimand is a residualized common-effect regression rather than a simple average of study ATEs. The model also understates the cross-study heterogeneity ($I^2=7.7\%$ in the model vs.\ 38.8\% in the reduced form), the price of imposing a common production structure with shrunken market residuals. This distinction reinforces the intended use of the structural model: it disciplines the missing high-$\rho$, high-$\omega$, high-$\tau$ cell rather than reproducing every reduced-form contrast exactly.
+
+Appendix~\ref{app:struct_diagnostics} reports the robustness battery. Six checks are central. First, varying the residual-shrinkage prior leaves the high-input counterfactual between $+0.183$ and $+0.190$ SD unless market residuals are made essentially unrestricted. Second, varying auxiliary scale normalizations makes clear what is and is not learned from the three experiments alone. With weaker scale priors, the high-input counterfactual remains close to the preferred estimate ($+0.180$ SD); removing the scale priors while retaining the raw-parameter norm raises it to $+0.242$ SD; removing all auxiliary scale discipline lowers it to $+0.068$ SD. The robust conclusion is therefore positive complementarity between accurate sorting and high delivery fidelity, while the exact DDK-sized magnitude should be read through the preferred scale normalization. Third, perturbing the observed-$\tau$ calibration and re-estimating the production block leaves the high-input counterfactual between $+0.165$ and $+0.206$ SD. Fourth, omitting one stage-4 target block at a time leaves the high-input counterfactual positive and economically meaningful in every row, from $+0.159$ to $+0.189$ SD. Fifth, Appendix Table~\ref{tab:struct_market_influence} omits all stage-4 targets from one market at a time; the fully high-input counterfactual remains between $+0.160$ and $+0.188$ SD. This market-level diagnostic is weaker for Nigeria-specific complementarity: the Nigeria $\rho+\tau$ counterfactual is not stable when Nigeria's own stage-4 targets are omitted. The stable claim is therefore the high-input assignment-delivery counterfactual, not every Nigeria-environment decomposition. Sixth, the delivery-activation sensitivity shows why the nonlinear payoff is disciplined by the data. Linear activation fits the three ITTs about as well, but raises the stage-4 criterion from $1.65$ to $3.65$ because it predicts a Kenya assignment-payoff slope of $+0.101$ when the target is $+0.008$. Specifications that fit that revealed-payoff diagnostic imply gains around $+0.18$--$+0.19$ SD. Thus the DDK-sized magnitude is tied to the observed combination of Kenya's strong sorting first stage, near-zero realized assignment payoff, and explicit scale and calibration choices that are reported transparently, not to unrestricted extrapolation.
+
+\subsection{Model Discipline and Validation}
+\label{subsec:struct_acceptance}
+
+The structural exercise is disciplined by three requirements before the counterfactuals are interpreted. First, the primitives must line up with their identifying evidence outside the treatment-effect fit: the signal ranking must recover Kenya as high predictive content, Liberia as weak predictive content, and Nigeria as intermediate; assignment execution must be near-deterministic in Kenya and Liberia and lower in Nigeria; and treatment-relevant delivery fidelity must be identified from process data rather than from achievement residuals. Second, the estimated production mapping must respect the comparative statics of the model. Raising delivery fidelity for Kenya's sorting rule cannot lower the predicted ATE, raising execution in Nigeria cannot lower the predicted ATE, and the fully high-input cell must dominate the observed cells. Third, the fitted model must remain close to the reduced-form experimental evidence at observed parameter values. Together, these requirements do not prove the model, but they rule out the most concerning extrapolations: a model in which high fidelity lowers the return to accurate sorting, or in which the high-input result is generated only by contradicting the observed experiments.
+
+The estimated model passes these restrictions; Appendix~\ref{app:struct_diagnostics} reports the full checklist. The implication is narrow but important. The counterfactuals below are not produced by violating the model's own comparative statics. They come from combining an observed high-quality signal, near-clean execution, and high treatment-relevant delivery in a production mapping that also respects the observed nulls.
+
+\subsection{Counterfactuals}
+\label{subsec:struct_counterfactuals}
+
+Table~\ref{tab:counterfactuals} reports the counterfactual ATEs.
+
+\input{structural_output/tab_counterfactuals.tex}
+
+Table~\ref{tab:struct_component_decomp} decomposes the model-implied ATEs into their structural components. The fully high-input counterfactual is driven by the assignment-payoff term ($+0.167$ SD). Setting the Kenya residual to zero while holding the common production parameters and measured environment inputs fixed leaves a predicted ATE of $+0.162$ SD, so the result is not a country-residual artifact. The social channel is essentially shut down when $\tau$ is high, and class/grade pressure is small in the Kenya production environment. Nigeria's realized positive point estimate, by contrast, is not an assignment story: the assignment component is nearly zero, while adverse social and class/grade terms are offset by a positive market residual. This is why the Nigeria complementarity exercise below is informative only after separating the productive assignment term from the country-level residual.
+
+\input{structural_output/tab_struct_component_decomp.tex}
+
+\paragraph{Counterfactual 1: Kenya with higher $\tau$.} Holding Kenya's high $\rho$ and deterministic $\omega$ fixed, raising delivery fidelity to the upper benchmark increases the predicted ATE from $+0.030$ to $+0.155$ SD, with a conditional 90\% interval of $[+0.028,+0.206]$. The mechanism is complementarity: higher $\tau$ activates the return to Kenya's accurate sorting (through $\tau^\alpha$) and attenuates the adverse peer/rank composite (through $(1-\tau)$). The result says that Kenya's null is not evidence that the sorting rule is valueless; it is evidence that accurate sorting has little payoff when treatment-relevant delivery fidelity remains moderate.
+
+\paragraph{Counterfactual 2: Nigeria as designed.} Replacing Nigeria's collapsed implementation ($\omega = 0.84$) with near-deterministic assignment execution ($\omega = 0.95$) leaves the predicted ATE essentially unchanged ($+0.056$ in both scenarios). This is a substantive finding: in the revised model, fixing assignment execution alone barely changes the treatment effect, because Nigeria's signal quality ($\rho = 0.12$) and treatment-relevant delivery fidelity ($\tau = 0.31$) remain low. Near-deterministic execution of a moderate signal through a low-fidelity delivery system does not produce large gains.
+
+\paragraph{One-at-a-time decomposition.} From Nigeria's realized baseline, the decomposition reveals the relative importance of each margin:
+\begin{itemize}
+\item Upgrading $\rho$ alone (to Kenya's 0.53): $+0.057$ SD. Better signal quality by itself does little when treatment-relevant delivery remains low.
+\item Upgrading $\tau$ alone (to $0.90$): $+0.115$ SD. Higher delivery fidelity has the largest one-at-a-time effect because it both activates assignment payoffs and attenuates the social channel.
+\item Upgrading $\omega$ alone (to $0.95$): $+0.056$ SD. Fixing execution has the smallest effect, because there is not much to execute faithfully when $\rho$ is moderate and $\tau$ is low.
+\end{itemize}
+
+The one-at-a-time decomposition understates the complementarity. Table~\ref{tab:struct_complementarity} evaluates all single, pairwise, and joint upgrades in the Nigeria production environment. Upgrading $\rho$ alone or $\omega$ alone leaves the ATE almost unchanged. Upgrading $\tau$ alone raises the ATE to $+0.115$ SD. But upgrading $\rho$ and $\tau$ jointly raises the ATE to $+0.203$ SD, and upgrading all three primitives raises it to $+0.217$ SD. Because every row in this table holds the Nigeria residual fixed, the gain and nonadditive columns are invariant to that residual. The residual-free levels are lower---realized Nigeria is $-0.078$ SD, $\rho+\tau$ is $+0.069$ SD, and all three upgrades are $+0.083$ SD---but the gains are unchanged. The nonadditive component is large: the joint $\rho+\tau$ gain exceeds the sum of the two separate gains by $+0.087$ SD, and the all-three upgrade exceeds the sum of the three separate gains by $+0.102$ SD. The payoff to a better signal is therefore latent when treatment-relevant delivery is low; it appears once the curriculum through which correct assignment matters is actually delivered.
+
+\input{structural_output/tab_struct_complementarity.tex}
+
+Table~\ref{tab:struct_signal_delivery_margins} reports the same complementarity as a marginal-product calculation. In the Nigeria realized environment, raising signal quality from Nigeria's estimate to Kenya's estimate is worth only $+0.001$ SD. Holding execution fixed but raising delivery fidelity to the high-delivery benchmark raises the same signal-quality upgrade to $+0.088$ SD. The marginal product of the diagnostic is therefore not a fixed property of the test; it is an equilibrium return that depends on whether the organization delivers the curriculum that makes correct assignment productive.
+
+\input{structural_output/tab_struct_signal_delivery_margins.tex}
+
+Figure~\ref{fig:struct_complementarity_surface} visualizes the same economics over the estimated response surface. Holding assignment execution near-clean, the predicted ATE is relatively flat at low delivery fidelity even as signal quality rises. The surface steepens only when high signal quality is paired with high treatment-relevant delivery fidelity. The figure makes clear why the high-input result is not a one-dimensional ``better sorting'' result: the return to sorting is activated by delivery.
+
+Appendix Table~\ref{tab:struct_delivery_thresholds} reports the corresponding delivery-fidelity thresholds. In the Kenya production environment with high signal quality and near-clean execution, the residual-free ATE turns positive only once $\tau$ reaches about $0.43$, reaches $+0.10$ SD at $\tau \simeq 0.85$, and reaches a DDK-sized $+0.18$ SD only near $\tau \simeq 0.97$. Including the shrinkage-regularized Kenya residual shifts the thresholds down slightly, with the $+0.18$ SD threshold at $\tau \simeq 0.94$. Thus the model does not imply that modest delivery improvements would have transformed the observed experiments. It implies that accurate sorting becomes valuable only when treatment-relevant delivery is very high.
+
+This decomposition inverts the reduced-form narrative in an important way. The reduced-form analysis naturally emphasizes the most visible failure---assignment execution collapse---because the audit evidence is dramatic. The structural model reveals that even near-clean execution would not have produced large gains given Nigeria's low treatment-relevant $\tau$ and moderate $\rho$. The binding margin is delivery fidelity, but delivery fidelity is most valuable when paired with accurate sorting. This is the structural sense in which the three inputs are complements rather than separable implementation fixes.
+
+\paragraph{Relation to DDK.} In the preferred specification, the fully high-input counterfactual produces an ATE of $+0.187$ SD, with a conditional 90\% interval of $[+0.058,+0.222]$. The approximate combined primitive-plus-production interval is wider but similar in its lower tail, $[+0.057,+0.226]$. The point estimate is close to the gain in \citet{duflo2011peer}. The interpretation is not that the observed experiments replicate DDK; they do not. Rather, the model reconciles the null observed implementations with DDK-sized gains by showing that those gains require the three inputs to be jointly present. In a teacher-discretion environment, instructional adaptation may arise endogenously from more homogeneous classrooms. In the scripted environment studied here, the analogous gain comes from accurate assignment to the correct content and faithful delivery of that content.
+
+\subsection{Interpretation and Limitations}
+\label{subsec:struct_limits}
+
+The structural estimates are designed to answer a counterfactual question that the experiments cannot answer directly: what would ability grouping produce if the three required organizational inputs were jointly present? The estimates are credible for this purpose insofar as the model separates the three primitives using distinct data margins, satisfies the theory-implied validation restrictions above, and produces counterfactuals that are economically interpretable rather than residual-driven.
+
+Five qualifications are important for interpretation. First, the peer/rank moments remain weakly fit relative to the assignment and ITT moments, especially in Liberia. This is consistent with the reduced-form evidence: the peer/rank estimates are useful diagnostics but not cleanly identified structural coefficients. Second, the market residuals are regularized rather than eliminated. This prevents exact interpolation of the three country ITTs, but it also means the model should be read as an extrapolation across implementation regimes, not as a complete structural explanation of all cross-country treatment-effect heterogeneity. Third, the Nigeria execution gap is smaller than the reduced-form narrative would suggest. The structural $\hat{\omega} = 0.84$ may not fully capture the economic consequences of wrong-track content delivery and missing Yellow groups. If the model's misclassification matrix understates the true extent of mis-delivery, then the counterfactual return to fixing execution is biased downward. Fourth, the DDK-sized magnitude depends on the preferred auxiliary scale normalization. The sign of the high-input counterfactual and the complementarity between signal quality and delivery fidelity are more stable than the precise magnitude. Fifth, the confidence intervals reported in Table~\ref{tab:counterfactuals} condition on the stage-1 to stage-3 primitive estimates and on the functional form for mismatch and delivery activation. Appendix Table~\ref{tab:struct_combined_uncertainty} relaxes the first part of this conditioning by combining primitive draws with the stage-4 production-parameter draws; the fully high-input interval remains positive but widens meaningfully. The key comparative statics (delivery fidelity activates assignment payoffs, low $\tau$ makes better execution low-return, and the fully idealized case is positive) are the main object; precise magnitudes should be read with appropriate caution.
+
+Despite these limitations, the structural exercise delivers the paper's punchline. The reduced-form evidence shows that no experiment achieves clearly positive effects. The structural model shows \emph{why}: each experiment is missing at least one of the three complementary inputs. The preferred counterfactual predicts that a setting achieving all three---Kenya's signal quality, near-clean execution, and high delivery fidelity---would yield an ATE of approximately $+0.19$ SD, comparable to the gains found by \citet{duflo2011peer} under teacher discretion. The broader and more robust lesson is complementarity: better sorting has high returns only when the organization also forms the intended groups and delivers the treatment-relevant curriculum.
+
+%% ============================================================
+\section{Conclusion}
+\label{sec:conclusion}
+%% ============================================================
+
+We have argued that scripted instruction changes the economics of ability grouping: it shifts the mechanism from classroom homogeneity to correct assignment, raising the return to accurate sorting while attenuating peer effects. The framework isolates three complementary inputs---signal quality ($\rho$), assignment execution ($\omega$), and treatment-relevant delivery fidelity ($\tau$)---and predicts that all three must be jointly present for grouping to succeed. Three experiments by the same school operator provide evidence consistent with this prediction, though the three settings differ in multiple dimensions beyond $(\rho, \omega, \tau)$, so the cross-experiment comparisons are suggestive rather than definitive.
+
+In Liberia (low $\rho$, high $\omega$, low $\tau$), near-random sorting generates no assignment gain despite faithful execution: there is nothing useful to execute. In Kenya (high $\rho$, high $\omega$, moderate $\tau$), accurate sorting is faithfully executed and the approximate peer/rank diagnostic is adverse, but exact recentering checks attenuate the channel. The safer conclusion is that accurate sorting did not translate into achievement gains, and the available mechanism diagnostics do not pin down a single offsetting channel. Nigeria was designed to fill the high-$\rho$, high-$\omega$, high-$\tau$ cell. It failed on two of three dimensions: assignment execution collapsed ($\hat{\omega} = 0.84$) and treatment-relevant delivery fidelity was low ($\hat{\tau} = 0.31$), because the DI numeracy curriculum had not been absorbed into routine practice. The gap between the operator's ex ante general delivery ranking (Nigeria highest) and realized treatment-relevant $\tau$ (Nigeria lowest) is itself a substantive finding.
+
+The structural model, with primitives measured or calibrated in stages and production parameters estimated conditional on them, disciplines the missing counterfactual. Under Kenya-level sorting accuracy, near-clean execution, and high delivery fidelity, the preferred predicted ATE is $+0.19$ SD---comparable to the gains found by \citet{duflo2011peer} under teacher discretion. The one-at-a-time decomposition from Nigeria's realized baseline reveals that the most consequential single investment is delivery fidelity ($+0.11$ SD), while signal quality and assignment execution alone do little when the treatment-relevant curriculum is not delivered. This inverts the reduced-form narrative: the most visible failure (execution collapse) is structurally less binding than the less visible delivery-fidelity failure.
+
+None of the three experiments produces a clearly positive average effect. But the decomposition identifies separable margins that help explain the nulls: weak signal quality in Liberia, an unresolved classroom-production margin in Kenya despite successful sorting, and collapsed execution and delivery in Nigeria. The Kenya evidence shows that accurate sorting \emph{does} generate a real reallocation first stage; it does not by itself prove that the realized assignment margin raised achievement or pin down which classroom channel offset it. The challenge is achieving all three inputs simultaneously---a challenge that involves not just better diagnostics or better instruction but the organizational capacity to form the intended groups and deliver the treatment-relevant curriculum with fidelity.
+
+For policy, the framework suggests that the relevant question is not ``does ability grouping work?'' but ``which margin is binding?'' The three primitives map to different investments: better diagnostics and binding placement rules ($\rho$); organizational protocols for forming and maintaining groups ($\omega$); scripted curricula that are \emph{actually absorbed into practice} ($\tau$). The structural model predicts that investing in any one without the others produces low returns. A school system contemplating ability grouping should assess where it stands on all three dimensions and invest in the binding margin---or in all three simultaneously.
+
+
+\clearpage
+\singlespacing
+\bibliography{bib}
+\doublespacing
+
+%% ============================================================
+%% FIGURES
+%% ============================================================
+
+\clearpage
+\section*{Figures}
+
+\begin{figure}[p]
+\caption{Structural Complementarity Between Signal Quality and Delivery Fidelity}
+\label{fig:struct_complementarity_surface}
+\begin{center}
+\includegraphics[width=0.92\textwidth]{structural_output/fig_struct_complementarity_surface.pdf}
+\end{center}
+\par\smallskip\noindent{\small\textit{Notes:} The figure plots model-predicted ATEs over signal quality ($\rho$) and treatment-relevant delivery fidelity ($\tau$), holding assignment execution near-clean. Panel A uses the Kenya production environment with $\omega=0.98$; Panel B uses the Nigeria production environment with $\omega=0.95$. Markers show observed $(\rho,\tau)$ values and the relevant high-input counterfactual point. Contours report predicted ATEs in standard-deviation units.}
+\end{figure}
+
+\begin{figure}[p]
+\caption{Kenya-Liberia Contrast on Four Assignment Margins}
+\label{fig:four_margins}
+\begin{center}
+\includegraphics[width=0.9\textwidth]{stata_output/fig_four_margins.pdf}
+\end{center}
+\par\smallskip\noindent{\small\textit{Notes:} This summary figure compares Kenya and Liberia along four margins. Panel (a) reports weighted baseline predictive content ($R^2_g$), Panel (b) reports assignment sharpness, Panel (c) reports track-target mismatch reduction, and Panel (d) reports class-size reallocation.}
+\end{figure}
+
+\begin{figure}[p]
+\caption{Baseline Score Distributions}
+\label{fig:bl_dist}
+\begin{center}
+\begin{subfigure}[b]{0.72\textwidth}
+\includegraphics[width=\textwidth]{stata_output/lib_bl_dist.pdf}
+\caption{Liberia}
+\end{subfigure}
+\par\smallskip
+\begin{subfigure}[b]{0.72\textwidth}
+\includegraphics[width=\textwidth]{stata_output/ke_bl_dist.pdf}
+\caption{Kenya}
+\end{subfigure}
+\end{center}
+\par\smallskip\noindent{\footnotesize\textit{Notes:} Kernel density estimates of raw baseline reading scores, separately by grade and treatment status. Vertical dashed lines mark the score cutoffs used for track assignment in treated schools.}
+\end{figure}
+
+\begin{figure}[p]
+\caption{Within-Class Dispersion: Treatment vs.\ Control}
+\label{fig:dispersion}
+\begin{center}
+\begin{subfigure}[b]{0.60\textwidth}
+\includegraphics[width=\textwidth]{stata_output/lib_dispersion_box.pdf}
+\caption{Liberia}
+\end{subfigure}
+\par\smallskip
+\begin{subfigure}[b]{0.60\textwidth}
+\includegraphics[width=\textwidth]{stata_output/ke_dispersion_box.pdf}
+\caption{Kenya}
+\end{subfigure}
+\end{center}
+\par\smallskip\noindent{\small\textit{Notes:} Distribution of the classroom-level standard deviation of baseline scores in treatment and control classrooms. A leftward shift indicates greater within-class homogeneity.}
+\end{figure}
+
+\begin{figure}[p]
+\caption{Baseline vs.\ Endline Scores}
+\label{fig:binscatter}
+\begin{center}
+\begin{subfigure}[b]{0.72\textwidth}
+\includegraphics[width=\textwidth]{stata_output/lib_binscatter.pdf}
+\caption{Liberia}
+\end{subfigure}
+\par\smallskip
+\begin{subfigure}[b]{0.72\textwidth}
+\includegraphics[width=\textwidth]{stata_output/ke_binscatter.pdf}
+\caption{Kenya}
+\end{subfigure}
+\end{center}
+\par\smallskip\noindent{\footnotesize\textit{Notes:} Binned means of endline scores against baseline scores, separately by grade and treatment status.}
+\end{figure}
+
+\begin{figure}[p]
+\caption{Treatment Effect by Distance from Assignment Cutoff in Liberia}
+\label{fig:cutoff_het}
+\begin{center}
+\includegraphics[width=0.7\textwidth]{stata_output/fig_cutoff_het.pdf}
+\end{center}
+\par\smallskip\noindent{\small\textit{Notes:} ITT estimates for standardized endline reading scores by quintiles of absolute distance from the grade-specific assignment cutoff. Error bars denote 95\% confidence intervals.}
+\end{figure}
+
+\begin{figure}[p]
+\caption{Posterior Shrinkage and Signal Quality}
+\label{fig:posterior_shrinkage}
+\begin{center}
+\includegraphics[width=0.95\textwidth]{stata_output/fig_posterior_shrinkage.pdf}
+\end{center}
+\par\smallskip\noindent{\small\textit{Notes:} Top panels show the distribution of raw baseline scores by grade. Bottom panels map the empirical Bayes posterior to the raw score. Liberia exhibits much stronger shrinkage than Kenya.}
+\end{figure}
+
+\begin{figure}[H]
+\caption{Deterministic Assignment Cutoffs}
+\label{fig:deterministic_cutoffs}
+\begin{center}
+\includegraphics[width=0.9\textwidth]{stata_output/fig_deterministic_cutoffs.pdf}
+\end{center}
+\par\smallskip\noindent{\small\textit{Notes:} Empirical probability of assignment to the upper track against baseline score for treated students. Discontinuous jumps occur exactly at the published score thresholds.}
+\end{figure}
+
+\begin{figure}[H]
+\caption{Treatment-Induced Classroom Reallocation}
+\label{fig:classroom_reallocation}
+\begin{center}
+\includegraphics[width=0.8\textwidth]{stata_output/fig_classroom_reallocation.pdf}
+\end{center}
+\par\smallskip\noindent{\small\textit{Notes:} Treatment minus control differences in mean class size, within-class grade variance, and number of grades represented in the classroom.}
+\end{figure}
+
+
+%% ============================================================
+%% TABLES
+%% ============================================================
+
+\clearpage
+\section*{Tables}
+
+%% Data and sample
+\input{stata_output/lib_sumstats}
+\input{stata_output/ke_sumstats}
+\input{stata_output/tab_ng_sumstats}
+\input{stata_output/tab_balance_1do}
+\input{stata_output/tab_ng_balance}
+\input{stata_output/tab_attrition_1do}
+\input{stata_output/tab_ng_attrition}
+
+%% Main results --- all three experiments
+\input{stata_output/tab_itt}
+\input{stata_output/tab_pooled_power}
+\input{stata_output/tab_ng_t2_ete}
+\input{stata_output/tab_ng_t3_ete}
+\input{stata_output/tab_ng_over_terms}
+
+%% Track-specific effects
+\input{stata_output/tab_upper_lower}
+\input{stata_output/tab_ng_upper_lower}
+\input{stata_output/tab_ng_over_terms_interact}
+
+%% Signal quality and diagnostics
+\input{stata_output/tab_signal_quality}
+\input{stata_output/tab_signal_quality_alt}
+\input{stata_output/tab_ng_signal_quality}
+\input{stata_output/tab_assignment_cutoffs}
+\input{stata_output/tab_classroom_reallocation}
+\input{stata_output/tab_assignment_payoff_kenya}
+\input{stata_output/tab_ng_classroom_reallocation}
+\input{stata_output/tab_ng_dispersion}
+\input{stata_output/tab_track_bins}
+\input{stata_output/tab_ng_track_bins}
+\input{stata_output/tab_cutoff_het}
+\input{stata_output/tab_dispersion_firststage}
+
+%% Mechanisms --- peer effects and decomposition
+\input{stata_output/tab_peer_effects}
+\input{stata_output/tab_peer_effects_exact_kenya}
+\input{stata_output/tab_ng_peer_effects}
+\input{stata_output/tab_suffstat_kenya}
+\input{stata_output/tab_suffstat_liberia}
+\input{stata_output/tab_ng_suffstat}
+\input{stata_output/tab_lesson_completion}
+\input{stata_output/tab_density_decomp}
+\input{stata_output/tab_ng_density_decomp}
+
+%% Robustness --- Kenya/Liberia
+\input{stata_output/tab_spec_robust}
+\input{stata_output/tab_gates}
+\input{stata_output/tab_classsize_ctrl}
+\input{stata_output/tab_ceiling}
+\input{stata_output/tab_score_variance}
+
+%% Robustness --- Nigeria
+\input{stata_output/tab_ng_spec_robust}
+\input{stata_output/tab_ng_lee_bounds}
+\input{stata_output/tab_ng_classsize_ctrl}
+\input{stata_output/tab_ng_ceiling}
+\input{stata_output/tab_ng_score_variance}
+
+%% ============================================================
+%% APPENDIX
+%% ============================================================
+
+\clearpage
+\appendix
+\setcounter{table}{0}
+\setcounter{figure}{0}
+\renewcommand{\thetable}{A\arabic{table}}
+\renewcommand{\thefigure}{A\arabic{figure}}
+
+\section{Structural Notation}
+\label{app:struct_notation}
+
+\begin{longtable}{p{2.5cm}p{11cm}}
+\toprule
+Symbol & Definition \\
+\midrule
+$\theta_i$ & Latent ability of student $i$ \\
+$s_i$ & Observed baseline diagnostic score \\
+$\mu_{g,m}$ & Mean latent ability in grade $g$ and market $m$ \\
+$\rho_{m,g}$ & Signal quality in grade $g$ and market $m$ \\
+$a_i$ & Posterior expectation of ability given $(s_i,g(i))$ \\
+$K_m$ & Number of tracks in market $m$ \\
+$I_{k,m}$ & Intended instructional target of track $k$ in market $m$ \\
+$k_i^*$ & Intended track assignment under the cutoff rule \\
+$k_i$ & Realized track assignment after implementation frictions \\
+$\omega_m$ & Assignment execution in market $m$ (summary of regime mixture and misclassification) \\
+$R_j$ & School-level implementation regime \\
+$p_{m,r}$ & Probability of implementation regime $r$ in market $m$ \\
+$M_{m,r}(k,\ell)$ & Probability that intended track $k$ is realized as track $\ell$ under regime $r$ \\
+$\tau_m$ & Treatment-relevant delivery fidelity in market $m$ \\
+$D_i(a)$ & Delivered instructional content under regime $a$ \\
+$J_{c,m}$ & Fallback classroom-responsive content in classroom $c$ \\
+$P_i(a)$ & Leave-self-out mean peer ability under regime $a$ \\
+$r_i(a)$ & Within-class percentile rank under regime $a$ \\
+$S_i(a)$ & Composite social object, $P_i(a)+\omega_r r_i(a)$ \\
+$q_{c,m}$ & Productive-time shifter for classroom $c$ in market $m$ \\
+$N_c$ & Class size \\
+$V_c^g$ & Within-class grade dispersion \\
+$\lambda$ & Assignment-payoff scale in the estimable production map \\
+$\varphi$ & Strength of the composite social channel before scaling by $(1-\tau_m)$ \\
+$\omega_r$ & Rank weight inside the composite social object \\
+$\delta_m$ & Market-specific baseline productivity shifter \\
+$\chi_N$ & Effect of class size on productive time \\
+$\chi_V$ & Effect of grade dispersion on productive time \\
+$\Theta$ & Vector of structural parameters \\
+$ATE_m$ & Average treatment effect in market $m$ \\
+\bottomrule
+\end{longtable}
+
+\section{Structural Estimation Diagnostics}
+\label{app:struct_diagnostics}
+
+This appendix reports the diagnostics behind the structural estimates in Section~\ref{sec:structural}. The first table gives a local finite-difference diagnostic for the stage-4 production parameters. The local weighted Jacobian has numerical rank seven for the seven common production parameters, but it is ill-conditioned. The estimates are therefore most credible as a disciplined mapping from observed implementation regimes to counterfactual regimes, rather than as sharp estimates of each production coefficient.
+
+Table~\ref{tab:struct_validation_checks} reports the validation restrictions used before interpreting the counterfactuals.
+
+\input{structural_output/tab_struct_validation_checks.tex}
+
+Table~\ref{tab:struct_tau_calibration} reports the outcome-free calibration from treatment-relevant process evidence into the delivery-fidelity primitive.
+
+\input{structural_output/tab_struct_tau_calibration.tex}
+
+Table~\ref{tab:struct_tau_sensitivity} re-estimates the production block under lower and upper process-to-$\tau$ mappings, holding the same structural target set fixed.
+
+\input{structural_output/tab_struct_tau_sensitivity.tex}
+
+\input{structural_output/tab_struct_local_identification.tex}
+
+The next two tables report conditional uncertainty for the common production parameters and sensitivity to the weakly identified rank component inside the peer/rank composite. The delivery-activation parameter remains above one in the re-estimation draws, and fixing the rank weight to zero leaves the central counterfactual nearly unchanged.
+
+\input{structural_output/tab_struct_stage4_param_uncertainty.tex}
+
+\input{structural_output/tab_struct_social_channel_sensitivity.tex}
+
+Table~\ref{tab:struct_stage4_discipline} reports the objective decomposition and optimizer diagnostics for the preferred production block. The hard comparative-static penalties are zero at the optimum, so the counterfactual is not produced by sitting on an inequality constraint. All local starts converge, and the high-input ATE is stable across starts, indicating that the headline counterfactual is not a numerical artifact of one optimizer initialization. Table~\ref{tab:struct_stage4_normalizations} reports the exact non-moment terms in the preferred criterion.
+
+\input{structural_output/tab_struct_stage4_discipline.tex}
+
+\input{structural_output/tab_struct_stage4_normalizations.tex}
+
+Tables~\ref{tab:struct_resid_sensitivity}--\ref{tab:struct_delivery_activation} report the main robustness battery. The residual, scale, delivery-calibration, target-block, and market-level checks ask whether the high-input counterfactual is a nuisance-intercept, calibration, single-moment, or single-market artifact. It is not: the preferred high-input ATE remains positive across these exercises, with the DDK-sized magnitude depending on auxiliary scale discipline but not on any one target block, market, or observed-$\tau$ calibration.
+
+The market-level exercise also clarifies scope. The Nigeria-environment $\rho+\tau$ decomposition is sensitive to omitting Nigeria's own stage-4 targets, so the paper treats that decomposition as mechanism evidence rather than as the headline counterfactual. The primitive-sensitivity and primitive-uncertainty tables ask whether the conclusion is driven by the benchmark values for $\rho$, $\omega$, and $\tau$. The combined-uncertainty table then pairs primitive draws with the stage-4 production-parameter draws; the fully high-input interval remains positive at the 5th percentile, while Nigeria-environment complementarity intervals are wider. The counterfactual is most sensitive to the high-delivery benchmark, but conservative joint primitive choices still imply a positive effect. The delivery-activation table shows that the nonlinear activation term is disciplined by Kenya's revealed-payoff diagnostic and by the full stage-4 criterion: linear activation predicts a positive effect, but it more than doubles the criterion because it fails that revealed-payoff diagnostic, while the specifications that fit it imply gains close to the preferred estimate.
+
+\input{structural_output/tab_struct_resid_sensitivity.tex}
+
+\input{structural_output/tab_struct_regularization_sensitivity.tex}
+
+\input{structural_output/tab_struct_influence.tex}
+
+\input{structural_output/tab_struct_market_influence.tex}
+
+\input{structural_output/tab_struct_primitive_sensitivity.tex}
+
+\input{structural_output/tab_struct_primitive_uncertainty.tex}
+
+\input{structural_output/tab_struct_combined_uncertainty.tex}
+
+\input{structural_output/tab_struct_delivery_activation.tex}
+
+\input{structural_output/tab_struct_delivery_thresholds.tex}
+
+\section{Supplementary Descriptives and Diagnostics}
+
+\begin{figure}[p]
+\caption{Endline Score Distributions by Grade and Treatment Status}
+\label{fig:el_dist}
+\begin{center}
+\begin{subfigure}[b]{0.72\textwidth}
+\includegraphics[width=\textwidth]{stata_output/lib_el_dist.pdf}
+\caption{Liberia}
+\end{subfigure}
+\par\smallskip
+\begin{subfigure}[b]{0.72\textwidth}
+\includegraphics[width=\textwidth]{stata_output/ke_el_dist.pdf}
+\caption{Kenya}
+\end{subfigure}
+\end{center}
+\par\smallskip\noindent{\footnotesize\textit{Notes:} Kernel density estimates of endline reading scores, separately by grade and treatment status. Scores are standardized within grade.}
+\end{figure}
+
+\begin{figure}[p]
+\caption{Reading-Class Size Distributions by Treatment Status}
+\label{fig:classsize}
+\begin{center}
+\begin{subfigure}[b]{0.68\textwidth}
+\includegraphics[width=\textwidth]{stata_output/lib_classsize.pdf}
+\caption{Liberia}
+\end{subfigure}
+\par\smallskip
+\begin{subfigure}[b]{0.68\textwidth}
+\includegraphics[width=\textwidth]{stata_output/ke_classsize.pdf}
+\caption{Kenya}
+\end{subfigure}
+\end{center}
+\par\smallskip\noindent{\footnotesize\textit{Notes:} Distribution of realized reading-class size in treatment and control schools.}
+\end{figure}
+
+\begin{figure}[H]
+\caption{Predicted Misclassification by Distance from the Assignment Cutoff in Liberia}
+\label{fig:misclass_rate}
+\begin{center}
+\includegraphics[width=0.7\textwidth]{stata_output/fig_misclass.pdf}
+\end{center}
+\par\smallskip\noindent{\small\textit{Notes:} Model-implied probability that a student's observed track assignment differs from the assignment under latent ability, as a function of distance from the cutoff.}
+\end{figure}
+
+\begin{figure}[H]
+\caption{Liberia Treatment Effects by Track and Within-Track Ability Tercile}
+\label{fig:track_bins}
+\begin{center}
+\includegraphics[width=0.85\textwidth]{stata_output/fig_track_bins.pdf}
+\end{center}
+\par\smallskip\noindent{\small\textit{Notes:} ITT estimates by assigned track and within-track ability tercile. Red bars indicate significance at 5\%.}
+\end{figure}
+
+\begin{figure}[H]
+\caption{Sorted GATES by Experiment}
+\label{fig:gates}
+\begin{center}
+\begin{subfigure}[b]{0.8\textwidth}
+\includegraphics[width=\textwidth]{stata_output/fig_gates_kenya.pdf}
+\caption{Kenya}
+\end{subfigure}
+\par\medskip
+\begin{subfigure}[b]{0.8\textwidth}
+\includegraphics[width=\textwidth]{stata_output/fig_gates_liberia.pdf}
+\caption{Liberia}
+\end{subfigure}
+\end{center}
+\par\smallskip\noindent{\small\textit{Notes:} Within-quintile treatment effects from sorted GATES. Students grouped by quintiles of causal-forest-predicted treatment effects.}
+\end{figure}
+
+\begin{figure}[H]
+\caption{Causal-Forest Variable Importance}
+\label{fig:gates_varimp}
+\begin{center}
+\begin{subfigure}[b]{0.8\textwidth}
+\includegraphics[width=\textwidth]{stata_output/fig_varimp_kenya.pdf}
+\caption{Kenya}
+\end{subfigure}
+\par\medskip
+\begin{subfigure}[b]{0.8\textwidth}
+\includegraphics[width=\textwidth]{stata_output/fig_varimp_liberia.pdf}
+\caption{Liberia}
+\end{subfigure}
+\end{center}
+\par\smallskip\noindent{\small\textit{Notes:} Variable-importance rankings from the causal forests.}
+\end{figure}
+
+\section{Sample Flow}
+
+\input{stata_output/lib_sampleflow}
+
+\input{stata_output/ke_sampleflow}
+
+
+\end{document}

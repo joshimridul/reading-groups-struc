@@ -1,0 +1,22 @@
+\begin{table}[H]
+\centering
+\caption{Delivery-Fidelity Thresholds Under High Signal and Execution}
+\label{tab:struct_delivery_thresholds}
+\begin{threeparttable}
+\footnotesize
+\begin{tabular}[t]{@{}llcccc@{}}
+\toprule
+Production env. & Residual & $\tau_{\geq 0}$ & $\tau_{\geq .10}$ & $\tau_{\geq .18}$ & ATE at $\tau=.95$ \\
+\midrule
+Kenya & With $\delta_m$ & 0.00 & 0.80 & 0.94 & $+0.187$ \\
+Kenya & $\delta_m=0$ & 0.43 & 0.85 & 0.97 & $+0.162$ \\
+Nigeria & With $\delta_m$ & 0.00 & 0.62 & 0.84 & $+0.254$ \\
+Nigeria & $\delta_m=0$ & 0.74 & 0.92 &  & $+0.120$ \\
+\bottomrule
+\end{tabular}
+\begin{tablenotes}[para,flushleft]
+\footnotesize
+\item \textit{Notes:} Each row holds signal quality at Kenya's estimate and assignment execution near clean, then varies delivery fidelity $\tau$ in the indicated production environment. The residual-included rows use the shrinkage-regularized market residual; the residual-excluded rows set $\delta_m=0$. Blank entries mean the target ATE is not reached for any $\tau\in[0,1]$. Country coverage is limited to Kenya and Nigeria because the threshold exercise asks how much delivery fidelity is needed in the high-signal benchmark environment and in the failed high-input Nigeria environment. Liberia's low-signal observed cell disciplines the model but is not a high-signal threshold environment.
+\end{tablenotes}
+\end{threeparttable}
+\end{table}

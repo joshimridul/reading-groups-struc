@@ -1,0 +1,38 @@
+\begin{table}[H]
+\centering
+\caption{Treatment Effect on Score Variance}
+\label{tab:score_variance}
+\begin{threeparttable}
+\begin{tabular}[t]{lcc}
+\toprule
+ & Kenya & Liberia \\
+\midrule
+\multicolumn{3}{l}{\textit{Panel A: Aggregate variance}} \\
+\addlinespace[2pt]
+Control &   0.988 &   0.921 \\
+Treatment &   0.915 &   0.997 \\
+\addlinespace
+\multicolumn{3}{l}{\textit{Panel B: Treatment on total variance}} \\
+\addlinespace[2pt]
+Treatment &   0.038 &   0.054 \\
+ & (  0.073) & (  0.210) \\
+\addlinespace
+\multicolumn{3}{l}{\textit{Panel C: Treatment on within class variance}} \\
+\addlinespace[2pt]
+Treatment &  -0.228*** &   0.137* \\
+ & (  0.052) & (  0.069) \\
+\addlinespace
+\multicolumn{3}{l}{\textit{Panel D: Treatment on between class variance}} \\
+\addlinespace[2pt]
+Treatment &   0.239*** &  -0.082 \\
+ & (  0.050) & (  0.199) \\
+\addlinespace
+N & 4954 & 3154 \\
+\bottomrule
+\end{tabular}
+\begin{tablenotes}[para,flushleft]
+\footnotesize
+\item \textit{Notes:} Panel~A reports raw variance of standardized endline scores by treatment arm. Panels~B--D regress individual-level squared deviations on treatment, controlling for EB ability and strata FE\@. Total variance uses deviations from the sample grand mean; within class variance uses deviations from realized reading classroom means; between class variance uses the squared deviation of the classroom mean from the grand mean. Standard errors are clustered at the school level in Kenya and at the school grade group level in Liberia. ***, **, and * indicate significance at 1\%, 5\%, and 10\%.
+\end{tablenotes}
+\end{threeparttable}
+\end{table}

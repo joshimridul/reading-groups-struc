@@ -1,0 +1,29 @@
+{\def\sym#1{\ifmmode^{#1}\else\(^{#1}\)\fi}                 \begin{tabular}{@{\hskip\tabcolsep\extracolsep\fill}l*{5}{>{\centering\arraybackslash}m{2.5cm}}}                 \toprule \toprule \\                 \multicolumn{4}{l}{\textit{Dependent variable: Reading club endline score}} &  \\                  &  &  &  &   \\
+                    &\multicolumn{1}{c}{(1)}         &\multicolumn{1}{c}{(2)}         &\multicolumn{1}{c}{(3)}         &\multicolumn{1}{c}{(4)}         \\
+\midrule
+Average peer score  &      -0.102         &                     &                     &      -0.051         \\
+                    &     [0.117]         &                     &                     &     [0.173]         \\
+\addlinespace
+E[Average peer score]&       0.201         &                     &                     &       0.125         \\
+                    &     [0.194]         &                     &                     &     [0.243]         \\
+\addlinespace
+Level               &                     &      -0.097         &                     &      -0.023         \\
+                    &                     &     [0.157]         &                     &     [0.252]         \\
+\addlinespace
+E[Level]            &                     &      -0.248         &                     &      -0.397         \\
+                    &                     &     [0.282]         &                     &     [0.354]         \\
+\addlinespace
+Class size          &                     &                     &      -0.007\sym{*}  &      -0.006         \\
+                    &                     &                     &     [0.004]         &     [0.005]         \\
+\addlinespace
+E[Class size]       &                     &                     &       0.014\sym{**} &       0.013\sym{**} \\
+                    &                     &                     &     [0.006]         &     [0.006]         \\
+\midrule
+Observations        &        5998         &        6153         &        6153         &        5998         \\
+Academy cohort fixed effects&         Yes         &         Yes         &         Yes         &         Yes         \\
+Baseline score control&         Yes         &         Yes         &         Yes         &         Yes         \\
+\bottomrule
+\multicolumn{5}{l}{\footnotesize Notes: Standard errors are clustered at the academy-grade group level.}\\
+\multicolumn{5}{l}{\footnotesize * p$<$0.05, ** p$<$0.01, *** p$<$0.001}\\
+\end{tabular}
+}

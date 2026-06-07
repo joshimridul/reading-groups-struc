@@ -1,0 +1,143 @@
+\documentclass[11pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[letterpaper,top=1in,right=1in,left=1in,bottom=1in]{geometry}
+\usepackage{amsmath,amsfonts,amssymb,amsthm}
+\usepackage{graphicx}
+\usepackage{placeins}
+\usepackage[capposition=top]{floatrow}
+\usepackage{subcaption}
+\usepackage{lscape}
+\usepackage{pdflscape}
+\usepackage{setspace}
+\usepackage{booktabs,caption}
+\usepackage[flushleft]{threeparttable}
+\usepackage{bbm}
+\usepackage{multirow}
+\usepackage{titlesec}
+\titleformat{\paragraph}[runin]{\normalfont\itshape}{}{0em}{}
+\titlespacing*{\paragraph}{0pt}{1ex plus 0.5ex minus 0.2ex}{0.5em}
+\usepackage{hyperref}
+\usepackage[authoryear]{natbib}
+\usepackage{float}
+\usepackage{longtable}
+\usepackage{array}
+\usepackage[page,toc,titletoc,title]{appendix}
+
+\newtheorem{assumption}{Assumption}
+\newtheorem{proposition}{Proposition}
+\newtheorem{remark}{Remark}
+\newcommand{\ind}{\mathbbm{1}}
+\newcommand{\E}{\mathbb{E}}
+\newcommand{\Longstack}[1]{\shortstack{#1}}
+\bibliographystyle{ecta}
+
+\hypersetup{
+	colorlinks=true,
+	linktoc=all,
+	linkcolor=black,
+	citecolor=black,
+    urlcolor=black
+}
+
+\title{Nigeria results}
+
+\begin{document}
+
+\begin{titlepage}
+\author{Mridul Joshi}
+
+\date{PRELIMINARY --- PLEASE DO NOT CIRCULATE \\ \today}
+\maketitle
+
+\begin{abstract}\noindent
+...
+
+\end{abstract}
+\setcounter{page}{0}
+\thispagestyle{empty}
+\end{titlepage}
+\doublespacing
+
+%% ============================================================
+\section{Introduction}
+\label{sec:intro}
+%% ============================================================
+
+
+%% ============================================================
+%% TABLES
+%% ============================================================
+
+\clearpage
+\section*{Tables}
+
+%% Data and sample (cf. main2: lib_sumstats, ke_sumstats, tab_balance_1do, tab_attrition_1do)
+\subsection*{Data and Sample}
+\input{stata_output/tab_ng_sumstats}
+\input{stata_output/tab_ng_sampleflow}
+\input{stata_output/tab_ng_balance}
+\input{stata_output/tab_ng_attrition}
+
+%% Main results (cf. main2: tab_itt, tab_upper_lower)
+\subsection*{Main Results}
+\input{stata_output/tab_ng_t2_mte}
+\input{stata_output/tab_ng_t2_ete}
+\input{stata_output/tab_ng_t3_mte}
+\input{stata_output/tab_ng_t3_ete}
+\input{stata_output/tab_ng_upper_lower}
+
+%% Signal quality and diagnostics (cf. main2: tab_signal_quality, tab_classroom_reallocation, tab_dispersion_firststage)
+\subsection*{Signal Quality and Classroom Reallocation}
+\input{stata_output/tab_ng_signal_quality}
+\input{stata_output/tab_ng_classroom_reallocation}
+\input{stata_output/tab_ng_dispersion}
+
+%% Treatment effect heterogeneity (cf. main2: tab_track_bins)
+\subsection*{Treatment Effect Heterogeneity}
+\input{stata_output/tab_ng_track_bins}
+
+%% Mechanisms (cf. main2: tab_peer_effects, tab_suffstat_kenya, tab_density_decomp)
+\subsection*{Mechanisms: Peer Effects and Accounting}
+\input{stata_output/tab_ng_peer_effects}
+\input{stata_output/tab_ng_suffstat}
+\input{stata_output/tab_ng_density_decomp}
+
+%% Robustness (cf. main2: tab_spec_robust, tab_classsize_ctrl, tab_ceiling, tab_score_variance)
+\subsection*{Robustness}
+\input{stata_output/tab_ng_spec_robust}
+\input{stata_output/tab_ng_classsize_ctrl}
+\input{stata_output/tab_ng_ceiling}
+\input{stata_output/tab_ng_score_variance}
+\input{stata_output/tab_ng_lee_bounds}
+
+%% Over-time and panel specifications
+\subsection*{Over-Time Specifications}
+\input{stata_output/tab_ng_over_terms}
+\input{stata_output/tab_ng_t2_over_time}
+\input{stata_output/tab_ng_t3_over_time}
+
+%% IRT
+\subsection*{IRT Outcomes}
+\input{stata_output/tab_ng_irt}
+
+%% Interactions by group color
+\subsection*{Interactions by Group Color}
+\input{stata_output/tab_ng_t2_mte_interact}
+\input{stata_output/tab_ng_t2_ete_interact}
+\input{stata_output/tab_ng_t3_mte_interact}
+\input{stata_output/tab_ng_t3_ete_interact}
+\input{stata_output/tab_ng_over_terms_interact}
+\input{stata_output/tab_ng_t2_over_time_interact}
+\input{stata_output/tab_ng_t3_over_time_interact}
+\input{stata_output/tab_ng_irt_interact}
+
+%% Pooled cross-country specifications
+\subsection*{Pooled Cross-Country Specifications}
+\input{stata_output/tab_pooled_itt}
+\input{stata_output/tab_pooled_upper_lower}
+\input{stata_output/tab_pooled_dispersion}
+\input{stata_output/tab_pooled_peer_effects}
+\input{stata_output/tab_pooled_gradient}
+
+
+\end{document}

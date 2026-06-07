@@ -1,0 +1,26 @@
+\begin{table}[htbp]
+\caption{Liberia Intent-to-Treat Heterogeneity by Distance from the Assignment Cutoff}
+\label{tab:cutoff_het}
+\begin{center}
+\begin{small}
+\begin{threeparttable}
+\begin{tabular}{lccccc}
+\toprule
+Quintile & \Longstack{Mean\\ $|s-c|$} & Estimate & \Longstack{Standard\\ error} & $p$-value & $N$ \\
+\midrule
+Q1 & 1.7 & -0.109 & (0.167) & 0.513 & 813 \\
+Q2 & 5.0 & -0.053 & (0.156) & 0.733 & 636 \\
+Q3 & 8.0 & -0.204 & (0.149) & 0.171 & 556 \\
+Q4 & 11.3 & -0.385* & (0.207) & 0.063 & 604 \\
+Q5 & 17.2 & -0.403* & (0.217) & 0.064 & 545 \\
+\midrule
+T $\times$ $|s-c|$ (continuous) & & -0.0237 & (0.0178) & 0.183 & 3,154 \\
+\bottomrule
+\end{tabular}
+\begin{tablenotes}
+\footnotesize \item Notes: The table reports Liberia student-level intent-to-treat estimates for standardized endline reading scores, separately by quintiles of absolute distance between the student's baseline score $s$ and the grade-specific assignment cutoff $c$. Each row comes from an OLS specification with strata fixed effects and the empirical Bayes baseline-score control used in the main ITT regression. Standard errors are cluster-robust at the school-grade-group level. More negative estimates in higher quintiles imply that treatment harm is larger farther from the cutoff rather than being concentrated among students closest to the threshold. $^*$ denotes significance at the 10 percent level.
+\end{tablenotes}
+\end{threeparttable}
+\end{small}
+\end{center}
+\end{table}
