@@ -184,7 +184,7 @@ def main() -> int:
             "stage3_tau_calibration.csv",
             "tau_calibration_sensitivity.csv",
             "signal_delivery_marginal_products.csv",
-            "disciplined counterfactual mapping",
+            "anchored counterfactual mapping",
             "market-level ATE map",
             "mechanical sorting first stage",
         ],
@@ -199,7 +199,7 @@ def main() -> int:
             "stage3_tau_calibration.csv",
             "tau_calibration_sensitivity.csv",
             "signal_delivery_marginal_products.csv",
-            "disciplined counterfactual mapping",
+            "anchored counterfactual mapping",
             "stage-4 production mapping separates",
         ],
     }
@@ -761,12 +761,12 @@ def main() -> int:
         "parameter_level_identification": [
             "Parameter-level identification follows from this division of moments",
             r"The dispersion equation pins down $\kappa$",
-            r"The ITT moments and Kenya assignment-payoff slope jointly discipline $\lambda$ and $\alpha$",
+            r"The ITT moments and Kenya assignment-payoff slope jointly identify $\lambda$ and $\alpha$",
             "the preferred interpretation is therefore a composite social channel",
             "The class-size and grade-dispersion coefficients",
         ],
         "validation_framing": [
-            "The structural exercise is disciplined by three requirements",
+            "The structural exercise is anchored by three requirements",
             "identifying evidence outside the treatment-effect fit",
             r"Table~\ref{tab:struct_validation_checks}",
             r"\input{structural_output/tab_struct_validation_checks.tex}",
@@ -774,7 +774,7 @@ def main() -> int:
         "tau_calibration_framing": [
             r"Table~\ref{tab:struct_tau_calibration}",
             r"\input{structural_output/tab_struct_tau_calibration.tex}",
-            "outcome-free calibration from treatment-relevant process evidence",
+            "outcome-free calibration from assignment-channel process evidence",
         ],
         "tau_sensitivity_framing": [
             r"Table~\ref{tab:struct_tau_sensitivity}",
@@ -819,7 +819,7 @@ def main() -> int:
             r"Appendix Table~\ref{tab:struct_delivery_thresholds}",
             f"$\\tau \\simeq {_fmt(float(kenya_high_thresholds['tau_for_010']), 2)}$",
             f"$\\tau \\simeq {_fmt(float(kenya_high_thresholds['tau_for_018']), 2)}$",
-            "accurate sorting becomes valuable only when treatment-relevant delivery is very high",
+            "accurate sorting becomes valuable only when assignment-channel delivery is very high",
         ]
     manuscript_claim_checks = _check_required_text(manuscript_text, manuscript_claim_terms, failures)
     forbidden_phrase_checks = _check_forbidden_text(

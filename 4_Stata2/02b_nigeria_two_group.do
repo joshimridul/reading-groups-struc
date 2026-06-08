@@ -259,7 +259,7 @@ file write `fh' "\bottomrule" _n
 file write `fh' "\end{tabular}" _n
 file write `fh' "\begin{tablenotes}[para,flushleft]" _n
 file write `fh' "\footnotesize" _n
-file write `fh' "\item Notes: Outcomes are standardized math+numeracy index outcomes. Each column estimates a treatment-by-two-group interaction with baseline score, constituency fixed effects, and grade fixed effects; the stacked endterm column pools T2 and T3 endterm observations and adds wave fixed effects. Standard errors are clustered at the academy level. The table uses the preferred support-disciplined Nigeria collapse, combining Blue and Yellow into a higher-level group because the realized Yellow cell is thin. ***, **, and * indicate 1\%, 5\%, and 10\% significance." _n
+file write `fh' "\item Notes: Outcomes are standardized math+numeracy index outcomes. Each column estimates a treatment-by-two-group interaction with baseline score, constituency fixed effects, and grade fixed effects; the stacked endterm column pools T2 and T3 endterm observations and adds wave fixed effects. Standard errors are clustered at the academy level. The table uses the preferred support-aware Nigeria collapse, combining Blue and Yellow into a higher-level group because the realized Yellow cell is thin. ***, **, and * indicate 1\%, 5\%, and 10\% significance." _n
 file write `fh' "\end{tablenotes}" _n
 file write `fh' "\end{threeparttable}" _n
 file write `fh' "\end{table}" _n
@@ -270,7 +270,7 @@ copy_to_paper tab_ng_two_group.tex
 
 file open `fh' using "$out/ng_two_group_note.md", write replace
 file write `fh' "# Nigeria two-group reduced-form check" _n _n
-file write `fh' "The preferred support-disciplined collapse combines Blue and Yellow into a higher-level group and compares it with Red. Unrestricted Red/Blue/Yellow estimates are reported separately as an appendix transparency table." _n _n
+file write `fh' "The preferred support-aware collapse combines Blue and Yellow into a higher-level group and compares it with Red. Unrestricted Red/Blue/Yellow estimates are reported separately as an appendix transparency table." _n _n
 file write `fh' "Primary T3 ETE estimates: Red effect = `a_red_b4' `a_red_s4'; Blue/Yellow effect = `a_high_b4' `a_high_s4'; difference = `a_diff_b4' `a_diff_s4'." _n
 file write `fh' "Stacked ETE estimates: Red effect = `a_red_b5' `a_red_s5'; Blue/Yellow effect = `a_high_b5' `a_high_s5'; difference = `a_diff_b5' `a_diff_s5'." _n
 file close `fh'

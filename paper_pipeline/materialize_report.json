@@ -1,5 +1,5 @@
 {
-  "timestamp_utc": "2026-06-08T00:58:18.752066+00:00",
+  "timestamp_utc": "2026-06-08T01:53:08.573419+00:00",
   "manuscript": "/Users/mriduljoshi/Github/reading-groups-struc/main_3country_new.tex",
   "check_only": false,
   "keep_stale": false,
@@ -27,7 +27,7 @@
       "repo_target": "structural_output/tab_struct_primitive_moments.tex",
       "generator": "3_Python/structural_blockwise_redesign.py",
       "status": "materialized",
-      "sha256": "97497fa1a33e5cdac7d3db53106b0bb3d73310e70b02d7fd4bde2e3c9b567765",
+      "sha256": "a027876891bb3bd7a7278e46b3786a0f501d0239bfe86bbbbc0572020d321d8c",
       "note": "Structural LaTeX table"
     },
     {
@@ -37,7 +37,7 @@
       "repo_target": "structural_output/tab_structural_params.tex",
       "generator": "3_Python/structural_blockwise_redesign.py",
       "status": "materialized",
-      "sha256": "bc24a850d868b7e4a228069b0624b0bcfa56b4f5a94d9280228c2928ad4d26b5",
+      "sha256": "8f5f401f885ba2bce821f9792e5e80c6fcd8d7edd6d0ba2a9e5bb9ade3d675f7",
       "note": "Structural LaTeX table"
     },
     {
@@ -67,7 +67,7 @@
       "repo_target": "structural_output/tab_counterfactuals.tex",
       "generator": "3_Python/structural_blockwise_redesign.py",
       "status": "materialized",
-      "sha256": "f54383f9fd615dd3e75fdba6c57392fa74b347cf7aba7386b866766799d3862a",
+      "sha256": "75a73f11257a438c8d0bea7722d30de9c7bafaf03a50f358986a7ee19bfb46fb",
       "note": "Structural LaTeX table"
     },
     {
@@ -107,7 +107,7 @@
       "repo_target": "structural_output/tab_struct_delivery_thresholds.tex",
       "generator": "3_Python/structural_blockwise_redesign.py",
       "status": "materialized",
-      "sha256": "da5a69f8ffb5d6774e3c3228cfd35a933927bf595c844cc2956a3a35f22a747e",
+      "sha256": "d9e9ba54f0bbc95635490b5aa1ee4626eb7678d4192434d3f7b5ee6fa018515c",
       "note": "Structural LaTeX table"
     },
     {
@@ -147,7 +147,7 @@
       "repo_target": "stata_output/tab_ng_two_group.tex",
       "generator": "4_Stata2 pipeline; see paper_pipeline/README.md",
       "status": "materialized",
-      "sha256": "c32c1ffa3c01cd276690a1856b8d08eaab5e44d4db7c3360feda3961b87579bd",
+      "sha256": "6a16f6141b9ac4066e4e7aa574af28d221923b170e297f2ceac6c6e21fe3d435",
       "note": "Stata manuscript table"
     },
     {
@@ -307,7 +307,7 @@
       "repo_target": "stata_output/tab_ng_over_terms_interact.tex",
       "generator": "4_Stata2 pipeline; see paper_pipeline/README.md",
       "status": "materialized",
-      "sha256": "e262c98125a215b6455efda733e28ddfe6f10aed06bad2e9eac5eb25b8f8343e",
+      "sha256": "78ed85a7f224cadbd60e970f9f9a0deabdc6e82cd3354e6c6cf6a865070e39fe",
       "note": "Stata manuscript table"
     },
     {
@@ -567,7 +567,7 @@
       "repo_target": "stata_output/tab_ng_classsize_ctrl.tex",
       "generator": "4_Stata2 pipeline; see paper_pipeline/README.md",
       "status": "materialized",
-      "sha256": "8921ef71cd87e586a1833b4a78217f0aba9f1d7c0a943a1cc1e2c56ab2600c6f",
+      "sha256": "1c169498b0420aa236258acbcfcbb6c072b6fa043cf3a39a58ef5a0bf395a92b",
       "note": "Stata manuscript table"
     },
     {
@@ -617,7 +617,7 @@
       "repo_target": "structural_output/tab_struct_tau_calibration.tex",
       "generator": "3_Python/structural_blockwise_redesign.py",
       "status": "materialized",
-      "sha256": "60eead3dd96bf917330a201d93152803e632a290fc179f7b10d2fa7766e2eef2",
+      "sha256": "5cc10fa24518084c6dc95ffcfc8b847bc85150e9c4084d1efa08fbc1ca6beeb9",
       "note": "Structural LaTeX table"
     },
     {
@@ -627,7 +627,7 @@
       "repo_target": "structural_output/tab_struct_tau_sensitivity.tex",
       "generator": "3_Python/structural_blockwise_redesign.py",
       "status": "materialized",
-      "sha256": "fea3e972958da32a050c8bc8d56ea36bb72fbcde7a796c82f6f366daec1bce42",
+      "sha256": "bbc3853a49289a4ac7262df9a221286dc5797f801821ec2bca0fd443238353fb",
       "note": "Structural LaTeX table"
     },
     {
@@ -667,7 +667,7 @@
       "repo_target": "structural_output/tab_struct_stage4_discipline.tex",
       "generator": "3_Python/structural_blockwise_redesign.py",
       "status": "materialized",
-      "sha256": "950578a3b517a113e149e7329343dc36c5c8568a1398487ac16eeeef12ca594b",
+      "sha256": "3521c23d4a4d0eb57797465fc6d51d2dffc946aed80cf833b9866ff43ac7934a",
       "note": "Structural LaTeX table"
     },
     {
@@ -677,7 +677,7 @@
       "repo_target": "structural_output/tab_struct_stage4_normalizations.tex",
       "generator": "3_Python/structural_blockwise_redesign.py",
       "status": "materialized",
-      "sha256": "b7fe20d1d6bb15620159c02926020f3a8ba94d25c337dcc3457d7a8113170552",
+      "sha256": "5f481573dead897034e442b2eadd728625026f94f48ef95bb5d2cdefba7da421",
       "note": "Structural LaTeX table"
     },
     {
@@ -697,7 +697,7 @@
       "repo_target": "structural_output/tab_struct_regularization_sensitivity.tex",
       "generator": "3_Python/structural_blockwise_redesign.py",
       "status": "materialized",
-      "sha256": "cec07896fce21dc2a7aeb008e1dcbbd9eb2875f04229aa43fe630d92fd34c16a",
+      "sha256": "d590821fb8d389d573e3537005d963eabbb564ade0854d7e28ced92c8ff256d2",
       "note": "Structural LaTeX table"
     },
     {

@@ -1,0 +1,31 @@
+\begin{table}[H]
+\centering
+\caption{ITT Estimates under Alternative Specifications}
+\label{tab:spec_robust}
+\begin{threeparttable}
+\fontsize{9}{11}\selectfont
+\begin{tabular}[t]{lcccc}
+\toprule
+ & \multicolumn{2}{c}{Kenya} & \multicolumn{2}{c}{Liberia} \\
+\cmidrule(l{3pt}r{3pt}){2-3} \cmidrule(l{3pt}r{3pt}){4-5}
+ & Coef. & SE & Coef. & SE \\
+\midrule
+Baseline (EB + strata FE) &   0.031 & (  0.053) &  -0.212 & (  0.135) \\
+\addlinespace
+Raw baseline score control &   0.031 & (  0.053) &  -0.212 & (  0.135) \\
+\addlinespace
+No baseline control &   0.110 & (  0.071) &  -0.240* & (  0.139) \\
+\addlinespace
+\midrule
+Wild cluster bootstrap $p$-value & \multicolumn{2}{c}{0.622} & \multicolumn{2}{c}{0.126} \\
+Permutation $p$-value & \multicolumn{2}{c}{0.573} & \multicolumn{2}{c}{0.128} \\
+\addlinespace
+N & \multicolumn{2}{c}{4954} & \multicolumn{2}{c}{3154} \\
+\bottomrule
+\end{tabular}
+\begin{tablenotes}[para,flushleft]
+\footnotesize
+\item \textit{Notes:} Each row reports the ITT estimate of treatment on standardized endline scores under a different specification. The baseline controls for empirical Bayes ability and strata fixed effects, with standard errors clustered at the school level in Kenya and at the school grade group level in Liberia. The raw baseline score row replaces the EB shrinkage estimate with the standardized raw baseline score. Wild cluster bootstrap $p$-values use 999 replications (\citealt{cameron2008bootstrap}). Permutation $p$-values are from a Fisher-exact randomization test with 999 permutations within strata at the country-specific assignment unit: school in Kenya and school grade group in Liberia. ***, **, and * indicate significance at 1\%, 5\%, and 10\%.
+\end{tablenotes}
+\end{threeparttable}
+\end{table}

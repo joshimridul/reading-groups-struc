@@ -5,7 +5,7 @@ structural_blockwise_redesign.py
 Blockwise structural redesign with explicit separation of:
   - rho (signal informativeness)
   - omega (assignment execution)
-  - tau (treatment-relevant delivery fidelity)
+  - tau (assignment-channel delivery fidelity)
 
 This script is a clean redesign and does not patch the old all-at-once optimizer.
 """
@@ -542,7 +542,7 @@ def estimate_omega_block(data: dict[str, pd.DataFrame], rho_market: dict[str, fl
 
 def estimate_tau_block(data: dict[str, pd.DataFrame]) -> tuple[pd.DataFrame, dict[str, float], pd.DataFrame, list[str]]:
     """
-    Stage 3: estimate/calibrate tau from treatment-relevant process moments only.
+    Stage 3: estimate/calibrate tau from assignment-channel process moments only.
     """
     warnings = []
     rows = []
@@ -550,7 +550,7 @@ def estimate_tau_block(data: dict[str, pd.DataFrame]) -> tuple[pd.DataFrame, dic
     # Process moments (estimation moments only for tau)
     process = []
 
-    # Kenya: external treatment-relevant lesson completion effect
+    # Kenya: external lesson-completion effect in the assignment channel
     process.append(
         {
             "market": "kenya",
@@ -559,7 +559,7 @@ def estimate_tau_block(data: dict[str, pd.DataFrame]) -> tuple[pd.DataFrame, dic
             "variance": 0.0004,
             "source": "external_target",
             "role": "estimation",
-            "notes": "Treatment-relevant process target from paper notes.",
+            "notes": "Assignment-channel process target from paper notes.",
         }
     )
 
@@ -585,7 +585,7 @@ def estimate_tau_block(data: dict[str, pd.DataFrame]) -> tuple[pd.DataFrame, dic
     else:
         warnings.append("Liberia lp_comp missing; using fallback tau prior.")
 
-    # Nigeria: external DI numeracy process moments (treatment-relevant)
+    # Nigeria: external DI numeracy process moments (assignment-channel)
     process.extend(
         [
             {
@@ -638,7 +638,7 @@ def estimate_tau_block(data: dict[str, pd.DataFrame]) -> tuple[pd.DataFrame, dic
                 tval = float(pm.loc[pm["moment"] == "di_numeracy_completion_treat", "value"].iloc[0])
                 cval = float(pm.loc[pm["moment"] == "di_numeracy_completion_control", "value"].iloc[0])
                 diff = tval - cval
-                # Low DI completion implies lower treatment-relevant fidelity.
+                # Low DI completion implies lower assignment-channel fidelity.
                 prior = float(np.clip(0.10 + 0.80 * tval + 2.0 * diff, 0.05, 0.85))
 
         # Strong regularization around process-derived prior
@@ -1556,7 +1556,7 @@ def write_tau_calibration_documentation(stage3: pd.DataFrame, process_df: pd.Dat
             r"\end{tabular}",
             r"\begin{tablenotes}[para,flushleft]",
             r"\footnotesize",
-            r"\item \textit{Notes:} The table documents the outcome-free mapping from treatment-relevant process evidence into the delivery-fidelity primitive. $\Delta LC$ is the treatment-control lesson-completion difference. $LC_T$ and $LC_C$ are DI numeracy completion rates in Nigeria treatment and control schools. The wrong-track proxy is retained as validation evidence and is not used to set $\tau$.",
+            r"\item \textit{Notes:} The table documents the outcome-free mapping from assignment-channel process evidence into the delivery-fidelity primitive. $\Delta LC$ is the treatment-control lesson-completion difference. $LC_T$ and $LC_C$ are DI numeracy completion rates in Nigeria treatment and control schools. The wrong-track proxy is retained as validation evidence and is not used to set $\tau$.",
             r"\end{tablenotes}",
             r"\end{threeparttable}",
             r"\end{table}",
@@ -1606,7 +1606,7 @@ def write_stage4_normalization_documentation() -> pd.DataFrame:
             "preferred_setting": "weight 0.05",
             "objective_contribution": obj_value("raw_parameter_norm"),
             "share": obj_share("raw_parameter_norm"),
-            "role": "Numerical scale discipline on transformed parameters.",
+            "role": "Numerical scale restriction on transformed parameters.",
         },
         {
             "term": "Assignment-payoff scale",
@@ -1843,7 +1843,7 @@ def write_structural_surface_figure(
             va="bottom",
             bbox={"facecolor": "white", "edgecolor": "0.8", "boxstyle": "round,pad=0.2", "alpha": 0.9},
         )
-    axes[0].set_ylabel(r"Treatment-relevant delivery fidelity $\tau$")
+    axes[0].set_ylabel(r"Assignment-channel delivery fidelity $\tau$")
     if contour is not None:
         cb = fig.colorbar(contour, ax=axes, shrink=0.96, pad=0.02)
         cb.set_ticks(np.arange(0.05, 0.36, 0.05))
@@ -1993,7 +1993,7 @@ def write_regularization_sensitivity(
     """Re-estimate stage 4 under alternative non-residual regularization.
 
     Residual shrinkage is held at the preferred value; the exercise asks whether
-    the headline counterfactual depends on auxiliary scale discipline for raw
+    the headline counterfactual depends on auxiliary scale restrictions for raw
     parameters, lambda, or phi.
     """
     se = {m: POOLED_STUDY_EFFECTS[m]["se"] for m in MARKETS}
@@ -2028,7 +2028,7 @@ def write_regularization_sensitivity(
         },
         {
             "specification": "no_auxiliary_scale",
-            "label": "No auxiliary scale discipline",
+            "label": "No auxiliary scale restriction",
             "raw_norm_weight": 0.0,
             "lambda_prior_weight": 0.0,
             "phi_prior_weight": 0.0,
@@ -2467,7 +2467,7 @@ def write_tau_calibration_sensitivity(
     """Re-estimate stage 4 under transparent alternatives to the tau mapping.
 
     This targets the judgement-heavy step in the structural package: translating
-    treatment-relevant process evidence into a delivery-fidelity primitive.
+    assignment-channel process evidence into a delivery-fidelity primitive.
     """
 
     proc = process_df.set_index(["market", "moment"])
@@ -2642,7 +2642,7 @@ def write_primitive_uncertainty_sensitivity(
 ) -> pd.DataFrame:
     """Propagate primitive-estimation uncertainty holding production fixed.
 
-    This is deliberately not a full-system bootstrap. It asks whether the main
+    This is not a full-system bootstrap. It asks whether the main
     counterfactual ranking survives plausible sampling variation in the
     stage-1 to stage-3 primitive estimates.
     """
@@ -3448,7 +3448,7 @@ def _write_latex_tables(
     primitive_rows.extend(
         [
             r"\addlinespace",
-            r"\multicolumn{4}{l}{\textit{Block 3: Delivery fidelity from treatment-relevant process moments}} \\",
+            r"\multicolumn{4}{l}{\textit{Block 3: Delivery fidelity from assignment-channel process moments}} \\",
         ]
     )
     tau_labels = {
@@ -3479,7 +3479,7 @@ def _write_latex_tables(
             r"\end{tabular}",
             r"\begin{tablenotes}[para,flushleft]",
             r"\footnotesize",
-            "\\item \\textit{Notes:} The table reports the primitive-specific moments used to pin down the first three structural primitives before the treatment-effect fit. Signal quality is the market-level control-group baseline--endline $R^2$. Kenya and Liberia assignment execution is deterministic cutoff compliance; Nigeria execution is fit to the cleaned roster/audit moments shown here, with conflicting external audit targets reserved for validation. Delivery fidelity is based on treatment-relevant lesson-completion moments; Nigeria uses DI numeracy completion because that curriculum carries the assignment-rule treatment.",
+            "\\item \\textit{Notes:} The table reports the primitive-specific moments used to pin down the first three structural primitives before the treatment-effect fit. Signal quality is the market-level control-group baseline--endline $R^2$. Kenya and Liberia assignment execution is deterministic cutoff compliance; Nigeria execution is fit to the cleaned roster/audit moments shown here, with conflicting external audit targets reserved for validation. Delivery fidelity is based on lesson-completion moments in the assignment channel; Nigeria uses DI numeracy completion because that curriculum carries the assignment-rule treatment.",
             r"\end{tablenotes}",
             r"\end{threeparttable}",
             r"\end{table}",
@@ -3583,7 +3583,7 @@ def _write_latex_tables(
 \multicolumn{{5}}{{l}}{{\textit{{Block 2: Assignment execution (audit/roster moments)}}}} \\
 & $\hat{{\omega}}$ & {_fmt(omega["liberia"], 2)} & {_fmt(omega["kenya"], 2)} & {_fmt(omega["nigeria"], 2)} \\
 \addlinespace
-\multicolumn{{5}}{{l}}{{\textit{{Block 3: Treatment-relevant delivery fidelity (process moments)}}}} \\
+\multicolumn{{5}}{{l}}{{\textit{{Block 3: Assignment-channel delivery fidelity (process moments)}}}} \\
 & $\hat{{\tau}}$ & {_fmt(tau["liberia"], 2)} & {_fmt(tau["kenya"], 2)} & {_fmt(tau["nigeria"], 2)} \\
 \addlinespace
 \multicolumn{{5}}{{l}}{{\textit{{Block 4: Production parameters (common across markets)}}}} \\
@@ -3809,7 +3809,7 @@ def _write_latex_tables(
                 "Penalty for using country residuals to interpolate ITTs.",
             ),
             (
-                "Auxiliary scale discipline",
+                "Auxiliary scale restrictions",
                 auxiliary_regularization,
                 auxiliary_share,
                 "Raw-parameter norm plus weak scale priors.",
@@ -4090,7 +4090,7 @@ def _write_latex_tables(
             r"\end{tabular}",
             r"\begin{tablenotes}[para,flushleft]",
             r"\footnotesize",
-            "\\item \\textit{Notes:} Each row re-estimates the stage-4 production block after replacing the stage-3 delivery-fidelity primitives with a transparent lower, preferred, or upper process-to-$\\tau$ mapping. The lower and upper mappings preserve the same process moments and market ordering logic but vary the intercept and slope used to translate treatment-relevant completion evidence into $\\tau$. The high-input counterfactual still sets $\\rho=\\max_m\\hat{\\rho}_m$, $\\omega=0.98$, and $\\tau=0.95$; this table asks whether the observed-cell calibration of $\\tau$ materially changes the extrapolation.",
+            "\\item \\textit{Notes:} Each row re-estimates the stage-4 production block after replacing the stage-3 delivery-fidelity primitives with a transparent lower, preferred, or upper process-to-$\\tau$ mapping. The lower and upper mappings preserve the same process moments and market ordering logic but vary the intercept and slope used to translate completion evidence for the assignment channel into $\\tau$. The high-input counterfactual still sets $\\rho=\\max_m\\hat{\\rho}_m$, $\\omega=0.98$, and $\\tau=0.95$; this table asks whether the observed-cell calibration of $\\tau$ materially changes the extrapolation.",
             r"\end{tablenotes}",
             r"\end{threeparttable}",
             r"\end{table}",
@@ -4484,7 +4484,7 @@ def _write_redesign_note(
     lines.append("- Nigeria primitive-complementarity decomposition is saved in `nigeria_complementarity_decomposition.csv`.")
     lines.append("- Signal-delivery marginal products are saved in `signal_delivery_marginal_products.csv`.")
     lines.append("")
-    lines.append("The stage-4 production mapping separates three objects: outcome payoff to correct placement (`lambda`), nonlinear activation of that payoff by delivery fidelity (`alpha`), and mechanical sorting compression (`kappa_sort`). This lets the model respect Kenya's strong sorting first stage and near-zero revealed payoff at realized fidelity while still asking what happens when treatment-relevant delivery becomes high. Market residuals are nuisance terms and are shrinkage-regularized, so the preferred run fits country ITTs within sampling uncertainty rather than mechanically interpolating them. The local identification diagnostic shows full numerical rank for the seven common production parameters but a high condition number; the structural estimates should therefore be read as a disciplined counterfactual mapping rather than sharp coefficient-by-coefficient identification. The rank weight inside the peer/rank composite is weakly identified, but fixing it to zero barely changes the high-input counterfactual.")
+    lines.append("The stage-4 production mapping separates three objects: outcome payoff to correct placement (`lambda`), nonlinear activation of that payoff by delivery fidelity (`alpha`), and mechanical sorting compression (`kappa_sort`). This lets the model respect Kenya's strong sorting first stage and near-zero revealed payoff at realized fidelity while still asking what happens when assignment-channel delivery becomes high. Market residuals are nuisance terms and are shrinkage-regularized, so the preferred run fits country ITTs within sampling uncertainty rather than mechanically interpolating them. The local identification diagnostic shows full numerical rank for the seven common production parameters but a high condition number; the structural estimates should therefore be read as an anchored counterfactual mapping rather than sharp coefficient-by-coefficient identification. The rank weight inside the peer/rank composite is weakly identified, but fixing it to zero barely changes the high-input counterfactual.")
     lines.append("")
     lines.append("## Nigeria moments: estimation vs validation")
     lines.append("")

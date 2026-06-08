@@ -9,7 +9,7 @@ blockwise version uses harmonized study-specific ITT targets, Kenya's
 assignment-payoff diagnostic, class-size pressure scaling, and
 shrinkage-regularized market residuals to discipline the production mapping:
 the payoff to sorting is low at realized delivery fidelity, but can rise
-nonlinearly when treatment-relevant delivery becomes high.
+nonlinearly when assignment-channel delivery becomes high.
 
 The production block estimates a market-level ATE map, not a full individual
 potential-outcome model:
@@ -31,11 +31,11 @@ dispersion first stage and achievement payoff to be the same parameter.
 
 Parameter-level interpretation:
 - `kappa_sort` is pinned primarily by the within-class dispersion moments.
-- `lambda` and `tau_power` are jointly disciplined by market ITTs plus the Kenya
+- `lambda` and `tau_power` are jointly identified by market ITTs plus the Kenya
   assignment-payoff slope; Kenya's near-zero assignment payoff at realized
   fidelity prevents the model from putting a large payoff on correct placement
   at observed `tau`.
-- `phi` and `omega_r` are disciplined by peer/rank composites, but the rank
+- `phi` and `omega_r` are anchored by peer/rank composites, but the rank
   component is weakly separated; interpret this as a composite social channel.
 - `chi_N` and `chi_V` are cost-accounting terms for measured class-size pressure
   and grade-dispersion shifts, not independent class-size or grade-mixing
@@ -121,7 +121,7 @@ python 3_Python/make_tables_figures.py
 
 ## Identification and assumptions
 
-What is tightly disciplined by data:
+What is tightly tied to data:
 - Cross-market signal-quality ordering (`rho` moments).
 - Treatment effects on dispersion/peer reallocation.
 - Country-level ITT and peer/rank composite reduced-form moments.
@@ -160,7 +160,7 @@ The current canonical blockwise run:
 - reports 49 converged stage-4 re-estimation draws in `stage4_counterfactual_bootstrap_draws.csv` and `stage4_parameter_bootstrap_draws.csv`,
 - reports conditional production-parameter uncertainty in `stage4_parameter_uncertainty.csv`: the 5th percentile remains positive for `lambda` and `phi`, and the 5th percentile of the delivery-activation parameter remains above 1,
 - reports combined primitive-plus-production uncertainty in `combined_uncertainty_summary.csv`, which combines primitive draws with the converged stage-4 parameter re-estimation draws,
-- reports local stage-4 identification diagnostics in `stage4_local_identification.csv` and `stage4_local_identification_summary.csv`: the local weighted Jacobian has numerical rank 7 for the 7 common production parameters but is ill-conditioned, so the model should be read as a disciplined counterfactual mapping rather than precise coefficient-by-coefficient identification,
+- reports local stage-4 identification diagnostics in `stage4_local_identification.csv` and `stage4_local_identification_summary.csv`: the local weighted Jacobian has numerical rank 7 for the 7 common production parameters but is ill-conditioned, so the model should be read as an anchored counterfactual mapping rather than precise coefficient-by-coefficient identification,
 - reports delivery-fidelity calibration rules in `stage3_tau_calibration.csv` and `latex/tab_struct_tau_calibration.tex`, documenting the outcome-free mapping from process moments into `tau`,
 - reports objective, optimizer, and normalization diagnostics in `stage4_objective_decomposition.csv`, `stage4_optimizer_diagnostics.csv`, `stage4_normalizations.csv`, `latex/tab_struct_stage4_discipline.tex`, and `latex/tab_struct_stage4_normalizations.tex`: all 25 starts converge, 18 starts are within `1e-3` of the best objective, the hard comparative-static penalties are zero, and the high-input ATE varies only narrowly across starts,
 - reports residual-prior robustness in `residual_prior_sensitivity.csv`: fully idealized ATE ranges from `0.1831` under strict residual shrinkage to `0.1939` with unrestricted residuals,

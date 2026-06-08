@@ -1631,7 +1631,7 @@ def _write_revision_memo(
         f.write("\n\n")
 
         f.write("## B) Assignment/cutoff summary\n\n")
-        f.write("Assignment is deterministic cutoff in both studies; assignment noise is not the relevant margin here.\n\n")
+        f.write("Assignment is deterministic cutoff in both studies; assignment noise is not the binding margin here.\n\n")
         f.write(_md_table(tableAssign))
         f.write("\n\n")
 

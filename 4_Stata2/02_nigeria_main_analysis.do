@@ -174,7 +174,7 @@ program define make_interaction_table
     file write `fh' "\end{tabular}" _n
     file write `fh' "\begin{tablenotes}[para]" _n
     file write `fh' "\item Notes: Rows report group-specific total treatment effects from treatment-by-group interaction regressions. " _n
-    file write `fh' "Red is the treatment coefficient; Blue and Yellow are Treatment plus the relevant interaction. Controls and SE clustering as in baseline tables." _n
+    file write `fh' "Red is the treatment coefficient; Blue and Yellow are Treatment plus the corresponding interaction. Controls and SE clustering as in baseline tables." _n
     file write `fh' "\end{tablenotes}" _n
     file write `fh' "\end{threeparttable}" _n
     file write `fh' "\end{table}" _n
@@ -395,7 +395,7 @@ program define make_panel_interaction_table
     file write `fh' "\end{tabular}" _n
     file write `fh' "\begin{tablenotes}[para]" _n
     file write `fh' "\item Notes: Pooled OLS on stacked student-wave observations with wave FE. Rows report group-specific total treatment effects. " _n
-    file write `fh' "Red is the treatment coefficient; Blue and Yellow are Treatment plus the relevant interaction. SEs clustered at academy level. Controls as in baseline tables." _n
+    file write `fh' "Red is the treatment coefficient; Blue and Yellow are Treatment plus the corresponding interaction. SEs clustered at academy level. Controls as in baseline tables." _n
     file write `fh' "\end{tablenotes}" _n
     file write `fh' "\end{threeparttable}" _n
     file write `fh' "\end{table}" _n
@@ -766,7 +766,7 @@ file write `fh' "N & `n1' & `n2' & `n3' & `n4' \\" _n
 file write `fh' "\bottomrule" _n
 file write `fh' "\end{tabular}" _n
 file write `fh' "\begin{tablenotes}[para]" _n
-file write `fh' "\item Notes: Upper group is the preferred support-disciplined two-group collapse, Blue/Yellow (\texttt{group\_id} = 2 or 3). Controls: baseline score, constituency FE, grade FE. SEs clustered at academy level." _n
+file write `fh' "\item Notes: Upper group is the preferred support-aware two-group collapse, Blue/Yellow (\texttt{group\_id} = 2 or 3). Controls: baseline score, constituency FE, grade FE. SEs clustered at academy level." _n
 file write `fh' "\end{tablenotes}" _n
 file write `fh' "\end{threeparttable}" _n
 file write `fh' "\end{table}" _n
@@ -1613,7 +1613,7 @@ file write `fh' "N & `no_n' & `cs_n' \\" _n
 file write `fh' "\bottomrule" _n
 file write `fh' "\end{tabular}" _n
 file write `fh' "\begin{tablenotes}[para]" _n
-file write `fh' "\item Notes: Upper = Blue/Yellow group under the preferred support-disciplined two-group collapse. Upper track total = Treatment + T `ds'\times`ds' Upper. Controls: baseline score, constituency FE, grade FE. SEs clustered at academy. ***, **, and * indicate 1\%, 5\%, and 10\%." _n
+file write `fh' "\item Notes: Upper = Blue/Yellow group under the preferred support-aware two-group collapse. Upper track total = Treatment + T `ds'\times`ds' Upper. Controls: baseline score, constituency FE, grade FE. SEs clustered at academy. ***, **, and * indicate 1\%, 5\%, and 10\%." _n
 file write `fh' "\end{tablenotes}" _n
 file write `fh' "\end{threeparttable}" _n
 file write `fh' "\end{table}" _n

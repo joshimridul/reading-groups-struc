@@ -78,7 +78,7 @@ Nigeria has its own cleaning and table scripts because the experiment structure
 and source files differ. The preferred manuscript convention is the two-group
 collapse for Nigeria, with the three-group estimates retained for transparency.
 
-Relevant scripts:
+Main scripts:
 
 - `00_clean_nigeria.do`
 - `02_nigeria_main_analysis.do`
@@ -110,7 +110,7 @@ active replication entry point:
 - `triage_release_worktree.py`
 - `embed_active_figure_fonts.py`
 
-Use them only if you are deliberately auditing the archived `main2.tex` line.
+Use them only when auditing the archived `main2.tex` line.
 
 ## Practical Debugging
 
