@@ -1,0 +1,23 @@
+\begin{table}[H]
+\centering
+\caption{Sensitivity to Delivery-Activation Functional Form}
+\label{tab:struct_delivery_activation}
+\begin{threeparttable}
+\scriptsize
+\begin{tabular}[t]{@{}lcccccc@{}}
+\toprule
+Spec. & $\alpha$ & Obj. & Assign-payoff & Max ITT/SE & K high-$\tau$ & High-input \\
+\midrule
+Linear & 1.00 & 3.648 & $+0.101$ & 0.286 & $+0.120$ & $+0.127$ \\
+Quadratic & 2.00 & 2.071 & $+0.053$ & 0.285 & $+0.152$ & $+0.168$ \\
+Cubic & 3.00 & 1.713 & $+0.027$ & 0.283 & $+0.160$ & $+0.184$ \\
+Estimated & 4.32 & 1.655 & $+0.011$ & 0.281 & $+0.155$ & $+0.187$ \\
+Steeper & 6.00 & 1.659 & $+0.003$ & 0.280 & $+0.139$ & $+0.180$ \\
+\bottomrule
+\end{tabular}
+\begin{tablenotes}[para,flushleft]
+\footnotesize
+\item \textit{Notes:} Each row re-estimates the stage-4 production block under the indicated delivery-activation exponent in $\tau^{\alpha}$, holding the stage-1 to stage-3 primitives fixed. The preferred row estimates $\alpha$; the other rows fix it. ``Obj.'' is the full stage-4 minimum-distance criterion, including moment fit and regularization terms. ``Assign-payoff fit'' is the model-implied Kenya coefficient on treatment interacted with the predicted assignment-gain index, whose data target is $+0.008$. The table shows the fit--extrapolation tradeoff behind the delivery-activation restriction.
+\end{tablenotes}
+\end{threeparttable}
+\end{table}

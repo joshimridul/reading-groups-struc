@@ -217,7 +217,7 @@ def main() -> int:
             print(f"  unreferenced-exhibit-label: {label} at {', '.join(locations)}")
         label_failed = bool(missing_labels)
 
-    return 1 if missing_all or missing_entry or sync_failed or label_failed else 0
+    return 1 if missing_all or missing_entry or extra_all or extra_entry or sync_failed or label_failed else 0
 
 
 if __name__ == "__main__":

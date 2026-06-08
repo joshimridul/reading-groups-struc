@@ -1,0 +1,23 @@
+\begin{table}[!htbp]
+\centering
+\caption{Pooled Peer Composition Effects (BH-style)}
+\label{tab:pooled_peer_effects}
+\begin{threeparttable}
+\begin{tabular}[t]{lcccc}
+\toprule
+ & (1) & (2) & (3) & (4) \\
+\cmidrule(l{3pt}r{3pt}){2-5}
+ & Kenya & Liberia & Nigeria & Pooled \\
+\midrule
+Peer baseline ability (leave-out mean) &  -0.133** &  -0.048 &  -0.121 &  -0.105** \\
+ & (  0.052) & (  0.108) & (  0.098) & (  0.046) \\
+\addlinespace
+N & 4954 & 3153 & 1659 & 9766 \\
+\bottomrule
+\end{tabular}
+\begin{tablenotes}[para]
+\item Notes: Borusyak-Hull-style reduced form with baseline-decile $\times$ treatment $\times$ grade FE and country-nested strata FE. 
+Peer variable is harmonized leave-self-out baseline ability (\texttt{peer\_eb} for Kenya/Liberia, \texttt{peer\_lo\_bl} for Nigeria). SEs are clustered at the harmonized assignment cluster.
+\end{tablenotes}
+\end{threeparttable}
+\end{table}

@@ -4,7 +4,7 @@ set -euo pipefail
 SOURCE_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 TARGET_ROOT="${1:-/Users/mriduljoshi/Github/reading-groups-struc}"
 ARCHIVE_DIR="$TARGET_ROOT/archive/legacy_root_entrypoints_2026-06-07_ability_migration"
-STALE_INPUT_ARCHIVE="$ARCHIVE_DIR/stale_paper_inputs"
+STALE_INPUT_ARCHIVE="$TARGET_ROOT/archive/stale_paper_inputs"
 
 if [[ ! -d "$TARGET_ROOT/.git" ]]; then
   echo "Target is not a git repository: $TARGET_ROOT" >&2
@@ -43,6 +43,9 @@ rsync -a "$SOURCE_ROOT/README.md" "$TARGET_ROOT/README.md"
 rsync -a "$SOURCE_ROOT/.gitignore" "$TARGET_ROOT/.gitignore"
 if [[ -e "$SOURCE_ROOT/build_paper.sh" ]]; then
   rsync -a "$SOURCE_ROOT/build_paper.sh" "$TARGET_ROOT/build_paper.sh"
+fi
+if [[ -e "$SOURCE_ROOT/run_all.sh" ]]; then
+  rsync -a "$SOURCE_ROOT/run_all.sh" "$TARGET_ROOT/run_all.sh"
 fi
 
 # Active paper inputs and audit trail. Stale files are archived, not deleted.

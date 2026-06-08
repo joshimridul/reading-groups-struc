@@ -1,0 +1,35 @@
+\begin{table}[H]
+\centering
+\caption{Structural Parameter Estimates}
+\label{tab:structural_params}
+\begin{threeparttable}
+\begin{tabular}[t]{llccc}
+\toprule
+ & & Liberia & Kenya & Nigeria \\
+\midrule
+\multicolumn{5}{l}{\textit{Block 1: Signal quality (control-group moments)}} \\
+& $\hat{\rho}$ & 0.055 & 0.533 & 0.121 \\
+\addlinespace
+\multicolumn{5}{l}{\textit{Block 2: Assignment execution (audit/roster moments)}} \\
+& $\hat{\omega}$ & 1.00 & 1.00 & 0.84 \\
+\addlinespace
+\multicolumn{5}{l}{\textit{Block 3: Treatment-relevant delivery fidelity (process moments)}} \\
+& $\hat{\tau}$ & 0.38 & 0.50 & 0.31 \\
+\addlinespace
+\multicolumn{5}{l}{\textit{Block 4: Production parameters (common across markets)}} \\
+& $\hat{\lambda}$ (assignment-payoff scale) & \multicolumn{3}{c}{0.400} \\
+& $\hat{\varphi}$ (social channel) & \multicolumn{3}{c}{0.192} \\
+& $\hat{\omega}_r$ (rank weight in composite) & \multicolumn{3}{c}{$-0.281$} \\
+& $\hat{\chi}_N$ (class-size pressure) & \multicolumn{3}{c}{0.033} \\
+& $\hat{\chi}_V$ (grade dispersion) & \multicolumn{3}{c}{0.022} \\
+& $\hat{\alpha}$ (delivery activation) & \multicolumn{3}{c}{4.317} \\
+& $\hat{\kappa}$ (sorting compression) & \multicolumn{3}{c}{1.649} \\
+\bottomrule
+\end{tabular}
+\begin{tablenotes}[para,flushleft]
+\footnotesize
+\item \textit{Notes:} Blocks 1--3 measure or calibrate primitives sequentially before fitting treatment-effect moments: control predictive content for $\rho$, implementation evidence for $\omega$, and process/delivery evidence for $\tau$. Block 4 is estimated by minimum distance conditional on fixed $(\hat{\rho}, \hat{\omega}, \hat{\tau})$, targeting harmonized ITTs, peer/rank composites, within-class dispersion changes, and the Kenya assignment-payoff slope. $\lambda$, $\alpha$, $\kappa$, $\varphi$, $\omega_r$, $\chi_N$, and $\chi_V$ are constrained to be common across markets; $\delta_m$ is market-specific and shrinkage-regularized.
+\end{tablenotes}
+\end{threeparttable}
+\end{table}
+    

@@ -1,6 +1,7 @@
 # Three-Country Paper Pipeline
 
-This folder is the canonical paper-facing pipeline for the active manuscript:
+This folder contains the paper-facing materialization utilities for the active
+manuscript:
 
 ```text
 main_3country_new.tex
@@ -35,7 +36,7 @@ Run this after regenerating outputs:
 python3 paper_pipeline/materialize_latex_inputs.py
 ```
 
-The script parses `main_3country_new.structural_edit.tex`, finds every active
+The script parses `main_3country_new.tex`, finds every active
 `\input{stata_output/...}`, `\input{structural_output/...}`, and
 `\includegraphics{structural_output/...}`, and materializes only those files.
 It also writes:
@@ -44,6 +45,10 @@ It also writes:
 paper_pipeline/active_inputs_manifest.csv
 paper_pipeline/materialize_report.json
 ```
+
+Unreferenced files in `stata_output/` or `structural_output/` are moved to
+`archive/stale_paper_inputs/`. This keeps the active LaTeX input folders as a
+literal inventory of the current manuscript exhibits.
 
 Use a dry run when checking a dirty repo:
 
@@ -68,17 +73,11 @@ bash paper_pipeline/run_main_3country_pipeline.sh --skip-regenerate
 
 ## Current Limits
 
-This is a clean paper-input pipeline, not yet a full raw-data replication
-package. The remaining cleanup is concentrated in the reduced-form Stata stack:
+This folder is not the full replication entry point. Collaborators should use:
 
-- `03_pooled_analysis.do`, `02_nigeria_main_analysis.do`,
-  `02b_nigeria_two_group.do`, and `00_clean_nigeria.do` still need a fully
-  scratch-safe no-sync mode.
-- Several old release scripts still target `main2.tex` and should stay out of
-  the active build path.
-- `3_Python/verify_structural_package.py` currently fails prose-gate checks
-  even though the structural tables and figures are materialized.
+```bash
+./run_all.sh
+```
 
-The replication audit in `replication_audit/` gives the detailed status of
-those issues. This folder is the replacement entry point for the active
-three-country paper.
+from the repository root. The root runner calls the Stata, Python,
+materialization, audit, and LaTeX build stages in order.

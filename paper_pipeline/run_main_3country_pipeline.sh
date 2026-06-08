@@ -14,7 +14,7 @@ usage() {
   cat <<'USAGE'
 Usage: paper_pipeline/run_main_3country_pipeline.sh [options]
 
-Canonical materialization wrapper for the three-country paper.
+Paper-input materialization wrapper for the three-country paper.
 
 Options:
   --check-only          Do not copy artifacts; only report missing or stale inputs.
@@ -22,10 +22,9 @@ Options:
   -h, --help            Show this help text.
 
 Notes:
-  This wrapper is intentionally conservative. It does not yet rerun the full
-  Stata reduced-form stack because several Nigeria/pooled Stata scripts still
-  hard-code output paths and Overleaf copy behavior. It materializes the active
-  Stata tables from 4_Stata2/output/ and records their hashes.
+  This wrapper is useful for refreshing structural outputs and then
+  materializing the exact tables and figures read by LaTeX. Use ./run_all.sh
+  from the repository root for the full collaborator-facing replication run.
 USAGE
 }
 

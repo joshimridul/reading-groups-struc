@@ -1,0 +1,23 @@
+\begin{table}[H]
+\centering
+\caption{Sensitivity to Auxiliary Scale Regularization}
+\label{tab:struct_regularization_sensitivity}
+\begin{threeparttable}
+\footnotesize
+\begin{tabular}[t]{lccccc}
+\toprule
+Specification & Raw norm & $\lambda$ prior & $\varphi$ prior & Max ITT/SE & High-input \\
+\midrule
+Preferred & 0.05 & 10.0 & 2.0 & 0.281 & $+0.187$ \\
+No raw-norm penalty & 0.00 & 10.0 & 2.0 & 0.292 & $+0.191$ \\
+Weak scale priors & 0.05 & 2.5 & 0.5 & 0.273 & $+0.180$ \\
+No lambda/phi priors & 0.05 & 0.0 & 0.0 & 0.283 & $+0.242$ \\
+No auxiliary scale discipline & 0.00 & 0.0 & 0.0 & 0.289 & $+0.068$ \\
+\bottomrule
+\end{tabular}
+\begin{tablenotes}[para,flushleft]
+\footnotesize
+\item \textit{Notes:} Each row re-estimates the stage-4 production block holding the residual prior at its preferred value and varying only auxiliary scale regularization. ``Raw norm'' is the coefficient on the raw-parameter norm penalty; ``$\lambda$ prior'' and ``$\varphi$ prior'' are the weights on scale priors centered at 0.4 and 0.2, respectively. The high-input ATE sets $\rho$ to the highest observed signal quality, $\omega=0.98$, and $\tau=0.95$.
+\end{tablenotes}
+\end{threeparttable}
+\end{table}

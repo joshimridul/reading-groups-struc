@@ -38,6 +38,7 @@ STRUCTURAL_FIG_SOURCE_DIR = REPO_ROOT / "3_Python" / "output" / "structural_smm"
 STRUCTURAL_PAPER_DIR = REPO_ROOT / "structural_output"
 REPORT_PATH = REPO_ROOT / "paper_pipeline" / "materialize_report.json"
 MANIFEST_PATH = REPO_ROOT / "paper_pipeline" / "active_inputs_manifest.csv"
+STALE_ARCHIVE_DIR = REPO_ROOT / "archive" / "stale_paper_inputs"
 
 
 @dataclass
@@ -181,10 +182,55 @@ def write_manifest(artifacts: list[Artifact]) -> None:
             writer.writerow(asdict(artifact))
 
 
+def archive_stale_outputs(
+    artifacts: list[Artifact],
+    folder_name: str,
+    check_only: bool,
+    keep_stale: bool,
+) -> list[dict[str, str]]:
+    """Move unreferenced paper-facing outputs out of active LaTeX folders."""
+    folder = REPO_ROOT / folder_name
+    if not folder.exists():
+        return []
+
+    active_names = {
+        Path(artifact.repo_target).name
+        for artifact in artifacts
+        if Path(artifact.repo_target).parts and Path(artifact.repo_target).parts[0] == folder_name
+    }
+    stale_paths = sorted(
+        path for path in folder.iterdir() if path.is_file() and path.name not in active_names
+    )
+
+    archived: list[dict[str, str]] = []
+    for stale_path in stale_paths:
+        destination = STALE_ARCHIVE_DIR / folder_name / stale_path.name
+        archived.append(
+            {
+                "path": str(stale_path.relative_to(REPO_ROOT)),
+                "archive_path": str(destination.relative_to(REPO_ROOT)),
+                "status": "kept" if keep_stale else "would_archive" if check_only else "archived",
+            }
+        )
+        if check_only or keep_stale:
+            continue
+        destination.parent.mkdir(parents=True, exist_ok=True)
+        if destination.exists():
+            destination.unlink()
+        shutil.move(str(stale_path), str(destination))
+
+    return archived
+
+
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--manuscript", type=Path, default=DEFAULT_MANUSCRIPT)
     parser.add_argument("--check-only", action="store_true")
+    parser.add_argument(
+        "--keep-stale",
+        action="store_true",
+        help="Report but do not archive unreferenced paper-facing outputs.",
+    )
     args = parser.parse_args()
 
     manuscript = args.manuscript.resolve()
@@ -199,15 +245,28 @@ def main() -> int:
         if artifact.status == "missing_source":
             missing.append(artifact.source_path)
 
+    archived_stale = []
+    archived_stale.extend(
+        archive_stale_outputs(artifacts, "stata_output", args.check_only, args.keep_stale)
+    )
+    archived_stale.extend(
+        archive_stale_outputs(
+            artifacts, "structural_output", args.check_only, args.keep_stale
+        )
+    )
+
     write_manifest(artifacts)
 
     report = {
         "timestamp_utc": datetime.now(timezone.utc).isoformat(),
         "manuscript": str(manuscript),
         "check_only": args.check_only,
+        "keep_stale": args.keep_stale,
         "artifact_count": len(artifacts),
         "missing_source_count": len(missing),
         "missing_sources": missing,
+        "stale_file_count": len(archived_stale),
+        "stale_files": archived_stale,
         "manifest": str(MANIFEST_PATH),
         "artifacts": [asdict(artifact) for artifact in artifacts],
     }
@@ -217,6 +276,11 @@ def main() -> int:
         f"Materialization {'check' if args.check_only else 'run'}: "
         f"{len(artifacts)} artifacts, {len(missing)} missing sources."
     )
+    if archived_stale:
+        action = "kept" if args.keep_stale else "would archive" if args.check_only else "archived"
+        print(f"Stale paper-facing outputs {action}: {len(archived_stale)}.")
+        for item in archived_stale:
+            print(f"Stale output: {item['path']} -> {item['archive_path']}")
     print(f"Manifest: {MANIFEST_PATH}")
     print(f"Report: {REPORT_PATH}")
     if missing:

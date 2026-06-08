@@ -1,106 +1,124 @@
-# 4_Stata2 — Stata Replication Pipeline
+# Stata Reduced-Form Pipeline
 
-## Current Status for the Three-Country Paper
+This folder contains the reduced-form Stata code for the three-country paper.
 
-The active paper is now `main_3country_new.tex` in the
-`reading-groups-struc` repository, not the old `main2.tex` release track. Use
-`paper_pipeline/` as the paper-facing entry point: it materializes the exact
-active LaTeX inputs from `4_Stata2/output/` and
-`3_Python/output/structural_smm/` into repo-local paper folders.
+The collaborator-facing Stata entry point is:
 
-Several scripts documented below still belong to the old Kenya/Liberia
-`main2.tex` workflow. They are useful provenance, but they should not be
-treated as the active release checklist until all release checks target
-`main_3country_new.tex`.
+```text
+4_Stata2/_master_paper.do
+```
 
-Stata replication of the Python pipeline in `3_Python/`, covering both experiments
-(Kenya Y1 and Liberia).
-
-## Requirements
-
-- StataNow/StataMP 19.5 in this local environment:
-  `/Applications/StataNow/StataMP.app/Contents/MacOS/stata-mp`
-- Raw CSV data in `2_Data/1_Raw/`
-
-## Running
+Run it directly with Stata 19:
 
 ```bash
-'/Applications/StataNow/StataMP.app/Contents/MacOS/stata-mp' -b do \
-  /Users/mriduljoshi/Github/AbilityGrouping/4_Stata2/_master.do
+/Applications/StataNow/StataMP.app/Contents/MacOS/stata-mp -b do 4_Stata2/_master_paper.do
 ```
 
-Inspect the generated Stata log before treating any regenerated output as
-validated.
-
-To build the full set of generated table and figure inputs currently referenced by `main2.tex`
-without editing the TeX file, run:
+or, preferably, run it through the repository-level pipeline:
 
 ```bash
-python3 4_Stata2/build_main2_tables.py
+./run_all.sh --skip-python
 ```
 
-This runs the Stata pipeline, materializes legacy alias tables still referenced
-by `main2.tex`, validates the required figure files, and copies the required
-`.tex` and figure files into the Overleaf `stata_output/` directory.
+The Stata master writes its main log to:
 
-To audit the current repo-local paper inputs, run:
-
-```bash
-python3 4_Stata2/audit_overleaf_artifacts.py \
-  --overleaf-dir "/Users/mriduljoshi/Github/reading-groups-struc" \
-  --entrypoint main_3country_new.tex \
-  --repo-output-dir 4_Stata2/output \
-  --check-labels
+```text
+build/logs/stata_master_paper.log
 ```
 
-Or set globals and run individual scripts:
+## What The Master Runs
 
-```stata
-global root "/Users/mriduljoshi/Github/AbilityGrouping"
-global raw  "$root/2_Data/1_Raw"
-global out  "$root/4_Stata2/output"
-global do   "$root/4_Stata2"
+The paper master regenerates the reduced-form tables used in
+`main_3country_new.tex`:
 
-do "$do/00_clean_liberia.do"
+1. `00_clean_liberia.do`
+2. `00_clean_kenya.do`
+3. `01_descriptives.do`
+4. `02_main_analysis.do`
+5. `03_diagnostics.do`
+6. `04_structural.do`
+7. `04c_assignment_channel_tests.do`
+8. `06_robustness.do`
+9. `07_lesson_completion.do`
+10. `00_clean_nigeria.do`
+11. `02_nigeria_main_analysis.do`
+12. `02b_nigeria_two_group.do`
+13. `03_pooled_analysis.do`
+
+Primary generated outputs go to:
+
+```text
+4_Stata2/output/
 ```
 
-## Pipeline Structure
+Paper-facing tables are materialized or copied into:
 
-| Script | Replicates | Description |
-|--------|-----------|-------------|
-| `_master.do` | — | Sets globals, runs all scripts |
-| `00_clean_liberia.do` | `00_clean.py` | Loads raw Liberia CSVs, merges BL/ML/EL, applies sample restrictions, constructs EB ability, peer variables, class size, misfit |
-| `00_clean_kenya.do` | `00_clean_kenya.py` | Same for Kenya Y1 (composite Literacy + English scores) |
-| `01_descriptives.do` | `make_descriptives.py` | Summary stats, balance tables, attrition, sample flow |
-| `02_main_analysis.do` | `structural_estimation_revision.py` (ITT section) | ITT estimates, upper/lower track effects, within-class dispersion, Borusyak-Hull peer effects |
-| `03_diagnostics.do` | `round1_diagnostics.py`, `round2_mechanisms.py` | Signal quality (R^2), assignment accuracy, classroom reallocation, cutoff heterogeneity, track x ability bins, class-size controls |
-| `04_structural.do` | `structural_estimation_revision.py` (structural section) | Signal quality table, Kenya reduced-form accounting, minimum-distance decomposition, Liberia sensitivity grid, four-margin summary |
-| `05_sufficientstats.do` | — | Deprecated compatibility wrapper that now calls `04_structural.do` |
-| `06_robustness.do` | — | Specification robustness, ceiling, score-variance, class-size robustness, Lee bounds |
-| `07_lesson_completion.do` | — | Kenya lesson-completion table used by the current manuscript |
+```text
+stata_output/
+```
 
-## Key Variables
+The manuscript reads from `stata_output/`. Do not manually edit paper-facing
+tables there unless you also update the generating code and document the reason.
 
-| Variable | Definition |
-|----------|-----------|
-| `score_bl`, `score_el` | Raw baseline/endline scores (Liberia: single; Kenya: literacy + English composite) |
-| `std_score_bl`, `std_score_el` | Standardized by grade, control-group mean/SD |
-| `eb_ability`, `std_eb` | Empirical Bayes predicted ability: grade mean + control-group baseline-endline R^2 x score residual |
-| `upper_group` | 1 if score > cutoff (deterministic assignment) |
-| `std_grp` | Reading-group classroom label |
-| `peer_eb`, `peer_bl` | Leave-self-out peer mean (realized) |
-| `exp_peer_eb` | Expected peer quality (BH conditioning variable) |
-| `misfit` | (θ̂_i − Ī_k)²: squared distance from class mean EB |
-| `dev_eb` | |θ̂_i − mean(θ̂)_class|: within-class EB dispersion |
-| `csize` | Class size (treatment: std_grp; control: grade) |
-| `finsamp` | Final analytic sample flag |
+## Country-Specific Notes
 
-## Cross-Validation
+### Kenya and Liberia
 
-Numbers to compare between Stata and Python output:
+Kenya and Liberia use the older cleaned-data and reduced-form flow:
 
-1. **Sample sizes**: `finsamp` counts by grade × treatment
-2. **Signal quality**: control-group baseline-endline R^2 by grade
-3. **ITT point estimates**: coefficient on `treat` in main specification
-4. **Peer-effect coefficients**: BH estimates of β_P
-5. **Sensitivity grid values**: Liberia predicted effects under parameter combinations
+- cleaning scripts create `analysis_kenya.dta` and `analysis_liberia.dta`;
+- descriptives and reduced-form scripts write the main country tables;
+- robustness scripts write specification, class-size, ceiling, and score-variance
+  checks;
+- `07_lesson_completion.do` writes the lesson-completion table.
+
+### Nigeria
+
+Nigeria has its own cleaning and table scripts because the experiment structure
+and source files differ. The preferred manuscript convention is the two-group
+collapse for Nigeria, with the three-group estimates retained for transparency.
+
+Relevant scripts:
+
+- `00_clean_nigeria.do`
+- `02_nigeria_main_analysis.do`
+- `02b_nigeria_two_group.do`
+
+### Pooled Tables
+
+Pooled three-country tables are generated by:
+
+```text
+03_pooled_analysis.do
+```
+
+These are descriptive pooled specifications for power and cross-country
+comparison. Interpret them using the manuscript text rather than as a separate
+fourth experiment.
+
+## Legacy Files
+
+Several scripts in this folder still exist for provenance from earlier
+Kenya/Liberia drafts, especially the old `main2.tex` workflow. They are not the
+active replication entry point:
+
+- `build_main2_tables.py`
+- `check_release_readiness.py`
+- `check_numeric_claims.py`
+- `check_public_version.py`
+- `verify_freeze_manifest.py`
+- `triage_release_worktree.py`
+- `embed_active_figure_fonts.py`
+
+Use them only if you are deliberately auditing the archived `main2.tex` line.
+
+## Practical Debugging
+
+- If Stata cannot find a raw file, first check the expected data roots under
+  `2_Data/`.
+- If a do-file succeeds but a manuscript table does not change, run
+  `python3 paper_pipeline/materialize_latex_inputs.py`.
+- If a coefficient changes, inspect the generated `.tex` in `4_Stata2/output/`
+  and then the materialized copy in `stata_output/`.
+- After any Stata change, inspect `build/logs/stata_master_paper.log` before
+  trusting the PDF.

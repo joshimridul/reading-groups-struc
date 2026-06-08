@@ -1,0 +1,20 @@
+\begin{table}[H]
+\centering
+\caption{Social-Channel Parameter Sensitivity}
+\label{tab:struct_social_channel_sensitivity}
+\begin{threeparttable}
+\footnotesize
+\begin{tabular}[t]{lccccc}
+\toprule
+Spec. & $\omega_r$ & Peer RMSE & Max ITT/SE & High-input & Nigeria $\rho+\tau$ \\
+\midrule
+Preferred & -0.281 & 0.518 & 0.281 & $+0.187$ & $+0.203$ \\
+No rank weight & 0.000 & 0.520 & 0.275 & $+0.181$ & $+0.194$ \\
+\bottomrule
+\end{tabular}
+\begin{tablenotes}[para,flushleft]
+\footnotesize
+\item \textit{Notes:} The second row re-estimates the stage-4 production block after fixing the rank weight inside the social composite to zero. Peer/rank RMSE is the root mean squared weighted error across the three peer/rank diagnostic targets. Max ITT/SE is the largest absolute fitted-minus-target ITT residual divided by the corresponding study-specific standard error. The diagnostic asks whether the main assignment-delivery counterfactual relies on separately estimating a rank component.
+\end{tablenotes}
+\end{threeparttable}
+\end{table}

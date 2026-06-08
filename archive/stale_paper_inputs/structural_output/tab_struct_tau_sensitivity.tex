@@ -1,0 +1,21 @@
+\begin{table}[H]
+\centering
+\caption{Sensitivity to Delivery-Fidelity Calibration}
+\label{tab:struct_tau_sensitivity}
+\begin{threeparttable}
+\footnotesize
+\begin{tabular}[t]{lcccccc}
+\toprule
+Spec. & $\tau_K$ & $\tau_L$ & $\tau_N$ & Max ITT/SE & K high-$\tau$ & High-input \\
+\midrule
+Lower process map & 0.40 & 0.31 & 0.22 & 0.297 & $+0.179$ & $+0.206$ \\
+Preferred & 0.50 & 0.38 & 0.31 & 0.281 & $+0.155$ & $+0.187$ \\
+Upper process map & 0.60 & 0.46 & 0.40 & 0.276 & $+0.126$ & $+0.165$ \\
+\bottomrule
+\end{tabular}
+\begin{tablenotes}[para,flushleft]
+\footnotesize
+\item \textit{Notes:} Each row re-estimates the stage-4 production block after replacing the stage-3 delivery-fidelity primitives with a transparent lower, preferred, or upper process-to-$\tau$ mapping. The lower and upper mappings preserve the same process moments and market ordering logic but vary the intercept and slope used to translate treatment-relevant completion evidence into $\tau$. The high-input counterfactual still sets $\rho=\max_m\hat{\rho}_m$, $\omega=0.98$, and $\tau=0.95$; this table asks whether the observed-cell calibration of $\tau$ materially changes the extrapolation.
+\end{tablenotes}
+\end{threeparttable}
+\end{table}

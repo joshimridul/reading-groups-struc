@@ -1,0 +1,25 @@
+\begin{table}[!htbp]
+\centering
+\caption{Nigeria Attrition by Term and Window}
+\label{tab:ng_attrition}
+\begin{threeparttable}
+\begin{tabular}[t]{lccccc}
+\toprule
+Wave/Outcome & Treat retain & Control retain & Diff & SE & p value \\
+\midrule
+t2\_mte\_math &   0.608 &   0.628 &  -0.027 & (  0.042) & 0.517 \\
+t2\_mte\_num &   0.610 &   0.589 &   0.020 & (  0.061) & 0.747 \\
+t2\_ete\_math &   0.687 &   0.676 &  -0.004 & (  0.034) & 0.902 \\
+t2\_ete\_num &   0.691 &   0.676 &  -0.001 & (  0.034) & 0.985 \\
+t3\_mte\_math &   0.460 &   0.514 &  -0.116 & (  0.075) & 0.128 \\
+t3\_mte\_num &   0.464 &   0.504 &  -0.100 & (  0.074) & 0.183 \\
+t3\_ete\_math &   0.650 &   0.510 &   0.135 & (  0.084) & 0.117 \\
+t3\_ete\_num &   0.636 &   0.493 &   0.143 & (  0.089) & 0.118 \\
+\bottomrule
+\end{tabular}
+\begin{tablenotes}[para]
+\item Notes: Retention indicators defined unconditionally for all students in sample. 
+OLS with constituency and grade FE, clustered by academy.
+\end{tablenotes}
+\end{threeparttable}
+\end{table}
