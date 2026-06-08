@@ -1,0 +1,25 @@
+\begin{table}[H]
+\centering
+\caption{Liberia Sensitivity: Predicted Effect under Transported Kenya Parameters}
+\label{tab:lib_sensitivity}
+\begin{threeparttable}
+\begin{tabular}[t]{l*{5}{c}}
+\toprule
+ & \multicolumn{5}{c}{Disruption cost ($\psi$)} \\
+\cmidrule(l{3pt}r{3pt}){2-6}
+$\lambda$ & 0.0 & 0.1 & 0.3 & 0.5 & 1.0 \\
+\midrule
+0.00 &  -0.005 &  -0.048 &  -0.132 &  -0.217 &  -0.429 \\
+0.05 &   0.012 &  -0.030 &  -0.115 &  -0.200 &  -0.411 \\
+0.10 &   0.029 &  -0.013 &  -0.098 &  -0.182 &  -0.394 \\
+0.20 &   0.064 &   0.022 &  -0.063 &  -0.147 &  -0.359 \\
+0.30 &   0.099 &   0.057 &  -0.028 &  -0.113 &  -0.324 \\
+0.50 &   0.169 &   0.126 &   0.042 &  -0.043 &  -0.255 \\
+\bottomrule
+\end{tabular}
+\begin{tablenotes}[para,flushleft]
+\footnotesize
+\item \textit{Notes:} Each cell reports the predicted Liberia ITT: $\lambda \cdot \Delta\text{Mismatch} + \hat{\zeta}_{\text{Ken}} \cdot \Delta\text{Peer} - \psi \cdot \Delta\text{ClassSize}$. Liberia treatment control shifts are used; class size change is divided by its pooled SD. $\lambda$ (mismatch return) and $\psi$ (disruption cost per SD of class size) vary over the grid; $\hat{\zeta}_{\text{Ken}}$ is fixed at the Kenya BH peer estimate. Positive values indicate that ability grouping is predicted to raise scores.
+\end{tablenotes}
+\end{threeparttable}
+\end{table}

@@ -1,0 +1,29 @@
+\begin{table}[!htbp]
+\centering
+\caption{Treatment Effects by Track Position Across Countries}
+\label{tab:pooled_upper_lower}
+\begin{threeparttable}
+\begin{tabular}[t]{lccc}
+\toprule
+ & (1) & (2) & (3) \\
+\cmidrule(l{3pt}r{3pt}){2-4}
+ & Kenya & Liberia & Nigeria \\
+\midrule
+Lower-track effect &   0.046 &  -0.019 &   0.007 \\
+ & (  0.137) & (  0.181) & (  0.152) \\
+\addlinespace
+Higher-track differential &  -0.023 &  -0.328 &   0.239** \\
+ & (  0.147) & (  0.201) & (  0.098) \\
+\addlinespace
+Higher-track effect &   0.023 &  -0.348** &   0.246* \\
+ & (  0.044) & (  0.154) & (  0.129) \\
+\addlinespace
+N & 4954 & 3154 & 1611 \\
+\bottomrule
+\end{tabular}
+\begin{tablenotes}[para]
+\item Notes: Each column estimates a country-specific treatment-by-track-position interaction. The higher track is the upper reading group in Kenya and Liberia; in Nigeria it is the preferred two-group collapse, Blue/Yellow (\texttt{group\_id} = 2 or 3). 
+Controls are country-specific baseline slopes and country-nested strata fixed effects. SEs are clustered at the harmonized assignment cluster.
+\end{tablenotes}
+\end{threeparttable}
+\end{table}

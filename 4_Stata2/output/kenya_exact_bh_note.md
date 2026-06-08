@@ -1,0 +1,12 @@
+# Kenya exact BH note
+
+- Construction of mu_i^BH: mu_i^BH = p_j * P1_i + (1 - p_j) * P0_i, where P1_i is the leave-self-out mean peer EB ability under Kenya's deterministic treated reading-group rule and P0_i is the leave-self-out mean peer EB ability in the grade-based control classroom. In the current Kenya analysis dataset these are already stored as peer_std_eb_treat, peer_std_eb_ctrl, and exp_peer_eb.
+- Randomization probability used: P_t is the constituency-specific assignment probability recovered from the full Kenya year-1 raw school roster. In that roster, 50 of 292 schools are treated overall, and P_t varies across constituency strata with the realized design counts.
+- Estimate comparison: decile FE =  -0.133; ventile FE =  -0.136; exact control-function =   0.001; exact recentered =  -0.009; exact control-function (simple own-score controls) =  -0.003.
+- Exact-BH change relative to approximation: exact minus decile =   0.133; exact minus ventile =   0.137. The control-function and recentered coefficients differ by     .0101.
+- Approximation closeness: corr(exact mu_i^BH, current decile-cell approximation) =  0.463.
+- Mechanical checks: treated/control identity failures = 0; mu_i^BH outside [P0_i, P1_i] = 0; P_t outside [0,1] = 0; max identity gap =         0.
+- Decomposing the exact-BH change: exact BH with no own-score controls =  -0.127; exact BH with linear own-score controls =  -0.003; exact BH with cubic own-score controls =   0.001; approximate decile FE with the same cubic own-score controls =  -0.147.
+- Missing-baseline sensitivity: recomputing both state-specific peer objects after excluding students with missing baseline from the counterfactual classroom means gives exact BH control-function =  -0.007 and exact recentered =  -0.016 (change relative to baseline exact cubic =  -0.007).
+- Control sensitivity differences: linear minus none =   0.123; cubic minus linear =   0.004; exact cubic minus approximate cubic =   0.147.
+- Ambiguities and fallbacks used: the optional comparability spec is implemented as the exact control-function regression with linear std_eb x treat x grade controls, while the preferred exact spec uses cubic std_eb, std_eb^2, and std_eb^3 each fully interacted with treatment and grade. Missing constituency labels in the raw Kenya files are filled from county using the same regional stratification implicit in the legacy cleaning code before constructing P_t.

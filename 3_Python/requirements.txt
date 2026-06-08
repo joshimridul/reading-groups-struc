@@ -1,0 +1,7 @@
+pandas>=1.5
+numpy>=1.23
+statsmodels>=0.13
+matplotlib>=3.6
+seaborn>=0.12
+scipy>=1.9
+openpyxl>=3.0
