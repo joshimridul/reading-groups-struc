@@ -52,6 +52,7 @@ done
 
 if [[ "$SKIP_REGENERATE" -eq 0 ]]; then
   python3 "$ROOT/3_Python/structural_blockwise_redesign.py"
+  python3 "$ROOT/3_Python/make_assignment_value_figures.py"
   python3 "$ROOT/3_Python/make_paper_summary_figures.py"
 fi
 

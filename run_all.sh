@@ -4,6 +4,11 @@ set -euo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 STATA_BIN="${STATA_BIN:-/Applications/StataNow/StataMP.app/Contents/MacOS/stata-mp}"
 PYTHON_BIN="${PYTHON_BIN:-python3}"
+if [[ -f "$ROOT/main_3country_new.tex" ]]; then
+  ENTRYPOINT="main_3country_new.tex"
+else
+  ENTRYPOINT="main_3country_new.structural_edit.tex"
+fi
 
 RUN_STATA=1
 RUN_PYTHON=1
@@ -95,6 +100,7 @@ if [[ "$RUN_PYTHON" -eq 1 ]]; then
   echo
   echo "== Python structural and figure pipeline =="
   "$PYTHON_BIN" "$ROOT/3_Python/structural_blockwise_redesign.py"
+  "$PYTHON_BIN" "$ROOT/3_Python/make_assignment_value_figures.py"
   "$PYTHON_BIN" "$ROOT/3_Python/make_paper_summary_figures.py"
 else
   echo
@@ -109,7 +115,7 @@ echo
 echo "== Audit active paper inputs =="
 "$PYTHON_BIN" "$ROOT/4_Stata2/audit_overleaf_artifacts.py" \
   --overleaf-dir "$ROOT" \
-  --entrypoint main_3country_new.tex \
+  --entrypoint "$ENTRYPOINT" \
   --repo-output-dir "$ROOT/4_Stata2/output" \
   --check-labels
 
@@ -117,11 +123,12 @@ if [[ "$RUN_BUILD" -eq 1 ]]; then
   echo
   echo "== Compile paper =="
   "$ROOT/build_paper.sh"
-  if rg -n "undefined|Citation.*undefined|Reference.*undefined|There were undefined|Label\\(s\\) may have changed|Fatal|Emergency|Error|Overfull" "$ROOT/build/main_3country_new.log"; then
+  LOG_BASENAME="${ENTRYPOINT%.tex}"
+  if rg -n "undefined|Citation.*undefined|Reference.*undefined|There were undefined|Label\\(s\\) may have changed|Fatal|Emergency|Error|Overfull" "$ROOT/build/$LOG_BASENAME.log"; then
     echo "LaTeX log has unresolved references/citations or serious warnings." >&2
     exit 1
   fi
-  echo "PDF: build/main_3country_new.pdf"
+  echo "PDF: build/$LOG_BASENAME.pdf"
 else
   echo
   echo "== LaTeX build skipped =="

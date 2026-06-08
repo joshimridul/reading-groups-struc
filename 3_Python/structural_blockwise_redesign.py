@@ -613,7 +613,7 @@ def estimate_tau_block(data: dict[str, pd.DataFrame]) -> tuple[pd.DataFrame, dic
                 "variance": 0.01,
                 "source": "external_target",
                 "role": "validation",
-                "notes": "Proxy target for wrong-track/partial script adherence (validation only).",
+                "notes": "Proxy target for wrong-track/partial script adherence (diagnostic only).",
             },
         ]
     )
@@ -765,6 +765,7 @@ def estimate_production_block(
     compute_local_diagnostics: bool = True,
     initial_raw: np.ndarray | None = None,
     optimizer_maxiter: int = 1500,
+    payoff_signal: dict[str, float] | None = None,
 ) -> tuple[pd.DataFrame, dict[str, float], pd.DataFrame, list[str]]:
     """
     Stage 4: estimate production parameters conditional on rho, omega, tau.
@@ -795,6 +796,7 @@ def estimate_production_block(
         env.to_csv(OUT_DIR / "stage4_environment_moments.csv")
 
     markets = MARKETS
+    payoff = {m: float((payoff_signal or rho)[m]) for m in markets}
 
     def unpack(raw: np.ndarray) -> dict[str, float]:
         return {
@@ -863,13 +865,13 @@ def estimate_production_block(
             if not np.isfinite(y):
                 continue
             if mom == "itt_main":
-                pred = ate_m(m, p, rho[m], omega[m], tau[m])
+                pred = ate_m(m, p, payoff[m], omega[m], tau[m])
             elif mom == "peer_rank_beta":
                 pred = peer_beta_m(m, p, tau[m])
             elif mom == "te_within_class_dispersion":
                 pred = dispersion_m(m, p, rho[m], omega[m])
             elif mom == "assignment_payoff_beta":
-                pred = assignment_payoff_m(p, rho[m], omega[m], tau[m])
+                pred = assignment_payoff_m(p, payoff[m], omega[m], tau[m])
             else:
                 continue
             contrib = w * (y - pred) ** 2
@@ -886,23 +888,23 @@ def estimate_production_block(
 
         # Hard comparative-static penalties
         # Kenya high-tau monotonicity
-        ate_k = ate_m("kenya", p, rho["kenya"], omega["kenya"], tau["kenya"])
-        ate_k_hi_tau = ate_m("kenya", p, rho["kenya"], omega["kenya"], HIGH_TAU_BENCHMARK)
+        ate_k = ate_m("kenya", p, payoff["kenya"], omega["kenya"], tau["kenya"])
+        ate_k_hi_tau = ate_m("kenya", p, payoff["kenya"], omega["kenya"], HIGH_TAU_BENCHMARK)
         if ate_k_hi_tau < ate_k:
             components["kenya_high_tau_monotonicity_penalty"] = float(1e5 * (ate_k - ate_k_hi_tau) ** 2)
         if (ate_k_hi_tau - ate_k) > 0.35:
             components["kenya_high_tau_scale_penalty"] = float(2e4 * (ate_k_hi_tau - ate_k - 0.35) ** 2)
 
         # Nigeria execution monotonicity
-        ate_n = ate_m("nigeria", p, rho["nigeria"], omega["nigeria"], tau["nigeria"])
-        ate_n_hi_om = ate_m("nigeria", p, rho["nigeria"], DESIGNED_OMEGA_BENCHMARK, tau["nigeria"])
+        ate_n = ate_m("nigeria", p, payoff["nigeria"], omega["nigeria"], tau["nigeria"])
+        ate_n_hi_om = ate_m("nigeria", p, payoff["nigeria"], DESIGNED_OMEGA_BENCHMARK, tau["nigeria"])
         if ate_n_hi_om < ate_n:
             components["nigeria_execution_monotonicity_penalty"] = float(1e5 * (ate_n - ate_n_hi_om) ** 2)
         if (ate_n_hi_om - ate_n) > 0.35:
             components["nigeria_execution_scale_penalty"] = float(2e4 * (ate_n_hi_om - ate_n - 0.35) ** 2)
 
         # Idealized scenario should dominate Kenya high-tau counterfactual.
-        ate_ideal = ate_m("kenya", p, max(rho.values()), IDEALIZED_OMEGA_BENCHMARK, IDEALIZED_TAU_BENCHMARK)
+        ate_ideal = ate_m("kenya", p, max(payoff.values()), IDEALIZED_OMEGA_BENCHMARK, IDEALIZED_TAU_BENCHMARK)
         if ate_ideal < ate_k_hi_tau:
             components["idealized_dominance_penalty"] = float(5e4 * (ate_k_hi_tau - ate_ideal) ** 2)
 
@@ -933,13 +935,13 @@ def estimate_production_block(
             m = r["market"]
             mom = r["moment"]
             if mom == "itt_main":
-                pred = ate_m(m, p, rho[m], omega[m], tau[m])
+                pred = ate_m(m, p, payoff[m], omega[m], tau[m])
             elif mom == "peer_rank_beta":
                 pred = peer_beta_m(m, p, tau[m])
             elif mom == "te_within_class_dispersion":
                 pred = dispersion_m(m, p, rho[m], omega[m])
             elif mom == "assignment_payoff_beta":
-                pred = assignment_payoff_m(p, rho[m], omega[m], tau[m])
+                pred = assignment_payoff_m(p, payoff[m], omega[m], tau[m])
             else:
                 pred = np.nan
             pred_rows.append(
@@ -1011,11 +1013,11 @@ def estimate_production_block(
                     "high_input_ate": ate_m(
                         "kenya",
                         p_start,
-                        max(rho.values()),
+                        max(payoff.values()),
                         IDEALIZED_OMEGA_BENCHMARK,
                         IDEALIZED_TAU_BENCHMARK,
                     ),
-                    "kenya_high_tau": ate_m("kenya", p_start, rho["kenya"], omega["kenya"], HIGH_TAU_BENCHMARK),
+                    "kenya_high_tau": ate_m("kenya", p_start, payoff["kenya"], omega["kenya"], HIGH_TAU_BENCHMARK),
                     "message": str(res.message),
                 }
             )
@@ -1059,13 +1061,13 @@ def estimate_production_block(
         if not np.isfinite(y):
             continue
         if mom == "itt_main":
-            pred = ate_m(m, p, rho[m], omega[m], tau[m])
+            pred = ate_m(m, p, payoff[m], omega[m], tau[m])
         elif mom == "peer_rank_beta":
             pred = peer_beta_m(m, p, tau[m])
         elif mom == "te_within_class_dispersion":
             pred = dispersion_m(m, p, rho[m], omega[m])
         elif mom == "assignment_payoff_beta":
-            pred = assignment_payoff_m(p, rho[m], omega[m], tau[m])
+            pred = assignment_payoff_m(p, payoff[m], omega[m], tau[m])
         else:
             continue
         fit_rows.append(
@@ -1160,15 +1162,15 @@ def estimate_production_block(
 
     def scenario_ates(p_boot: dict[str, float]) -> dict[str, float]:
         return {
-            "kenya_observed": ate_m("kenya", p_boot, rho["kenya"], omega["kenya"], tau["kenya"]),
-            "kenya_high_tau": ate_m("kenya", p_boot, rho["kenya"], omega["kenya"], HIGH_TAU_BENCHMARK),
-            "nigeria_realized": ate_m("nigeria", p_boot, rho["nigeria"], omega["nigeria"], tau["nigeria"]),
-            "nigeria_designed_execution": ate_m("nigeria", p_boot, rho["nigeria"], DESIGNED_OMEGA_BENCHMARK, tau["nigeria"]),
-            "liberia_observed": ate_m("liberia", p_boot, rho["liberia"], omega["liberia"], tau["liberia"]),
-            "idealized_high_rho_high_omega_high_tau": ate_m("kenya", p_boot, max(rho.values()), IDEALIZED_OMEGA_BENCHMARK, IDEALIZED_TAU_BENCHMARK),
-            "nigeria_rho_only": ate_m("nigeria", p_boot, rho["kenya"], omega["nigeria"], tau["nigeria"]),
-            "nigeria_tau_only": ate_m("nigeria", p_boot, rho["nigeria"], omega["nigeria"], HIGH_TAU_BENCHMARK),
-            "nigeria_omega_only": ate_m("nigeria", p_boot, rho["nigeria"], DESIGNED_OMEGA_BENCHMARK, tau["nigeria"]),
+            "kenya_observed": ate_m("kenya", p_boot, payoff["kenya"], omega["kenya"], tau["kenya"]),
+            "kenya_high_tau": ate_m("kenya", p_boot, payoff["kenya"], omega["kenya"], HIGH_TAU_BENCHMARK),
+            "nigeria_realized": ate_m("nigeria", p_boot, payoff["nigeria"], omega["nigeria"], tau["nigeria"]),
+            "nigeria_designed_execution": ate_m("nigeria", p_boot, payoff["nigeria"], DESIGNED_OMEGA_BENCHMARK, tau["nigeria"]),
+            "liberia_observed": ate_m("liberia", p_boot, payoff["liberia"], omega["liberia"], tau["liberia"]),
+            "idealized_high_rho_high_omega_high_tau": ate_m("kenya", p_boot, max(payoff.values()), IDEALIZED_OMEGA_BENCHMARK, IDEALIZED_TAU_BENCHMARK),
+            "nigeria_rho_only": ate_m("nigeria", p_boot, payoff["kenya"], omega["nigeria"], tau["nigeria"]),
+            "nigeria_tau_only": ate_m("nigeria", p_boot, payoff["nigeria"], omega["nigeria"], HIGH_TAU_BENCHMARK),
+            "nigeria_omega_only": ate_m("nigeria", p_boot, payoff["nigeria"], DESIGNED_OMEGA_BENCHMARK, tau["nigeria"]),
         }
 
     # Parametric uncertainty for counterfactuals, conditional on stage-1 to
@@ -1349,7 +1351,7 @@ def run_acceptance_tests(
 
     tests["nigeria_target_coherence"] = {
         "pass": True,
-        "detail": "Estimation uses computed canonical moments; external moments used for validation only.",
+            "detail": "Estimation uses computed canonical moments; external moments used for diagnostic checks only.",
     }
 
     # Reduced-form respect: broad ITT ranking Liberia negative, Kenya near zero, Nigeria small positive
@@ -1377,7 +1379,7 @@ def run_acceptance_tests(
 
 
 def write_structural_validation_checks(acceptance: dict[str, Any], fit_df: pd.DataFrame) -> pd.DataFrame:
-    """Write a paper-facing table for post-estimation validation checks."""
+    """Write a paper-facing table for model fit, restrictions, and sensitivity checks."""
 
     def status(key: str) -> str:
         return "Pass" if bool(acceptance.get(key, {}).get("pass", False)) else "Fail"
@@ -1386,7 +1388,6 @@ def write_structural_validation_checks(acceptance: dict[str, Any], fit_df: pd.Da
     omega = acceptance["omega_ordering"]["detail"]
     k_tau = acceptance["kenya_high_tau_monotonicity"]["detail"]
     n_exec = acceptance["nigeria_execution_monotonicity"]["detail"]
-    dominance = acceptance["idealized_dominance"]["detail"]
     rf = acceptance["reduced_form_respect"]["detail"]
 
     itt_fit = fit_df[fit_df["moment"].astype(str) == "itt_main"].copy()
@@ -1409,29 +1410,24 @@ def write_structural_validation_checks(acceptance: dict[str, Any], fit_df: pd.Da
             "status": status("tau_process_identification"),
         },
         {
-            "check": "Kenya delivery monotonicity",
+            "check": "Maintained restriction: Kenya delivery",
             "evidence": f"ATE rises from ${_fmt_signed(k_tau['kenya_observed'])}$ to ${_fmt_signed(k_tau['kenya_high_tau'])}$",
             "status": status("kenya_high_tau_monotonicity"),
         },
         {
-            "check": "Nigeria execution monotonicity",
+            "check": "Maintained restriction: Nigeria execution",
             "evidence": f"ATE weakly rises from ${_fmt_signed(n_exec['nigeria_realized'], 4)}$ to ${_fmt_signed(n_exec['nigeria_designed_execution'], 4)}$",
             "status": status("nigeria_execution_monotonicity"),
         },
         {
             "check": "Nigeria target coherence",
-            "evidence": "Cleaned roster moments estimated; conflicting audit targets validation only",
+            "evidence": "Cleaned roster moments estimated; conflicting audit targets diagnostic only",
             "status": status("nigeria_target_coherence"),
         },
         {
             "check": "Observed-cell fit",
             "evidence": f"Predicted observed ATEs: K ${_fmt_signed(rf['kenya_ate'])}$, L ${_fmt_signed(rf['liberia_ate'])}$, N ${_fmt_signed(rf['nigeria_ate'])}$; max ITT error/SE {_fmt(max_itt_over_se)}",
             "status": status("reduced_form_respect"),
-        },
-        {
-            "check": "High-input dominance",
-            "evidence": f"High-input ${_fmt_signed(dominance['idealized_ate'])}$ exceeds max observed ${_fmt_signed(dominance['max_observed_ate'])}$",
-            "status": status("idealized_dominance"),
         },
     ]
     out = pd.DataFrame(rows)
@@ -1444,20 +1440,20 @@ def write_structural_validation_checks(acceptance: dict[str, Any], fit_df: pd.Da
         [
             r"\begin{table}[H]",
             r"\centering",
-            r"\caption{Structural Validation Checks}",
+            r"\caption{Model Fit, Maintained Restrictions, and Sensitivity Checks}",
             r"\label{tab:struct_validation_checks}",
             r"\begin{threeparttable}",
             r"\footnotesize",
             r"\begin{tabular}[t]{>{\raggedright\arraybackslash}p{3.1cm}>{\raggedright\arraybackslash}p{8.0cm}c}",
             r"\toprule",
-            r"Check & Evidence & Status \\",
+            r"Item & Evidence & Status \\",
             r"\midrule",
             *body,
             r"\bottomrule",
             r"\end{tabular}",
             r"\begin{tablenotes}[para,flushleft]",
             r"\footnotesize",
-            "\\item \\textit{Notes:} The table reports post-estimation restrictions used before interpreting the counterfactuals. These checks are not additional moments that mechanically fit the high-input result. They verify that the measured primitives line up with their identifying evidence outside the treatment-effect fit, that the production mapping respects the model's comparative statics, and that fitted observed-cell ATEs remain close to the harmonized reduced-form estimates.",
+            "\\item \\textit{Notes:} The table separates measured-input checks, observed-cell fit, and maintained comparative-static restrictions. The comparative-static rows are restrictions imposed before interpreting counterfactuals; they are not validation evidence for the high-input result. The high-input ATE itself is reported only as a counterfactual result in Table~\\ref{tab:counterfactuals}.",
             r"\end{tablenotes}",
             r"\end{threeparttable}",
             r"\end{table}",
@@ -1520,7 +1516,7 @@ def write_tau_calibration_documentation(stage3: pd.DataFrame, process_df: pd.Dat
             "calibration": "Not used in calibration",
             "process_prior": np.nan,
             "tau_hat": np.nan,
-            "estimation_role": "Validation only",
+            "estimation_role": "Diagnostic only",
         },
     ]
     out = pd.DataFrame(rows)
@@ -1556,7 +1552,7 @@ def write_tau_calibration_documentation(stage3: pd.DataFrame, process_df: pd.Dat
             r"\end{tabular}",
             r"\begin{tablenotes}[para,flushleft]",
             r"\footnotesize",
-            r"\item \textit{Notes:} The table documents the outcome-free mapping from assignment-channel process evidence into the delivery-fidelity primitive. $\Delta LC$ is the treatment-control lesson-completion difference. $LC_T$ and $LC_C$ are DI numeracy completion rates in Nigeria treatment and control schools. The wrong-track proxy is retained as validation evidence and is not used to set $\tau$.",
+            r"\item \textit{Notes:} The table documents the outcome-free mapping from assignment-channel process evidence into the delivery-fidelity primitive. $\Delta LC$ is the treatment-control lesson-completion difference. $LC_T$ and $LC_C$ are DI numeracy completion rates in Nigeria treatment and control schools. The wrong-track proxy is retained as diagnostic evidence and is not used to set $\tau$.",
             r"\end{tablenotes}",
             r"\end{threeparttable}",
             r"\end{table}",
@@ -1564,6 +1560,107 @@ def write_tau_calibration_documentation(stage3: pd.DataFrame, process_df: pd.Dat
         ]
     )
     (TEX_DIR / "tab_struct_tau_calibration.tex").write_text(table, encoding="utf-8")
+    return out
+
+
+def write_tau_raw_unit_thresholds(stage3: pd.DataFrame) -> pd.DataFrame:
+    """Translate selected tau values back into raw process units."""
+
+    tau_hat = stage3.set_index("market")["tau_hat"].to_dict()
+
+    def kl_delta_lc(tau_v: float) -> float:
+        return float((tau_v - 0.30) / 8.0)
+
+    def nigeria_equal_completion(tau_v: float) -> float:
+        return float((tau_v - 0.10) / 0.80)
+
+    rows = [
+        {
+            "row": "Kenya observed",
+            "tau": tau_hat.get("kenya", np.nan),
+            "kl_delta_lc": kl_delta_lc(tau_hat.get("kenya", np.nan)),
+            "nigeria_completion": nigeria_equal_completion(tau_hat.get("kenya", np.nan)),
+            "interpretation": "Observed Kenya index",
+        },
+        {
+            "row": "Liberia observed",
+            "tau": tau_hat.get("liberia", np.nan),
+            "kl_delta_lc": kl_delta_lc(tau_hat.get("liberia", np.nan)),
+            "nigeria_completion": nigeria_equal_completion(tau_hat.get("liberia", np.nan)),
+            "interpretation": "Observed Liberia index",
+        },
+        {
+            "row": "Nigeria observed",
+            "tau": tau_hat.get("nigeria", np.nan),
+            "kl_delta_lc": kl_delta_lc(tau_hat.get("nigeria", np.nan)),
+            "nigeria_completion": nigeria_equal_completion(tau_hat.get("nigeria", np.nan)),
+            "interpretation": "Observed Nigeria index",
+        },
+        {
+            "row": "Moderate delivery",
+            "tau": 0.70,
+            "kl_delta_lc": kl_delta_lc(0.70),
+            "nigeria_completion": nigeria_equal_completion(0.70),
+            "interpretation": "Moderate benchmark",
+        },
+        {
+            "row": "High delivery",
+            "tau": HIGH_TAU_BENCHMARK,
+            "kl_delta_lc": kl_delta_lc(HIGH_TAU_BENCHMARK),
+            "nigeria_completion": nigeria_equal_completion(HIGH_TAU_BENCHMARK),
+            "interpretation": "High-delivery benchmark",
+        },
+        {
+            "row": "High-input benchmark",
+            "tau": IDEALIZED_TAU_BENCHMARK,
+            "kl_delta_lc": kl_delta_lc(IDEALIZED_TAU_BENCHMARK),
+            "nigeria_completion": nigeria_equal_completion(IDEALIZED_TAU_BENCHMARK),
+            "interpretation": "High-input benchmark",
+        },
+    ]
+    out = pd.DataFrame(rows)
+    out.to_csv(OUT_DIR / "tau_raw_unit_thresholds.csv", index=False)
+
+    def pct(x: float) -> str:
+        if not np.isfinite(float(x)):
+            return ""
+        return f"{100 * float(x):.1f}\\%"
+
+    body = []
+    for _, r in out.iterrows():
+        ng = pct(r["nigeria_completion"])
+        if float(r["tau"]) > 0.85:
+            ng = "above Nigeria cap"
+        body.append(
+            f"{r['row']} & {_fmt(r['tau'], 3)} & {pct(r['kl_delta_lc'])} & {ng} & {r['interpretation']} \\\\"
+        )
+
+    table = "\n".join(
+        [
+            r"\begin{table}[H]",
+            r"\centering",
+            r"\caption{Raw-Unit Interpretation of Delivery-Fidelity Benchmarks}",
+            r"\label{tab:struct_tau_raw_thresholds}",
+            r"\begin{threeparttable}",
+            r"\scriptsize",
+            r"\setlength{\tabcolsep}{3pt}",
+            r"\begin{tabular}[t]{>{\raggedright\arraybackslash}p{2.6cm}ccc>{\raggedright\arraybackslash}p{3.1cm}}",
+            r"\toprule",
+            r"Benchmark & $\tau$ & K/L $\Delta LC$ & Nigeria DI completion & Interpretation \\",
+            r"\midrule",
+            *body,
+            r"\bottomrule",
+            r"\end{tabular}",
+            r"\begin{tablenotes}[para,flushleft]",
+            r"\footnotesize",
+            r"\item \textit{Notes:} The table translates selected values of the normalized delivery-fidelity index back into the raw process units used in Table~\ref{tab:struct_tau_calibration}. For Kenya and Liberia, the raw unit is the treatment-control lesson-completion difference implied by $\tau=0.30+8\Delta LC$. For Nigeria, the raw unit is the DI numeracy completion rate implied by $\tau=0.10+0.80LC$ when treatment and control completion are equal. The Nigeria calibration is capped at $\tau=0.85$, so the $\tau=0.90$ and $\tau=0.95$ benchmarks should be read as high-delivery activation benchmarks rather than observed Nigeria-style completion rates.",
+            r"\end{tablenotes}",
+            r"\end{threeparttable}",
+            r"\end{table}",
+            "",
+        ]
+    )
+    (TEX_DIR / "tab_struct_tau_raw_thresholds.tex").write_text(table, encoding="utf-8")
     return out
 
 
@@ -1626,7 +1723,7 @@ def write_stage4_normalization_documentation() -> pd.DataFrame:
         },
         {
             "term": "Comparative-static penalties",
-            "formula": "monotonicity and dominance inequalities",
+            "formula": "monotonicity and ordering inequalities",
             "preferred_setting": "hard penalties",
             "objective_contribution": hard_value,
             "share": hard_share,
@@ -2453,6 +2550,181 @@ def write_primitive_benchmark_sensitivity(
 
     out = pd.DataFrame(rows)
     out.to_csv(OUT_DIR / "primitive_benchmark_sensitivity.csv", index=False)
+    return out
+
+
+def _load_assignment_value_primitives(rho: dict[str, float]) -> tuple[pd.DataFrame, dict[str, float], dict[str, float]]:
+    """Build normalized assignment-value primitives from predicted mismatch reductions."""
+
+    path = OUT_DIR / "assignment_value_summary.csv"
+    if path.exists():
+        av = pd.read_csv(path)
+    else:
+        gain_dir = OUT_DIR.parent / "control_trained_gains"
+        rows = []
+        for market, label in [("kenya", "Kenya"), ("liberia", "Liberia"), ("nigeria", "Nigeria")]:
+            df = pd.read_parquet(gain_dir / f"{market}_predicted_gains.parquet")
+            df = df.dropna(subset=["mismatch_grade", "mismatch_designed"]).copy()
+            gain = df["mismatch_grade"] - df["mismatch_designed"]
+            rows.append(
+                {
+                    "country": label,
+                    "n": int(len(df)),
+                    "grade_mismatch": float(df["mismatch_grade"].mean()),
+                    "diagnostic_mismatch": float(df["mismatch_designed"].mean()),
+                    "mean_reduction": float(gain.mean()),
+                    "share_lower": float((gain > 1e-6).mean()),
+                    "share_higher": float((gain < -1e-6).mean()),
+                    "share_unchanged": float((gain.abs() <= 1e-6).mean()),
+                }
+            )
+        av = pd.DataFrame(rows)
+
+    av = av.copy()
+    av["market"] = av["country"].astype(str).str.lower()
+    av["net_positive_reduction"] = av["mean_reduction"].clip(lower=0.0)
+    av["share_weighted_reduction"] = av["net_positive_reduction"] * av["share_lower"]
+    high_rho = float(max(rho.values()))
+
+    def normalize(col: str) -> dict[str, float]:
+        denom = float(av[col].max())
+        if not np.isfinite(denom) or denom <= 0:
+            return {m: 0.0 for m in MARKETS}
+        return {
+            str(r["market"]): float(high_rho * float(r[col]) / denom)
+            for _, r in av.iterrows()
+            if str(r["market"]) in MARKETS
+        }
+
+    return av, normalize("net_positive_reduction"), normalize("share_weighted_reduction")
+
+
+def write_assignment_value_payoff_sensitivity(
+    data: dict[str, pd.DataFrame],
+    rho: dict[str, float],
+    omega: dict[str, float],
+    tau: dict[str, float],
+    p: dict[str, float],
+    env: pd.DataFrame,
+    fit_df: pd.DataFrame,
+) -> pd.DataFrame:
+    """Re-estimate stage 4 after replacing rho in the payoff term with assignment value."""
+
+    av, g_net, g_weighted = _load_assignment_value_primitives(rho)
+    raw_start = _pack_stage4_raw(p)
+
+    def max_itt_over_se(fit: pd.DataFrame) -> float:
+        itt = fit[fit["moment"].astype(str) == "itt_main"].copy()
+        if itt.empty:
+            return np.nan
+        return float((itt["error"].abs() * np.sqrt(itt["weight"].astype(float))).max())
+
+    def ate_env(params: dict[str, float], payoff: dict[str, float], env_market: str, signal_v: float, om_v: float, tau_v: float) -> float:
+        e = env.loc[env_market]
+        social = float(e["peer_shift"] + params["omega_r"] * e["rank_proxy"])
+        tau_term = float(np.clip(tau_v, 0.0, 1.0) ** params["tau_power"])
+        return float(
+            params[f"delta_{env_market}"]
+            + params["lambda"] * signal_v * om_v * tau_term
+            + params["phi"] * (1.0 - tau_v) * social
+            - params["chi_N"] * e["class_size_pressure"]
+            - params["chi_V"] * e["grade_disp_shift"]
+        )
+
+    specs: list[dict[str, Any]] = [
+        {
+            "specification": "rho_preferred",
+            "label": "Preferred rho",
+            "payoff": rho,
+            "params": p,
+            "fit": fit_df,
+            "note": "Preferred model",
+        },
+    ]
+    for spec_name, label, payoff_signal in [
+        ("net_mismatch_reduction", "Net mismatch reduction", g_net),
+        ("share_weighted_reduction", "Share-weighted reduction", g_weighted),
+    ]:
+        stage4_s, p_s, fit_s, _ = estimate_production_block(
+            data,
+            rho,
+            omega,
+            tau,
+            write_outputs=False,
+            boot_draws=0,
+            stage4_starts=6,
+            compute_local_diagnostics=False,
+            initial_raw=raw_start,
+            optimizer_maxiter=600,
+            payoff_signal=payoff_signal,
+        )
+        specs.append(
+            {
+                "specification": spec_name,
+                "label": label,
+                "payoff": payoff_signal,
+                "params": p_s,
+                "fit": fit_s,
+                "note": "Re-estimated stage 4",
+            }
+        )
+
+    rows = []
+    for spec in specs:
+        payoff = {m: float(spec["payoff"][m]) for m in MARKETS}
+        params = spec["params"]
+        rows.append(
+            {
+                "specification": spec["specification"],
+                "label": spec["label"],
+                "g_kenya": payoff["kenya"],
+                "g_liberia": payoff["liberia"],
+                "g_nigeria": payoff["nigeria"],
+                "max_itt_over_se": max_itt_over_se(spec["fit"]),
+                "kenya_high_tau": ate_env(params, payoff, "kenya", payoff["kenya"], omega["kenya"], HIGH_TAU_BENCHMARK),
+                "high_input": ate_env(params, payoff, "kenya", max(payoff.values()), IDEALIZED_OMEGA_BENCHMARK, IDEALIZED_TAU_BENCHMARK),
+                "nigeria_signal_tau": ate_env(params, payoff, "nigeria", payoff["kenya"], omega["nigeria"], HIGH_TAU_BENCHMARK),
+                "lambda": params["lambda"],
+                "alpha": params["tau_power"],
+                "objective": params["objective"],
+                "note": spec["note"],
+            }
+        )
+
+    out = pd.DataFrame(rows)
+    out.to_csv(OUT_DIR / "assignment_value_payoff_sensitivity.csv", index=False)
+
+    body = []
+    for _, r in out.iterrows():
+        body.append(
+            f"{r['label']} & {_fmt(r['g_kenya'])} & {_fmt(r['g_liberia'])} & {_fmt(r['g_nigeria'])} & {_fmt(r['max_itt_over_se'])} & ${_fmt_signed(r['kenya_high_tau'])}$ & ${_fmt_signed(r['high_input'])}$ \\\\"
+        )
+
+    table = "\n".join(
+        [
+            r"\begin{table}[H]",
+            r"\centering",
+            r"\caption{Structural Robustness Using Assignment-Value Primitives}",
+            r"\label{tab:struct_assignment_value_sensitivity}",
+            r"\begin{threeparttable}",
+            r"\footnotesize",
+            r"\begin{tabular}[t]{lcccccc}",
+            r"\toprule",
+            r"Payoff primitive & Kenya & Liberia & Nigeria & Max ITT/SE & K high-$\tau$ & High-input \\",
+            r"\midrule",
+            *body,
+            r"\bottomrule",
+            r"\end{tabular}",
+            r"\begin{tablenotes}[para,flushleft]",
+            r"\footnotesize",
+            r"\item \textit{Notes:} The preferred model uses the control-group predictive-content primitive $\rho$ in the assignment-payoff term. The robustness rows re-estimate the stage-4 production block after replacing that payoff input with a normalized assignment-value primitive from Table~\ref{tab:assignment_value_summary}. ``Net mismatch reduction'' uses the positive part of Grade minus Diagnostic mismatch, normalized so Kenya equals the preferred high-signal value. ``Share-weighted reduction'' multiplies the positive mean reduction by the share of students whose predicted mismatch falls before the same normalization. The mechanical sorting equation continues to use $\rho$ because it predicts classroom compression rather than payoff value. The table reports the Kenya high-delivery and fully high-input counterfactuals under each re-estimated production map.",
+            r"\end{tablenotes}",
+            r"\end{threeparttable}",
+            r"\end{table}",
+            "",
+        ]
+    )
+    (TEX_DIR / "tab_struct_assignment_value_sensitivity.tex").write_text(table, encoding="utf-8")
     return out
 
 
@@ -3864,7 +4136,7 @@ def _write_latex_tables(
                 r"\end{tabular}",
                 r"\begin{tablenotes}[para,flushleft]",
                 r"\footnotesize",
-                "\\item \\textit{Notes:} Panel A decomposes the preferred stage-4 criterion at the optimum. Objective shares are relative to the total objective. The hard comparative-static penalties are the inequality penalties used to rule out counterfactual mappings that violate the model's monotonicity and dominance restrictions. Panel B reports multi-start optimizer diagnostics; the high-input ATE is the fully idealized $\\rho$-$\\omega$-$\\tau$ counterfactual.",
+                "\\item \\textit{Notes:} Panel A decomposes the preferred stage-4 criterion at the optimum. Objective shares are relative to the total objective. The hard comparative-static penalties are the inequality penalties used to rule out counterfactual mappings that violate the model's monotonicity and ordering restrictions. Panel B reports multi-start optimizer diagnostics; the high-input ATE is the fully idealized $\\rho$-$\\omega$-$\\tau$ counterfactual.",
                 r"\end{tablenotes}",
                 r"\end{threeparttable}",
                 r"\end{table}",
@@ -4476,6 +4748,8 @@ def _write_redesign_note(
     lines.append("- Social-channel/rank-weight robustness is saved in `social_channel_sensitivity.csv`.")
     lines.append("- Market-level target influence is saved in `stage4_market_influence.csv`.")
     lines.append("- High-input primitive benchmark sensitivity is saved in `primitive_benchmark_sensitivity.csv`.")
+    lines.append("- Assignment-value payoff robustness is saved in `assignment_value_payoff_sensitivity.csv`.")
+    lines.append("- Raw-unit tau benchmark translations are saved in `tau_raw_unit_thresholds.csv`.")
     lines.append("- Delivery-fidelity calibration sensitivity is saved in `tau_calibration_sensitivity.csv`.")
     lines.append("- Primitive-estimation uncertainty sensitivity is saved in `primitive_uncertainty_sensitivity.csv`.")
     lines.append("- Delivery-activation functional-form sensitivity is saved in `delivery_activation_sensitivity.csv`.")
@@ -4557,10 +4831,13 @@ def _write_run_manifest(acceptance: dict[str, Any], warnings: list[str], archive
         "stage4_structural_parameters.csv",
         "stage4_target_moments.csv",
         "structural_validation_checks.csv",
+        "assignment_value_payoff_sensitivity.csv",
+        "tau_raw_unit_thresholds.csv",
         "structural_redesign_note.md",
         "target_vs_fitted_moments.csv",
         "latex/tab_counterfactuals.tex",
         "latex/tab_struct_combined_uncertainty.tex",
+        "latex/tab_struct_assignment_value_sensitivity.tex",
         "latex/tab_struct_component_decomp.tex",
         "latex/tab_struct_delivery_activation.tex",
         "latex/tab_struct_delivery_thresholds.tex",
@@ -4582,6 +4859,7 @@ def _write_run_manifest(acceptance: dict[str, Any], warnings: list[str], archive
         "latex/tab_struct_stage4_param_uncertainty.tex",
         "latex/tab_struct_target_blocks.tex",
         "latex/tab_struct_tau_calibration.tex",
+        "latex/tab_struct_tau_raw_thresholds.tex",
         "latex/tab_struct_validation_checks.tex",
         "latex/tab_structural_params.tex",
     ]
@@ -4643,6 +4921,7 @@ def main() -> None:
     stage3, tau, process_df, w3 = estimate_tau_block(data)
     warnings.extend(w3)
     write_tau_calibration_documentation(stage3, process_df)
+    write_tau_raw_unit_thresholds(stage3)
     print("Stage 3 complete: tau calibrated from process moments only.", flush=True)
 
     # Stage 4
@@ -4671,6 +4950,7 @@ def main() -> None:
     influence_sensitivity = write_stage4_influence_sensitivity(data, rho, omega, tau, env, p)
     market_influence = write_stage4_market_influence(data, rho, omega, tau, env, p)
     primitive_sensitivity = write_primitive_benchmark_sensitivity(stage1, rho, p, env)
+    assignment_value_sensitivity = write_assignment_value_payoff_sensitivity(data, rho, omega, tau, p, env, fit_df)
     tau_calibration_sensitivity = write_tau_calibration_sensitivity(data, process_df, rho, omega, tau, env)
     primitive_uncertainty = write_primitive_uncertainty_sensitivity(stage1, stage2, stage3, process_df, rho, omega, tau, p, env)
     combined_uncertainty = write_combined_uncertainty(data, stage1, stage3, process_df, rho, omega, tau, p, env)

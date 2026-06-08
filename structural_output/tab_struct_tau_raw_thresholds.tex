@@ -1,0 +1,25 @@
+\begin{table}[H]
+\centering
+\caption{Raw-Unit Interpretation of Delivery-Fidelity Benchmarks}
+\label{tab:struct_tau_raw_thresholds}
+\begin{threeparttable}
+\scriptsize
+\setlength{\tabcolsep}{3pt}
+\begin{tabular}[t]{>{\raggedright\arraybackslash}p{2.6cm}ccc>{\raggedright\arraybackslash}p{3.1cm}}
+\toprule
+Benchmark & $\tau$ & K/L $\Delta LC$ & Nigeria DI completion & Interpretation \\
+\midrule
+Kenya observed & 0.500 & 2.5\% & 50.0\% & Observed Kenya index \\
+Liberia observed & 0.385 & 1.1\% & 35.6\% & Observed Liberia index \\
+Nigeria observed & 0.312 & 0.1\% & 26.4\% & Observed Nigeria index \\
+Moderate delivery & 0.700 & 5.0\% & 75.0\% & Moderate benchmark \\
+High delivery & 0.900 & 7.5\% & above Nigeria cap & High-delivery benchmark \\
+High-input benchmark & 0.950 & 8.1\% & above Nigeria cap & High-input benchmark \\
+\bottomrule
+\end{tabular}
+\begin{tablenotes}[para,flushleft]
+\footnotesize
+\item \textit{Notes:} The table translates selected values of the normalized delivery-fidelity index back into the raw process units used in Table~\ref{tab:struct_tau_calibration}. For Kenya and Liberia, the raw unit is the treatment-control lesson-completion difference implied by $\tau=0.30+8\Delta LC$. For Nigeria, the raw unit is the DI numeracy completion rate implied by $\tau=0.10+0.80LC$ when treatment and control completion are equal. The Nigeria calibration is capped at $\tau=0.85$, so the $\tau=0.90$ and $\tau=0.95$ benchmarks should be read as high-delivery activation benchmarks rather than observed Nigeria-style completion rates.
+\end{tablenotes}
+\end{threeparttable}
+\end{table}

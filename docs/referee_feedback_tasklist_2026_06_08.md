@@ -56,6 +56,28 @@ This note converts the June 8, 2026 feedback into revision tasks and records how
    - Added main-text language summarizing Appendix Table `tab:struct_market_influence`.
    - The high-input benchmark remains positive when omitting any one country from stage-4 targets, while the Nigeria-environment decomposition is more sensitive and is therefore treated as mechanism evidence.
 
+14. Make the tau threshold interpretable in raw units.
+   - Added Table `tab:struct_tau_raw_thresholds`, translating selected tau values into the raw process units used in the calibration.
+   - The table shows that tau 0.90 corresponds to a 7.5 percentage point Kenya/Liberia lesson-completion difference under the calibration rule, while the same benchmark is above the Nigeria calibration cap and should be read as a high-delivery activation benchmark.
+
+15. Replace the fragile grade-signal explanation of Kenya.
+   - Removed main-text claims that Kenya's null is explained by a comparatively strong incumbent grade signal.
+   - The paper now says Kenya is the sharp test because the diagnostic is informative, changes composition, and lowers predicted mismatch, yet achievement does not rise at observed delivery fidelity.
+
+16. Add assignment-value robustness to the structural model.
+   - Added Table `tab:struct_assignment_value_sensitivity`.
+   - The table re-estimates the stage-4 production block after replacing rho in the assignment-payoff term with normalized predicted mismatch-reduction primitives from Table `tab:assignment_value_summary`.
+   - The high-input benchmark remains about 0.186 SD under both assignment-value alternatives, with essentially unchanged observed-cell fit.
+
+17. Fix validation-table optics.
+   - Renamed Table `tab:struct_validation_checks` to "Model Fit, Maintained Restrictions, and Sensitivity Checks."
+   - Removed the high-input dominance row.
+   - Relabeled monotonicity rows as maintained comparative-static restrictions, not validation evidence.
+
+18. Make the abstract more precise on Liberia and the structural number.
+   - Replaced "grouping is harmful" with "estimated effects are negative, with harm concentrated in the upper track."
+   - Reframed the 0.19 SD sentence so the more robust implication is the high delivery threshold rather than the exact magnitude.
+
 ## Partly addressed, still worth deeper work
 
 1. Incumbent-grade signal table with vertical-scale outcomes.
@@ -71,6 +93,12 @@ This note converts the June 8, 2026 feedback into revision tasks and records how
 4. Main-text architecture.
    - The paper now foregrounds the reduced form more clearly, but the full section order was not rebuilt around the exact Kenya-Liberia-Nigeria sequence proposed in the feedback.
 
+5. Table numbering and placement.
+   - Not fully addressed in this pass. The active paper now materializes the new structural tables correctly, but a later presentation pass should reorder main reduced-form tables before structural tables if the target format allows in-text numbering by argument order.
+
+6. Disclosure/PAP/data note.
+   - Not addressed in this pass. This should be added before submission as a separate research-design note.
+
 ## Referee-facing summary
 
-We revised the manuscript so the observed experimental failures are the starting point rather than a problem for the structural model to undo. The abstract, introduction, results, structural section, and conclusion now state that the three RCTs do not show a clearly positive average effect and that the contribution is to explain why: Liberia lacks a valid signal, Kenya shows that correct sorting alone has no payoff at observed fidelity, and Nigeria shows how a high-input design can fail on execution and delivery. We recast the structural exercise as a calibrated assignment-delivery benchmark, not an identified substitute experiment; promoted the delivery-fidelity calibration, tau sensitivity, scale sensitivity, and delivery-threshold tables to the main text; added a main table documenting the diagnostic's incremental value over grade; added assignment-value diagnostics showing how predicted mismatch changes under grade versus diagnostic assignment; made Nigeria attrition and the support-aware two-group collapse explicit; clarified the interpretation of the assignment-execution primitive; and summarized leave-one-country structural influence diagnostics in the main text.
+We revised the manuscript so the observed experimental failures are the starting point rather than a problem for the structural model to undo. The abstract, introduction, results, structural section, and conclusion now state that the three RCTs do not show a clearly positive average effect and that the contribution is to explain why: Liberia lacks a valid signal, Kenya shows that correct sorting alone has no payoff at observed fidelity, and Nigeria shows how a high-input design can fail on execution and delivery. We recast the structural exercise as a calibrated assignment-delivery benchmark, not an identified substitute experiment; promoted the delivery-fidelity calibration, tau sensitivity, scale sensitivity, and delivery-threshold tables to the main text; added raw-unit tau translations; added a main table documenting the diagnostic's incremental value over grade; added assignment-value diagnostics showing how predicted mismatch changes under grade versus diagnostic assignment; added a structural robustness table using assignment-value primitives instead of rho in the payoff term; removed the high-input dominance validation row; made Nigeria attrition and the support-aware two-group collapse explicit; clarified the interpretation of the assignment-execution primitive; and summarized leave-one-country structural influence diagnostics in the main text.

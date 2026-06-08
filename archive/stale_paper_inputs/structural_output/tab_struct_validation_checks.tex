@@ -1,26 +1,25 @@
 \begin{table}[H]
 \centering
-\caption{Structural Validation Checks}
+\caption{Model Fit, Maintained Restrictions, and Sensitivity Checks}
 \label{tab:struct_validation_checks}
 \begin{threeparttable}
 \footnotesize
 \begin{tabular}[t]{>{\raggedright\arraybackslash}p{3.1cm}>{\raggedright\arraybackslash}p{8.0cm}c}
 \toprule
-Check & Evidence & Status \\
+Item & Evidence & Status \\
 \midrule
 Signal-quality ranking & $\rho_K=0.533>0.121>0.055=\rho_L$ & Pass \\
 Assignment-execution ranking & $\omega_K=\omega_L=1.00>0.84=\omega_N$ & Pass \\
 Delivery primitive measured before outcomes & $\tau$ calibrated from process moments before stage 4 & Pass \\
-Kenya delivery monotonicity & ATE rises from $+0.030$ to $+0.155$ & Pass \\
-Nigeria execution monotonicity & ATE weakly rises from $+0.0561$ to $+0.0562$ & Pass \\
+Maintained restriction: Kenya delivery & ATE rises from $+0.030$ to $+0.155$ & Pass \\
+Maintained restriction: Nigeria execution & ATE weakly rises from $+0.0561$ to $+0.0562$ & Pass \\
 Nigeria target coherence & Cleaned roster moments estimated; conflicting audit targets validation only & Pass \\
 Observed-cell fit & Predicted observed ATEs: K $+0.030$, L $-0.176$, N $+0.056$; max ITT error/SE 0.281 & Pass \\
-High-input dominance & High-input $+0.187$ exceeds max observed $+0.056$ & Pass \\
 \bottomrule
 \end{tabular}
 \begin{tablenotes}[para,flushleft]
 \footnotesize
-\item \textit{Notes:} The table reports post-estimation restrictions used before interpreting the counterfactuals. These checks are not additional moments that mechanically fit the high-input result. They verify that the measured primitives line up with their identifying evidence outside the treatment-effect fit, that the production mapping respects the model's comparative statics, and that fitted observed-cell ATEs remain close to the harmonized reduced-form estimates.
+\item \textit{Notes:} The table separates measured-input checks, observed-cell fit, and maintained comparative-static restrictions. The comparative-static rows are restrictions imposed before interpreting counterfactuals; they are not validation evidence for the high-input result. The high-input ATE itself is reported only as a counterfactual result in Table~\ref{tab:counterfactuals}.
 \end{tablenotes}
 \end{threeparttable}
 \end{table}

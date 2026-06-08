@@ -1,9 +1,9 @@
 {
-  "timestamp_utc": "2026-06-08T03:05:37.515655+00:00",
+  "timestamp_utc": "2026-06-08T04:03:49.530215+00:00",
   "manuscript": "/Users/mriduljoshi/Github/reading-groups-struc/main_3country_new.tex",
   "check_only": false,
   "keep_stale": false,
-  "artifact_count": 83,
+  "artifact_count": 85,
   "missing_source_count": 0,
   "missing_sources": [],
   "stale_file_count": 0,
@@ -57,7 +57,17 @@
       "repo_target": "structural_output/tab_struct_tau_calibration.tex",
       "generator": "3_Python/structural_blockwise_redesign.py",
       "status": "materialized",
-      "sha256": "5cc10fa24518084c6dc95ffcfc8b847bc85150e9c4084d1efa08fbc1ca6beeb9",
+      "sha256": "95a3ededee8b98d558d0f2d5685e576dfd618ac1b7062af45dbf9d20fa938461",
+      "note": "Structural LaTeX table"
+    },
+    {
+      "kind": "table",
+      "manuscript_path": "structural_output/tab_struct_tau_raw_thresholds.tex",
+      "source_path": "3_Python/output/structural_smm/latex/tab_struct_tau_raw_thresholds.tex",
+      "repo_target": "structural_output/tab_struct_tau_raw_thresholds.tex",
+      "generator": "3_Python/structural_blockwise_redesign.py",
+      "status": "materialized",
+      "sha256": "444ccb74b9c5c7feb3fb5ff0fba66ab725e0790afbbdc5658ca05122fd862201",
       "note": "Structural LaTeX table"
     },
     {
@@ -97,7 +107,7 @@
       "repo_target": "structural_output/tab_struct_validation_checks.tex",
       "generator": "3_Python/structural_blockwise_redesign.py",
       "status": "materialized",
-      "sha256": "e4f816f53bbd86adbd60b6478530c5cee199c4e1ae2c8dc60d5bb9a1e3f19286",
+      "sha256": "b3fe72848698ebdce996410355dfe40f900580e9ccb61f5ef3c6d8518c3c9c92",
       "note": "Structural LaTeX table"
     },
     {
@@ -107,7 +117,7 @@
       "repo_target": "structural_output/tab_counterfactuals.tex",
       "generator": "3_Python/structural_blockwise_redesign.py",
       "status": "materialized",
-      "sha256": "75a73f11257a438c8d0bea7722d30de9c7bafaf03a50f358986a7ee19bfb46fb",
+      "sha256": "27ca78ee9ed9fc27cfb0bce016c93b4f61d643bfddeb10069f2d05c50d6fc3ce",
       "note": "Structural LaTeX table"
     },
     {
@@ -117,7 +127,7 @@
       "repo_target": "structural_output/tab_struct_component_decomp.tex",
       "generator": "3_Python/structural_blockwise_redesign.py",
       "status": "materialized",
-      "sha256": "64a3fc08f21df2337239b8502b4428c11371d599de33981d574c880e5a2c6345",
+      "sha256": "376c2f432d1aaf59de2123fc129dbad6d7d44ba65da55431a1ca066735bbbc2f",
       "note": "Structural LaTeX table"
     },
     {
@@ -127,7 +137,7 @@
       "repo_target": "structural_output/tab_struct_complementarity.tex",
       "generator": "3_Python/structural_blockwise_redesign.py",
       "status": "materialized",
-      "sha256": "ea3b670801d664f838041574f24e69a4dd9f85e02db1510df1e96390d85b9f55",
+      "sha256": "dd4fb85e204404c8f8a6f45bc030faaaf0443f65fc5e12badaf46de6e076785e",
       "note": "Structural LaTeX table"
     },
     {
@@ -137,7 +147,7 @@
       "repo_target": "structural_output/tab_struct_signal_delivery_margins.tex",
       "generator": "3_Python/structural_blockwise_redesign.py",
       "status": "materialized",
-      "sha256": "14db413d7cf402d194f69fb142e121130d0ab16aa0f5ba993eca422be04144e1",
+      "sha256": "9719401e812f680e2081871846aa31dcc39c6bdc390918df950ff8fb226d20be",
       "note": "Structural LaTeX table"
     },
     {
@@ -147,7 +157,7 @@
       "repo_target": "structural_output/tab_struct_delivery_thresholds.tex",
       "generator": "3_Python/structural_blockwise_redesign.py",
       "status": "materialized",
-      "sha256": "d9e9ba54f0bbc95635490b5aa1ee4626eb7678d4192434d3f7b5ee6fa018515c",
+      "sha256": "3e37f937f1100cb503f27563fcf5130ad586d861d43390a6190ed468542b1575",
       "note": "Structural LaTeX table"
     },
     {
@@ -158,6 +168,16 @@
       "generator": "3_Python/structural_blockwise_redesign.py",
       "status": "materialized",
       "sha256": "d590821fb8d389d573e3537005d963eabbb564ade0854d7e28ced92c8ff256d2",
+      "note": "Structural LaTeX table"
+    },
+    {
+      "kind": "table",
+      "manuscript_path": "structural_output/tab_struct_assignment_value_sensitivity.tex",
+      "source_path": "3_Python/output/structural_smm/latex/tab_struct_assignment_value_sensitivity.tex",
+      "repo_target": "structural_output/tab_struct_assignment_value_sensitivity.tex",
+      "generator": "3_Python/structural_blockwise_redesign.py",
+      "status": "materialized",
+      "sha256": "50ce66de9a191095e2fbc649fa1a7d3e41c9120bf4d8d4643f8c5a08eeaff9cc",
       "note": "Structural LaTeX table"
     },
     {
@@ -697,7 +717,7 @@
       "repo_target": "structural_output/tab_struct_stage4_discipline.tex",
       "generator": "3_Python/structural_blockwise_redesign.py",
       "status": "materialized",
-      "sha256": "3521c23d4a4d0eb57797465fc6d51d2dffc946aed80cf833b9866ff43ac7934a",
+      "sha256": "648e538845ca80bc3bba5c99eda50254100a415de2787df9237d575e12a32621",
       "note": "Structural LaTeX table"
     },
     {
@@ -707,7 +727,7 @@
       "repo_target": "structural_output/tab_struct_stage4_normalizations.tex",
       "generator": "3_Python/structural_blockwise_redesign.py",
       "status": "materialized",
-      "sha256": "5f481573dead897034e442b2eadd728625026f94f48ef95bb5d2cdefba7da421",
+      "sha256": "407e5c235ab1f21f9f96b98574fa8d420cad4cd4ae8d8a86681ad7544eb719a7",
       "note": "Structural LaTeX table"
     },
     {
@@ -777,7 +797,7 @@
       "repo_target": "structural_output/tab_struct_delivery_activation.tex",
       "generator": "3_Python/structural_blockwise_redesign.py",
       "status": "materialized",
-      "sha256": "480b26b5528b19b5e65bca069fa714fd7f11fdb958e70194a448d7039acef25b",
+      "sha256": "274a3541822310708ba9dc3b5e4dea2bba13bc3dbf5c182fa3ac5aeecd154b2e",
       "note": "Structural LaTeX table"
     },
     {
@@ -807,7 +827,7 @@
       "repo_target": "structural_output/fig_struct_complementarity_surface.pdf",
       "generator": "3_Python/structural_blockwise_redesign.py",
       "status": "materialized",
-      "sha256": "4ad4561064ffafbddde61fd54dad9e53d91e306a7a4933f3ba6799df15cbb5dc",
+      "sha256": "e9b680f96f74368457db415545b4f4d4f1ca44b8b93871485aec3834451a325e",
       "note": "Structural or paper-summary figure"
     },
     {
@@ -827,7 +847,7 @@
       "repo_target": "structural_output/fig_assignment_mismatch_distributions.pdf",
       "generator": "3_Python/structural_blockwise_redesign.py",
       "status": "materialized",
-      "sha256": "896415601716299b775bea53d77041d2b224e006f462ef502bf5939c4f0b9e26",
+      "sha256": "8bc737a1c361cc57302a1fde370efc15ab6d87b0b7b6e19adcbe806a29fc095d",
       "note": "Structural or paper-summary figure"
     },
     {
