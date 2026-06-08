@@ -1,0 +1,21 @@
+\begin{table}[H]
+\centering
+\caption{Predicted Mismatch Under Grade and Diagnostic Assignment}
+\label{tab:assignment_value_summary}
+\begin{threeparttable}
+\footnotesize
+\begin{tabular}[t]{lrrrrrrr}
+\toprule
+ & N & Grade & Diagnostic & Reduction & Lower & Higher & Same \\
+\midrule
+Kenya & 9718 & 0.982 & 0.569 & 0.413 & 57.2\% & 42.8\% & 0.0\% \\
+Liberia & 7584 & 0.993 & 0.745 & 0.248 & 42.5\% & 57.5\% & 0.0\% \\
+Nigeria & 1256 & 1.286 & 1.297 & -0.011 & 44.8\% & 55.2\% & 0.0\% \\
+\bottomrule
+\end{tabular}
+\begin{tablenotes}[para,flushleft]
+\footnotesize
+\item \textit{Notes:} The table uses the control-trained assignment-gain objects described in the text. ``Grade'' is the mean squared distance between the baseline ability proxy and the grade-level instructional target. ``Diagnostic'' replaces the grade target with the intended diagnostic-assigned track target. ``Reduction'' is Grade minus Diagnostic, so positive values mean the diagnostic rule lowers predicted mismatch. Lower, Higher, and Same report the share of students whose predicted mismatch falls, rises, or is unchanged. Nigeria uses the designed assignment rule; realized-assignment failures enter the implementation diagnostics separately.
+\end{tablenotes}
+\end{threeparttable}
+\end{table}

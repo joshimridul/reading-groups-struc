@@ -1,15 +1,35 @@
 {
-  "timestamp_utc": "2026-06-08T01:53:08.573419+00:00",
+  "timestamp_utc": "2026-06-08T03:05:37.515655+00:00",
   "manuscript": "/Users/mriduljoshi/Github/reading-groups-struc/main_3country_new.tex",
   "check_only": false,
   "keep_stale": false,
-  "artifact_count": 80,
+  "artifact_count": 83,
   "missing_source_count": 0,
   "missing_sources": [],
   "stale_file_count": 0,
   "stale_files": [],
   "manifest": "/Users/mriduljoshi/Github/reading-groups-struc/paper_pipeline/active_inputs_manifest.csv",
   "artifacts": [
+    {
+      "kind": "table",
+      "manuscript_path": "structural_output/tab_grade_signal_substitution.tex",
+      "source_path": "3_Python/output/structural_smm/latex/tab_grade_signal_substitution.tex",
+      "repo_target": "structural_output/tab_grade_signal_substitution.tex",
+      "generator": "3_Python/structural_blockwise_redesign.py",
+      "status": "materialized",
+      "sha256": "69789840258cec83f98cb324660bf5124e4b2d4d24c1b64a0a69799745c2d468",
+      "note": "Structural LaTeX table"
+    },
+    {
+      "kind": "table",
+      "manuscript_path": "structural_output/tab_assignment_value_summary.tex",
+      "source_path": "3_Python/output/structural_smm/latex/tab_assignment_value_summary.tex",
+      "repo_target": "structural_output/tab_assignment_value_summary.tex",
+      "generator": "3_Python/structural_blockwise_redesign.py",
+      "status": "materialized",
+      "sha256": "a1725bc7f93ab7cdaf7ba0b61950099ec531a014a23d189aa8a623852c04e293",
+      "note": "Structural LaTeX table"
+    },
     {
       "kind": "table",
       "manuscript_path": "structural_output/tab_struct_target_blocks.tex",
@@ -28,6 +48,26 @@
       "generator": "3_Python/structural_blockwise_redesign.py",
       "status": "materialized",
       "sha256": "a027876891bb3bd7a7278e46b3786a0f501d0239bfe86bbbbc0572020d321d8c",
+      "note": "Structural LaTeX table"
+    },
+    {
+      "kind": "table",
+      "manuscript_path": "structural_output/tab_struct_tau_calibration.tex",
+      "source_path": "3_Python/output/structural_smm/latex/tab_struct_tau_calibration.tex",
+      "repo_target": "structural_output/tab_struct_tau_calibration.tex",
+      "generator": "3_Python/structural_blockwise_redesign.py",
+      "status": "materialized",
+      "sha256": "5cc10fa24518084c6dc95ffcfc8b847bc85150e9c4084d1efa08fbc1ca6beeb9",
+      "note": "Structural LaTeX table"
+    },
+    {
+      "kind": "table",
+      "manuscript_path": "structural_output/tab_struct_tau_sensitivity.tex",
+      "source_path": "3_Python/output/structural_smm/latex/tab_struct_tau_sensitivity.tex",
+      "repo_target": "structural_output/tab_struct_tau_sensitivity.tex",
+      "generator": "3_Python/structural_blockwise_redesign.py",
+      "status": "materialized",
+      "sha256": "bbc3853a49289a4ac7262df9a221286dc5797f801821ec2bca0fd443238353fb",
       "note": "Structural LaTeX table"
     },
     {
@@ -108,6 +148,16 @@
       "generator": "3_Python/structural_blockwise_redesign.py",
       "status": "materialized",
       "sha256": "d9e9ba54f0bbc95635490b5aa1ee4626eb7678d4192434d3f7b5ee6fa018515c",
+      "note": "Structural LaTeX table"
+    },
+    {
+      "kind": "table",
+      "manuscript_path": "structural_output/tab_struct_regularization_sensitivity.tex",
+      "source_path": "3_Python/output/structural_smm/latex/tab_struct_regularization_sensitivity.tex",
+      "repo_target": "structural_output/tab_struct_regularization_sensitivity.tex",
+      "generator": "3_Python/structural_blockwise_redesign.py",
+      "status": "materialized",
+      "sha256": "d590821fb8d389d573e3537005d963eabbb564ade0854d7e28ced92c8ff256d2",
       "note": "Structural LaTeX table"
     },
     {
@@ -612,26 +662,6 @@
     },
     {
       "kind": "table",
-      "manuscript_path": "structural_output/tab_struct_tau_calibration.tex",
-      "source_path": "3_Python/output/structural_smm/latex/tab_struct_tau_calibration.tex",
-      "repo_target": "structural_output/tab_struct_tau_calibration.tex",
-      "generator": "3_Python/structural_blockwise_redesign.py",
-      "status": "materialized",
-      "sha256": "5cc10fa24518084c6dc95ffcfc8b847bc85150e9c4084d1efa08fbc1ca6beeb9",
-      "note": "Structural LaTeX table"
-    },
-    {
-      "kind": "table",
-      "manuscript_path": "structural_output/tab_struct_tau_sensitivity.tex",
-      "source_path": "3_Python/output/structural_smm/latex/tab_struct_tau_sensitivity.tex",
-      "repo_target": "structural_output/tab_struct_tau_sensitivity.tex",
-      "generator": "3_Python/structural_blockwise_redesign.py",
-      "status": "materialized",
-      "sha256": "bbc3853a49289a4ac7262df9a221286dc5797f801821ec2bca0fd443238353fb",
-      "note": "Structural LaTeX table"
-    },
-    {
-      "kind": "table",
       "manuscript_path": "structural_output/tab_struct_local_identification.tex",
       "source_path": "3_Python/output/structural_smm/latex/tab_struct_local_identification.tex",
       "repo_target": "structural_output/tab_struct_local_identification.tex",
@@ -688,16 +718,6 @@
       "generator": "3_Python/structural_blockwise_redesign.py",
       "status": "materialized",
       "sha256": "9609179163a83b3d2f9b39e0ca29e7654d75930d7eada0469224c3dc7c04075b",
-      "note": "Structural LaTeX table"
-    },
-    {
-      "kind": "table",
-      "manuscript_path": "structural_output/tab_struct_regularization_sensitivity.tex",
-      "source_path": "3_Python/output/structural_smm/latex/tab_struct_regularization_sensitivity.tex",
-      "repo_target": "structural_output/tab_struct_regularization_sensitivity.tex",
-      "generator": "3_Python/structural_blockwise_redesign.py",
-      "status": "materialized",
-      "sha256": "d590821fb8d389d573e3537005d963eabbb564ade0854d7e28ced92c8ff256d2",
       "note": "Structural LaTeX table"
     },
     {
@@ -798,6 +818,16 @@
       "generator": "3_Python/make_paper_summary_figures.py",
       "status": "materialized",
       "sha256": "7c2cf4dbc98f06eef5f06b02c4f0523e52f64d7fc0428b4ccb2ea358bebbee59",
+      "note": "Structural or paper-summary figure"
+    },
+    {
+      "kind": "figure",
+      "manuscript_path": "structural_output/fig_assignment_mismatch_distributions.pdf",
+      "source_path": "3_Python/output/structural_smm/fig_assignment_mismatch_distributions.pdf",
+      "repo_target": "structural_output/fig_assignment_mismatch_distributions.pdf",
+      "generator": "3_Python/structural_blockwise_redesign.py",
+      "status": "materialized",
+      "sha256": "896415601716299b775bea53d77041d2b224e006f462ef502bf5939c4f0b9e26",
       "note": "Structural or paper-summary figure"
     },
     {
