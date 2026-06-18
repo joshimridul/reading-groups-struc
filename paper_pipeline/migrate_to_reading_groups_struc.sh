@@ -95,7 +95,7 @@ fi
 cat > "$ARCHIVE_DIR/MANIFEST.md" <<'MANIFEST'
 # Legacy Root Entrypoints
 
-Archived on 2026-06-07 during migration from `AbilityGrouping` into the
+Archived on 2026-06-07 during migration into the
 Overleaf-linked `reading-groups-struc` repository.
 
 The active root manuscript is now:

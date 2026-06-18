@@ -1,6 +1,6 @@
 \begin{table}[H]
 \centering
-\caption{Structural Robustness Using Assignment-Value Primitives}
+\caption{Structural Benchmark Under Alternative Payoff Primitives}
 \label{tab:struct_assignment_value_sensitivity}
 \begin{threeparttable}
 \footnotesize
@@ -8,14 +8,15 @@
 \toprule
 Payoff primitive & Kenya & Liberia & Nigeria & Max ITT/SE & K high-$\tau$ & High-input \\
 \midrule
-Preferred rho & 0.533 & 0.055 & 0.121 & 0.281 & $+0.155$ & $+0.187$ \\
+Preferred assignment value & 0.533 & 0.320 & -0.014 & 0.282 & $+0.152$ & $+0.186$ \\
+Legacy rho payoff & 0.533 & 0.055 & 0.121 & 0.281 & $+0.155$ & $+0.187$ \\
 Net mismatch reduction & 0.533 & 0.320 & 0.000 & 0.282 & $+0.152$ & $+0.186$ \\
 Share-weighted reduction & 0.533 & 0.238 & 0.000 & 0.282 & $+0.153$ & $+0.186$ \\
 \bottomrule
 \end{tabular}
 \begin{tablenotes}[para,flushleft]
 \footnotesize
-\item \textit{Notes:} The preferred model uses the control-group predictive-content primitive $\rho$ in the assignment-payoff term. The robustness rows re-estimate the stage-4 production block after replacing that payoff input with a normalized assignment-value primitive from Table~\ref{tab:assignment_value_summary}. ``Net mismatch reduction'' uses the positive part of Grade minus Diagnostic mismatch, normalized so Kenya equals the preferred high-signal value. ``Share-weighted reduction'' multiplies the positive mean reduction by the share of students whose predicted mismatch falls before the same normalization. The mechanical sorting equation continues to use $\rho$ because it predicts classroom compression rather than payoff value. The table reports the Kenya high-delivery and fully high-input counterfactuals under each re-estimated production map.
+\item \textit{Notes:} The preferred model uses a signed assignment-value primitive in the assignment-payoff term: mean predicted mismatch under grade assignment minus mean predicted mismatch under diagnostic assignment, normalized so Kenya equals the highest signal-quality value. Negative values are allowed, so a diagnostic rule that increases predicted mismatch lowers the assignment-payoff component. The ``Legacy rho payoff'' row re-estimates the old payoff specification using control-group predictive content directly. ``Net mismatch reduction'' truncates negative mean reductions at zero. ``Share-weighted reduction'' multiplies the positive mean reduction by the share of students whose predicted mismatch falls before normalization. The mechanical sorting equation continues to use $\rho$ because it predicts classroom compression rather than payoff value. The table reports the Kenya high-delivery and fully high-input counterfactuals under each production map.
 \end{tablenotes}
 \end{threeparttable}
 \end{table}

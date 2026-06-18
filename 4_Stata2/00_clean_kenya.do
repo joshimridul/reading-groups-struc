@@ -13,7 +13,7 @@ Produces: $out/analysis_kenya.dta
 */
 
 * Standalone-safe defaults
-if "$root" == "" global root "/Users/mriduljoshi/Github/AbilityGrouping"
+if "$root" == "" global root "/Users/mriduljoshi/Github/reading-groups-struc"
 if "$raw"  == "" global raw  "$root/2_Data/1_Raw"
 if "$out"  == "" global out  "$root/4_Stata2/output"
 if "$datadir" == "" global datadir "$root/2_Data/2_Cleaned"

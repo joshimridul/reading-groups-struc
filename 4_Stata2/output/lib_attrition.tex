@@ -1,4 +1,4 @@
-\begin{table}[H]
+\begin{table}[!h]
 \centering
 \caption{Attrition --- Liberia}
 \label{tab:lib_attrition}
@@ -9,7 +9,7 @@
 \cmidrule(l{3pt}r{3pt}){2-5}
 \multicolumn{1}{c}{ } & \multicolumn{1}{c}{(1)} & \multicolumn{1}{c}{(2)} & \multicolumn{1}{c}{(3)} & \multicolumn{1}{c}{(4)} \\
 \cmidrule(l{3pt}r{3pt}){2-2} \cmidrule(l{3pt}r{3pt}){3-3} \cmidrule(l{3pt}r{3pt}){4-4} \cmidrule(l{3pt}r{3pt}){5-5}
-Sample & T missing & C missing & Adj.\ diff. & N \\
+Sample & T Rate & C Rate & Difference & N \\
 \midrule
 Overall & 0.340 & 0.341 &   0.000 & 4784 \\
  & & & (  0.062) & \\
@@ -24,7 +24,7 @@ Grade 4 & 0.379 & 0.316 &   0.063 & 1124 \\
 \bottomrule
 \end{tabular}
 \begin{tablenotes}[para]
-\item Notes: Attrition = missing endline. T missing and C missing are unadjusted arm means. Adjusted difference is the treatment coefficient from an OLS regression with strata FE; SEs clustered at the school grade group level.
+\item Notes: Attrition = missing endline. OLS with strata FE, cluster-robust SEs. ***, **, and * indicate significance at 1\%, 5\%, and 10\%.
 \end{tablenotes}
 \end{threeparttable}
 \end{table}

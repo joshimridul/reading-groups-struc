@@ -17,7 +17,7 @@ from scipy.stats import norm, pearsonr, spearmanr
 from pathlib import Path
 import statsmodels.api as sm
 
-BASE = Path("/Users/mriduljoshi/Github/AbilityGrouping/2_Data/1_Raw/P123 Numeracy Groups")
+BASE = Path("/Users/mriduljoshi/Github/reading-groups-struc/2_Data/1_Raw/P123 Numeracy Groups")
 
 # ── 1. Load placement file ──
 pl = pd.read_excel(BASE / "[Data Entry] Numeracy Groups Placement - 2020-2021.xlsx")

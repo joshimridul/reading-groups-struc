@@ -3,33 +3,35 @@
 \caption{Counterfactual Treatment Effects}
 \label{tab:counterfactuals}
 \begin{threeparttable}
-\begin{tabular}[t]{lccc}
+\footnotesize
+\setlength{\tabcolsep}{3pt}
+\begin{tabular}[t]{@{}p{4.0cm}ccp{4.0cm}@{}}
 \toprule
 Scenario & ATE & 90\% interval & Description \\
 \midrule
 \multicolumn{4}{l}{\textit{Observed}} \\
-Kenya observed & $+0.030$ & $[-0.066,\,+0.117]$ & $\rho = 0.53$, $\omega = 1.00$, $\tau = 0.50$ \\
-Liberia observed & $-0.176$ & $[-0.337,\,-0.006]$ & $\rho = 0.06$, $\omega = 1.00$, $\tau = 0.38$ \\
-Nigeria realized & $+0.056$ & $[-0.148,\,+0.244]$ & $\rho = 0.12$, $\omega = 0.84$, $\tau = 0.31$ \\
+Kenya observed & $+0.030$ & $[-0.066,\,+0.117]$ & $G = 0.53$, $\omega = 1.00$, $\tau = 0.50$ \\
+Liberia observed & $-0.176$ & $[-0.337,\,-0.004]$ & $G = 0.32$, $\omega = 1.00$, $\tau = 0.38$ \\
+Nigeria realized & $+0.056$ & $[-0.149,\,+0.243]$ & $G = -0.01$, $\omega = 0.84$, $\tau = 0.31$ \\
 \addlinespace
 \multicolumn{4}{l}{\textit{Counterfactual 1: Kenya with higher $\tau$}} \\
-Kenya high-$\tau$ & $+0.155$ & $[+0.028,\,+0.206]$ & $\rho = 0.53$, $\omega = 1.00$, $\tau = 0.90$ \\
+Kenya high-$\tau$ & $+0.152$ & $[+0.028,\,+0.210]$ & $G = 0.53$, $\omega = 1.00$, $\tau = 0.90$ \\
 \addlinespace
 \multicolumn{4}{l}{\textit{Counterfactual 2: Nigeria as designed}} \\
-Nigeria designed $\omega$ & $+0.056$ & $[-0.148,\,+0.245]$ & $\rho = 0.12$, $\omega = 0.95$, $\tau = 0.31$ \\
+Nigeria designed $\omega$ & $+0.056$ & $[-0.149,\,+0.243]$ & $G = -0.01$, $\omega = 0.95$, $\tau = 0.31$ \\
 \addlinespace
 \multicolumn{4}{l}{\textit{Counterfactual 3: Fully idealized}} \\
-High $\rho$, high $\omega$, high $\tau$ & $+0.187$ & $[+0.058,\,+0.222]$ & $\rho = 0.53$, $\omega = 0.98$, $\tau = 0.95$ \\
+High assignment value, high $\omega$, high $\tau$ & $+0.186$ & $[+0.060,\,+0.223]$ & $G = 0.53$, $\omega = 0.98$, $\tau = 0.95$ \\
 \addlinespace
 \multicolumn{4}{l}{\textit{One-at-a-time decomposition (from Nigeria baseline)}} \\
-Upgrade $\rho$ only & $+0.057$ & $[-0.141,\,+0.263]$ & $\rho \to 0.53$, $\omega = 0.84$, $\tau = 0.31$ \\
-Upgrade $\tau$ only & $+0.115$ & $[-0.105,\,+0.306]$ & $\rho = 0.12$, $\omega = 0.84$, $\tau = 0.90$ \\
-Upgrade $\omega$ only & $+0.056$ & $[-0.148,\,+0.245]$ & $\rho = 0.12$, $\omega = 0.95$, $\tau = 0.31$ \\
+Upgrade assignment value only & $+0.057$ & $[-0.141,\,+0.265]$ & $G \to 0.53$, $\omega = 0.84$, $\tau = 0.31$ \\
+Upgrade $\tau$ only & $+0.086$ & $[-0.132,\,+0.289]$ & $G = -0.01$, $\omega = 0.84$, $\tau = 0.90$ \\
+Upgrade $\omega$ only & $+0.056$ & $[-0.149,\,+0.243]$ & $G = -0.01$, $\omega = 0.95$, $\tau = 0.31$ \\
 \bottomrule
 \end{tabular}
 \begin{tablenotes}[para,flushleft]
 \footnotesize
-\item \textit{Notes:} Intervals are 5th--95th percentiles from 49 parametric bootstrap re-estimation draws of the targeted stage-4 reduced-form moments, conditional on the stage-1 to stage-3 primitive estimates. The high-$\tau$ benchmark is $\tau = 0.90$ for the Kenya and Nigeria one-at-a-time counterfactuals. The fully idealized case uses $\omega = 0.98$ and $\tau = 0.95$. Nigeria designed execution sets $\omega = 0.95$. The one-at-a-time decomposition upgrades each primitive separately from Nigeria's realized values.
+\item \textit{Notes:} $G$ is the signed assignment-value primitive: mean predicted mismatch under grade assignment minus mean predicted mismatch under diagnostic assignment, normalized so Kenya equals the highest signal-quality value. Signal quality $\rho$ is still used in the sorting-compression equation. Intervals are 5th--95th percentiles from 49 parametric bootstrap re-estimation draws of the targeted stage-4 reduced-form moments, conditional on the stage-1 to stage-3 primitive estimates. The high-$\tau$ benchmark is $\tau = 0.90$ for the Kenya and Nigeria one-at-a-time counterfactuals. The fully idealized case uses $G = 0.53$, $\omega = 0.98$, and $\tau = 0.95$. Nigeria designed execution sets $\omega = 0.95$. The one-at-a-time decomposition upgrades each primitive separately from Nigeria's realized values.
 \end{tablenotes}
 \end{threeparttable}
 \end{table}

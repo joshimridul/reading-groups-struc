@@ -117,14 +117,13 @@ foreach x in `xlist' {
 				local b`x'k : display string(_b[treat],"%9.3f")
 
 				local t=abs(_b[treat]/_se[treat])
-				local p_raw = 2 * ttail(e(df_r), `t')
-					if `p_raw'<0.01{
+					if `t'>=2.33{
 						local star="***"
 					}
-					else if `p_raw'<0.05{
+					else if `t'>=1.96{
 						local star="**"
 					}
-					else if `p_raw'<0.10{
+					else if `t'>=1.64{
 						local star="*"
 					}
 					else {
@@ -138,7 +137,8 @@ foreach x in `xlist' {
 			local  b`x'k "`b`x'k'`star'"	
 
 			local s`x'k : display string(_se[treat],"%9.3fc")		
-			local p`x'k : display string(`p_raw',"%9.3f")	
+			local p`x'k = 2*(1-normal(`t'))
+			local p`x'k : display string(`p`x'k',"%9.3f")	
 			local N`x'k : display string(e(N),"%9.0fc")
 			local s`x'k "(`s`x'k')"
 		}
@@ -234,14 +234,13 @@ foreach x in `xlist' {
 			local b`x'l : display string(_b[treat],"%9.3f")
 
 			local t=abs(_b[treat]/_se[treat])
-			local p_raw = 2 * ttail(e(df_r), `t')
-				if `p_raw'<0.01{
+				if `t'>=2.33{
 					local star="***"
 				}
-				else if `p_raw'<0.05{
+				else if `t'>=1.96{
 					local star="**"
 				}
-				else if `p_raw'<0.10{
+				else if `t'>=1.64{
 					local star="*"
 				}
 				else {
@@ -252,7 +251,8 @@ foreach x in `xlist' {
 				}		
 			local  b`x'l "`b`x'l'`star'"	
 			local s`x'l : display string(_se[treat],"%9.3fc")		
-			local p`x'l : display string(`p_raw',"%9.3f")	
+			local p`x'l = 2*(1-normal(`t'))
+			local p`x'l : display string(`p`x'l',"%9.3f")	
 			local N`x'l : display string(e(N),"%9.0fc")
 			local s`x'l "(`s`x'l')"
 
@@ -342,12 +342,16 @@ file open let using "${outdir}/Kenya_new/baseline_balance_K.tex", write replace
 
 	file write let "\midrule" _n
 	*file write let "\multicolumn{2}{l}{Observations} `Nearly_enrollment' \\" _n	
+	file write let "\multicolumn{2}{l}{F-stat of joint test} `F2' \\" _n		
+	file write let "\multicolumn{2}{l}{P-value} `P2' \\" _n	
+
+
 
 	file write let "\bottomrule" _n
 
 	file write let "\end{tabular}" _n
 	file write let "\begin{tablenotes}" _n
-	file write let "\item Notes: Kenya specifications are at the school level and control for constituency fixed effects, with standard errors clustered at the school level. Liberia specifications are at the school-grade-group level and control for randomization strata fixed effects, with standard errors clustered at the school-grade-group level. ***, **, and * indicate significance at 1\%, 5\%, and 10\%." 
+	file write let "\item Notes: All specifications are at the academy-grade level and control for randomization strata fixed effects. Standard errors are clustered at the academy-grade group level. The joint test specification includes only class size and baseline test score. ***, **, and * indicate significance at 1\%, 5\%, and 10\%." 
 	file write let "\end{tablenotes}" _n
 	file write let "\end{threeparttable}" _n
 	file write let "\end{`size'}" _n
@@ -356,6 +360,9 @@ file open let using "${outdir}/Kenya_new/baseline_balance_K.tex", write replace
 	file write let "\clearpage" _n
 
 file close let
+
+
+
 
 
 

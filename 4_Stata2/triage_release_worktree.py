@@ -10,6 +10,7 @@ so the final cleanup can be deliberate.
 from __future__ import annotations
 
 import argparse
+import csv
 import subprocess
 from collections import defaultdict
 from dataclasses import dataclass
@@ -19,9 +20,9 @@ from pathlib import Path
 from audit_overleaf_artifacts import DEFAULT_OVERLEAF, scan_tex_references
 
 
-DEFAULT_REPO = Path("/Users/mriduljoshi/Github/AbilityGrouping")
+DEFAULT_REPO = Path("/Users/mriduljoshi/Github/reading-groups-struc")
 DEFAULT_REPO_OUTPUT = DEFAULT_REPO / "4_Stata2" / "output"
-DEFAULT_ENTRYPOINT = "main2.tex"
+DEFAULT_ENTRYPOINT = "main_3country_new.structural_edit.tex"
 LOCAL_ARTIFACT_NAMES = {".DS_Store", "Rplots.pdf"}
 
 
@@ -48,7 +49,7 @@ CATEGORY_ORDER = [
 
 def run_git_status(repo_root: Path) -> list[StatusEntry]:
     result = subprocess.run(
-        ["git", "status", "--short"],
+        ["git", "status", "--short", "--untracked-files=all"],
         cwd=repo_root,
         text=True,
         capture_output=True,
@@ -93,6 +94,19 @@ def tracked_clean_local_artifact_entries(repo_root: Path, entries: list[StatusEn
 
 
 def active_exhibit_paths(overleaf_dir: Path, repo_output: Path, entrypoint: str) -> set[str]:
+    manifest = overleaf_dir / "paper_pipeline" / "active_inputs_manifest.csv"
+    if manifest.exists():
+        active: set[str] = set()
+        with manifest.open(newline="") as handle:
+            for row in csv.DictReader(handle):
+                for key in ("repo_target", "source_path"):
+                    value = row.get(key, "").strip()
+                    if not value:
+                        continue
+                    active.add(value)
+                    active.add(str(overleaf_dir / value))
+        return active
+
     refs = scan_tex_references(overleaf_dir).get(entrypoint, set())
     return {str(repo_output / name) for name in refs} | {f"4_Stata2/output/{name}" for name in refs}
 
@@ -102,17 +116,55 @@ def is_generated_output(path: str) -> bool:
 
 
 def is_active_canonical_output(path: str, active_paths: set[str]) -> bool:
-    if not path.startswith("4_Stata2/output/"):
-        return False
     return path in active_paths or str(DEFAULT_REPO / path) in active_paths
+
+
+def is_deliberate_paper_removal(path: str) -> bool:
+    name = Path(path).name
+    return (
+        name == "05_gates.R"
+        or "gates" in name.lower()
+        or "varimp" in name.lower()
+    )
 
 
 def classify(entry: StatusEntry, active_paths: set[str]) -> str:
     path = entry.path
     name = Path(path).name
 
+    if is_active_canonical_output(path, active_paths):
+        return "active_canonical_outputs"
+    if path.startswith("3_Python/") and name in {
+        "README_structural.md",
+        "structural_blockwise_redesign.py",
+        "make_assignment_value_figures.py",
+        "make_paper_summary_figures.py",
+        "verify_structural_package.py",
+    }:
+        return "canonical_pipeline_code"
+    if path.startswith("4_Stata2/") and name in {
+        "00_clean_nigeria.do",
+        "02_nigeria_main_analysis.do",
+        "02b_nigeria_two_group.do",
+        "03_pooled_analysis.do",
+        "04c_assignment_channel_tests.do",
+    }:
+        return "canonical_pipeline_code"
+    if entry.status.strip().startswith("D") and is_deliberate_paper_removal(path):
+        return "release_guardrails_and_docs"
     if entry.status.strip().startswith("D"):
         return "deleted_or_removed"
+    if path.startswith("replication_audit/stata_scratch/"):
+        return "inactive_generated_outputs"
+    if path in {
+        "main_3country_new.structural_edit.tex",
+        "bib.bib",
+        "run_all.sh",
+        "build_paper.sh",
+    } or path.startswith(("docs/", "paper_pipeline/", "replication_audit/")):
+        return "release_guardrails_and_docs"
+    if path.startswith("build/") and path.endswith(("main_3country_new.structural_edit.pdf", "main_3country_new.structural_edit.log")):
+        return "release_guardrails_and_docs"
     if "nigeria" in path.lower() or "/tab_ng_" in path or "/tab_pooled_" in path or "pooled_" in name:
         return "nigeria_or_three_country_extension"
     if path == "STRUCTURAL_RESULTS_NOTE.md" or (
@@ -128,7 +180,9 @@ def classify(entry: StatusEntry, active_paths: set[str]) -> str:
         "README.md",
         "PAPER_COMPLETION_AUDIT.md",
         "PAPER_FINAL_READINESS.md",
+        "GITHUB_DESKTOP_RNR_COMMIT_CHECKLIST.md",
         "PAPER_RELEASE_CANDIDATE_PATHS.txt",
+        "PAPER_RELEASE_CLEANUP_DECISIONS.md",
         "PAPER_RELEASE_CLEANUP_PATHS.txt",
         "PAPER_RELEASE_WORKTREE_TRIAGE.md",
         "PAPER_REPRODUCIBILITY_FREEZE.md",
@@ -149,8 +203,6 @@ def classify(entry: StatusEntry, active_paths: set[str]) -> str:
         "triage_release_worktree.py",
     }:
         return "release_guardrails_and_docs"
-    if is_active_canonical_output(path, active_paths):
-        return "active_canonical_outputs"
     if is_generated_output(path):
         return "inactive_generated_outputs"
     if path.startswith("3_Python/") and name not in {"00_clean_kenya.py"}:
@@ -197,12 +249,12 @@ def render(entries: list[StatusEntry], active_paths: set[str], max_paths: int) -
             print(f"  {item.status} {item.path}")
         if len(items) > max_paths:
             print(f"  ... {len(items) - max_paths} more")
-        print()
+    print()
 
     print("Suggested release-review order:")
-    print("  1. Decide public/draft mode and coauthor approval.")
-    print("  2. Stage release guardrails/docs and canonical pipeline/output changes that support main2.tex.")
-    print("  3. Keep Nigeria/three-country, structural-extension, supplemental-diagnostic, inactive-output, and legacy work separate from the Kenya/Liberia release unless scope changes.")
+    print("  1. Confirm coauthor approval and public/circulation mode; the active manuscript currently has no draft markers.")
+    print("  2. Stage release guardrails/docs and canonical pipeline/output changes that support main_3country_new.structural_edit.tex.")
+    print("  3. Keep inactive-output and legacy work separate from the three-country R&R release unless explicitly needed.")
     print("  4. Decide whether tracked local artifacts such as .DS_Store and Rplots.pdf should be removed or restored before tagging.")
 
 
@@ -253,7 +305,7 @@ def write_markdown_plan(path: Path, repo_root: Path, entries: list[StatusEntry],
         "",
         f"Generated: {datetime.now().astimezone().isoformat(timespec='seconds')}",
         "",
-        "This read-only triage separates the dirty worktree into release-review buckets for the canonical Kenya/Liberia paper. It does not stage, restore, remove, or commit files.",
+        "This read-only triage separates the dirty worktree into release-review buckets for the active three-country R&R paper. It does not stage, restore, remove, or commit files.",
         "",
         "If `PAPER_RELEASE_CANDIDATE_PATHS.txt` or `PAPER_RELEASE_CLEANUP_PATHS.txt` exists, treat it as review input for a future staging/cleanup pass, not as an instruction to stage or remove blindly.",
         "",
@@ -266,14 +318,14 @@ def write_markdown_plan(path: Path, repo_root: Path, entries: list[StatusEntry],
         "",
         "## Recommended Release Order",
         "",
-        "1. Decide whether the live manuscript should remain draft or be switched to public mode.",
-        "2. Review the release-candidate set below: guardrails/docs, canonical Kenya/Liberia pipeline code, and active `main2.tex` outputs.",
-        "3. Keep Nigeria, three-country, structural-extension, supplemental-diagnostic, inactive-output, and legacy work out of the Kenya/Liberia release unless the paper scope changes.",
+        "1. Confirm coauthor approval and public/circulation mode; the active manuscript currently has no draft markers.",
+        "2. Review the release-candidate set below: guardrails/docs, canonical pipeline code, active manuscript inputs, and active generated outputs.",
+        "3. Keep inactive-output and legacy work out of the release unless the paper scope requires them.",
         "4. Resolve local metadata and deleted-file decisions before tagging or committing a final release.",
         "",
         "## Release-Candidate Review Set",
         "",
-        "These paths are the plausible Kenya/Liberia paper release set. They still require human review before staging because the worktree contains many related changes.",
+        "These paths are the plausible three-country R&R paper release set. They still require human review before staging because the worktree contains many related changes.",
         "",
     ]
     lines.extend(format_status_entries(release_candidate) or ["- None"])
@@ -282,7 +334,7 @@ def write_markdown_plan(path: Path, repo_root: Path, entries: list[StatusEntry],
             "",
             "## Keep Separate Unless Scope Changes",
             "",
-            "These paths belong to Nigeria, three-country, structural, supplemental-diagnostic, inactive generated-output, or legacy work. They should not be mixed into a clean Kenya/Liberia release without an explicit scope decision.",
+            "These paths are inactive generated outputs, supplemental diagnostics not directly active, legacy work, or other extensions. They should not be mixed into a clean R&R release without an explicit scope decision.",
             "",
         ]
     )
@@ -305,7 +357,7 @@ def write_pathspec(path: Path, entries: list[StatusEntry], active_paths: set[str
     buckets = group_entries(entries, active_paths)
     release_candidate = release_candidate_entries(buckets)
     lines = [
-        "# Review-only pathspec for the plausible Kenya/Liberia release set.",
+        "# Review-only pathspec for the plausible three-country R&R release set.",
         "# Generated by 4_Stata2/triage_release_worktree.py.",
         "# Do not stage this list blindly; review PAPER_RELEASE_WORKTREE_TRIAGE.md first.",
         "#",

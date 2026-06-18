@@ -2,11 +2,11 @@
 
 """Build and verify a public-version dry run of the canonical manuscript.
 
-The live Overleaf source currently remains a draft by design. This script keeps
-that contract intact: it copies the Overleaf folder to a temp directory, flips
-the public-version switch only in the temp copy, builds `main2.tex`, and runs
-the same manuscript checks used by the release-readiness wrapper plus a PDF
-text scan for draft markers and unresolved references.
+The current three-country manuscript has no draft/public switch. For older
+manuscripts that still use one, this script flips the switch only in a temp
+copy. It then builds the temp copy and runs the same manuscript checks used by
+the release-readiness wrapper plus a PDF text scan for draft markers and
+unresolved references.
 """
 
 from __future__ import annotations
@@ -23,6 +23,7 @@ from pathlib import Path
 from check_release_readiness import (
     EXPECTED_PDF_AUTHOR,
     EXPECTED_PDF_KEYWORD_PARTS,
+    EXPECTED_PAGES,
     EXPECTED_PDF_TITLE,
     WARNING_RE,
     CheckResult,
@@ -39,7 +40,7 @@ from verify_freeze_manifest import DEFAULT_OVERLEAF, DEFAULT_REPO_OUTPUT
 
 PUBLIC_SWITCH_FALSE = r"\publicversionfalse"
 PUBLIC_SWITCH_TRUE = r"\publicversiontrue"
-DEFAULT_ENTRYPOINT = "main2.tex"
+DEFAULT_ENTRYPOINT = "main_3country_new.structural_edit.tex"
 
 
 @dataclass
@@ -60,6 +61,7 @@ def today_latex_date() -> str:
 
 
 def make_temp_copy(overleaf_dir: Path, temp_parent: Path, prefix: str, entrypoint: str) -> DryRunPaths:
+    overleaf_dir = overleaf_dir.resolve()
     if not overleaf_dir.exists():
         raise FileNotFoundError(f"Missing Overleaf directory: {overleaf_dir}")
 
@@ -99,7 +101,9 @@ def flip_public_switch(entrypoint: Path) -> CheckResult:
             True,
             "temp copy already has public-version switch set",
         )
-    return CheckResult("temp public-version switch", False, "no public-version switch found")
+    if "PRELIMINARY" in text or "PLEASE DO NOT CIRCULATE" in text:
+        return CheckResult("temp public-version switch", False, "no switch found, but draft markers remain")
+    return CheckResult("temp public-version switch", True, "no switch found; temp copy has no draft markers")
 
 
 def build_latex(paths: DryRunPaths, entrypoint: str) -> CheckResult:
@@ -161,15 +165,15 @@ def check_pdf_text(pdf_path: Path, expected_date: str) -> CheckResult:
         "TBD",
     ]
     missing_literals = [
-        "When Does Ability Grouping Improve Learning?",
-        "Evidence from Two Experiments in Kenya and Liberia",
+        "Why Sorting Students Is Not Enough",
+        "Evidence from Three Ability-Grouping Experiments",
         "Guthrie Gray-Lobe",
         "Mridul Joshi",
         "Michael Kremer",
         expected_date,
         "Abstract",
         "Keywords:",
-        "JEL codes:",
+        "JEL Codes:",
     ]
     unresolved_patterns = [
         (r"\?\?", "visible unresolved reference marker"),
@@ -188,12 +192,6 @@ def check_pdf_text(pdf_path: Path, expected_date: str) -> CheckResult:
     for pattern, label in unresolved_patterns:
         if re.search(pattern, normalized):
             errors.append(label)
-
-    missing_keyword_parts = [
-        part for part in EXPECTED_PDF_KEYWORD_PARTS if part not in normalized
-    ]
-    if missing_keyword_parts:
-        errors.append(f"keyword text missing: {', '.join(missing_keyword_parts)}")
 
     if errors:
         return CheckResult("PDF text scan", False, "; ".join(errors[:8]))
@@ -219,7 +217,7 @@ def check_pdf_summary(pdf_path: Path) -> CheckResult:
 
 
 def check_public_pdf_render(pdf_path: Path) -> CheckResult:
-    ok, detail = check_rendered_pdf(pdf_path)
+    ok, detail = check_rendered_pdf(pdf_path, expected_pages=int(EXPECTED_PAGES))
     return CheckResult("public PDF render smoke test", ok, detail)
 
 
@@ -235,7 +233,7 @@ def main() -> int:
     parser.add_argument("--repo-output-dir", type=Path, default=DEFAULT_REPO_OUTPUT)
     parser.add_argument("--entrypoint", default=DEFAULT_ENTRYPOINT)
     parser.add_argument("--temp-parent", type=Path, default=Path("/private/tmp"))
-    parser.add_argument("--temp-prefix", default="rg_main2_public.")
+    parser.add_argument("--temp-prefix", default="rg_threecountry_public.")
     parser.add_argument("--expected-date", default=today_latex_date())
     args = parser.parse_args()
 

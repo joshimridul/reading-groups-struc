@@ -3,9 +3,9 @@
 """Check headline manuscript claims against active generated table outputs.
 
 This script is intentionally narrow. It is not a substitute for reading the
-paper; it guards the numeric claims that anchor the current Kenya/Liberia story:
-headline ITTs, signal quality, sample flow and attrition, classroom
-reallocation, dispersion, upper/lower track effects, peer/rank diagnostics, and
+paper; it guards the numeric claims that anchor the current three-country story:
+headline ITTs, signal quality, assignment value, attrition and inference,
+classroom reallocation, upper/lower track effects, peer/rank diagnostics, and
 the main robustness-section claims.
 """
 
@@ -20,7 +20,7 @@ from audit_overleaf_artifacts import DEFAULT_OVERLEAF
 from verify_freeze_manifest import DEFAULT_REPO, DEFAULT_REPO_OUTPUT
 
 
-DEFAULT_ENTRYPOINT = "main2.tex"
+DEFAULT_ENTRYPOINT = "main_3country_new.structural_edit.tex"
 
 
 @dataclass
@@ -150,10 +150,10 @@ def main() -> int:
         "robustness": read_text(args.repo_root / "4_Stata2/06_robustness.do"),
     }
     tables = {
-        "itt": read_text(output / "tab_itt.tex"),
+        "itt": read_text(output / "tab_pooled_itt.tex"),
         "signal": read_text(output / "tab_signal_quality.tex"),
         "signal_alt": read_text(output / "tab_signal_quality_alt.tex"),
-        "upper_lower": read_text(output / "tab_upper_lower.tex"),
+        "upper_lower": read_text(output / "tab_pooled_upper_lower.tex"),
         "classroom": read_text(output / "tab_classroom_reallocation.tex"),
         "assignment_payoff": read_text(output / "tab_assignment_payoff_kenya.tex"),
         "dispersion": read_text(output / "tab_dispersion_firststage.tex"),
@@ -161,6 +161,7 @@ def main() -> int:
         "ke_sample": read_text(output / "ke_sampleflow.tex"),
         "lib_attrition": read_text(output / "lib_attrition.tex"),
         "ke_attrition": read_text(output / "ke_attrition.tex"),
+        "rnr_attrition": read_text(output / "tab_rnr_attrition_bounds.tex"),
         "peer": read_text(output / "tab_peer_effects.tex"),
         "peer_exact": read_text(output / "tab_peer_effects_exact_kenya.tex"),
         "suffstat_ke": read_text(output / "tab_suffstat_kenya.tex"),
@@ -169,21 +170,24 @@ def main() -> int:
         "ceiling": read_text(output / "tab_ceiling.tex"),
         "score_variance": read_text(output / "tab_score_variance.tex"),
         "spec_robust": read_text(output / "tab_spec_robust.tex"),
-        "lee_bounds": read_text(output / "tab_lee_bounds.tex"),
+        "lee_bounds": read_text(output / "tab_rnr_attrition_bounds.tex"),
     }
 
     results = [
         check_exact_numbers("ITT coefficients", tables["itt"], "Treatment", [0.031, -0.212]),
         check_exact_numbers("ITT sample sizes", tables["itt"], "N", [4954, 3154]),
-        check_table_snippet(
+        contains_all(
             "ITT inference prose",
             manuscript,
-            r"Liberia estimate is negative ($-0.212$ SD, $p = 0.12$), while the Kenya estimate is small, positive, and statistically indistinguishable from zero ($0.031$ SD, $p = 0.56$)",
+            [
+                r"In Liberia, grouping reduces endline scores by $0.212$ SD ($p = 0.12$).",
+                r"In Kenya, the effect is near zero ($0.031$ SD, $p = 0.56$).",
+            ],
         ),
         check_table_snippet(
             "Kenya precision prose",
             manuscript,
-            r"The 95\% upper confidence bound is about $0.135$ SD, below the $0.18$ SD gain",
+            r"students with larger predicted assignment gains do not benefit more, and movers do not outperform stayers",
         ),
         check_exact_numbers("Signal quality Kenya grade 1", tables["signal"], "Kenya", [1, 2190, 0.713, 0.509]),
         check_signal_weight_floor(
@@ -214,37 +218,55 @@ def main() -> int:
             "Within-grade rank persistence",
             [0.684, 0.242],
         ),
-        check_table_snippet(
+        contains_all(
             "Signal quality prose",
             manuscript,
-            r"In Kenya, $R^2_g$ is 0.509 in Grade 1 and 0.559 in Grade 2. In Liberia, the corresponding values are only 0.034--0.065 across grades.",
+            [
+                r"Kenya is the high-signal case, with an incremental $R^2$ of $0.52$.",
+                r"Liberia is the low-signal case, with $R^2$ between $0.03$ and $0.07$.",
+            ],
         ),
         check_exact_numbers("Liberia sample flow analytic", tables["lib_sample"], "Analytic sample", [2249, 2535, 4784]),
         check_exact_numbers("Liberia sample flow endline", tables["lib_sample"], "With endline score", [1482, 1672, 3154]),
         check_exact_numbers("Kenya sample flow analytic", tables["ke_sample"], "Analytic sample", [6117, 985, 7102]),
         check_exact_numbers("Kenya sample flow endline", tables["ke_sample"], "With endline score", [4195, 759, 4954]),
-        check_table_snippet(
+        contains_all(
             "Sample-flow prose",
             manuscript,
-            r"Endline scores are observed for 3,154 of 4,784 Liberia analytic-sample students (65.9\%) and 4,954 of 7,102 Kenya analytic-sample students (69.8\%",
+            [
+                r"Tables~\ref{tab:lib_sumstats}, \ref{tab:ke_sumstats}, and \ref{tab:ng_sumstats} report country-level summary statistics",
+                r"Tables~\ref{tab:lib_sampleflow}, \ref{tab:ke_sampleflow}, and \ref{tab:ng_sampleflow} trace sample construction",
+            ],
         ),
-        check_exact_numbers("Liberia attrition overall", tables["lib_attrition"], "Overall", [0.340, 0.341, 0.000, 4784]),
-        check_exact_numbers("Kenya attrition overall", tables["ke_attrition"], "Overall", [0.229, 0.314, -0.075, 7102]),
         check_table_snippet(
+            "Liberia attrition overall",
+            tables["rnr_attrition"],
+            r"Liberia & endline & 0.340 & 0.341 &  0.000 & -0.212 & -0.214 & [-0.212, -0.212] \\",
+        ),
+        check_table_snippet(
+            "Kenya attrition overall",
+            tables["rnr_attrition"],
+            r"Kenya & T3 endline & 0.229 & 0.314 & -0.075 &  0.031 &  0.028 & [-0.023,  0.154] \\",
+        ),
+        contains_all(
             "Attrition prose",
             manuscript,
-            r"In Kenya, raw attrition is 22.9\% in treatment schools and 31.4\% in control schools; with strata fixed effects, treatment students are 7.5 percentage points less likely to be missing an endline score",
+            [
+                r"Attrition does not explain the Kenya or Liberia findings.",
+                r"Kenya's treatment arm has lower attrition than control, but IPW adjustment leaves the ITT at $+0.028$ SD and Lee bounds include zero.",
+                r"Liberia attrition is balanced, and the IPW estimate remains $-0.214$ SD.",
+            ],
         ),
         check_exact_numbers(
             "Upper/lower Liberia upper total",
             tables["upper_lower"],
-            "Upper track total",
+            "Higher-track effect",
             [0.023, -0.348],
         ),
         check_table_snippet(
             "Upper/lower prose",
             manuscript,
-            r"In Liberia, the lower-track effect is close to zero ($-0.019$ SD), while the upper-track total is $-0.348$ SD ($p = 0.03$).",
+            r"In Liberia, the negative effect is concentrated in the upper track ($-0.348$ SD, $p = 0.03$).",
         ),
         check_exact_numbers(
             "Classroom class size",
@@ -258,15 +280,18 @@ def main() -> int:
             "Squared track target misfit",
             [1.352, 0.419, 1.519, 0.639],
         ),
-        check_table_snippet(
+        contains_all(
             "Classroom reallocation prose",
             manuscript,
-            r"mean squared misfit falls from 1.35 to 0.42 in Kenya and from 1.52 to 0.64 in Liberia",
+            [
+                r"In Kenya, the diagnostic rule lowers average predicted squared mismatch from 0.982 to 0.569",
+                r"The classroom reallocation evidence then shows whether predictive content translated into realized grouping.",
+            ],
         ),
         check_table_snippet(
             "Liberia class-size prose",
             manuscript,
-            r"treated reading classes grow substantially (32.2 to 42.2 students)",
+            r"class sizes increase from 32 to 42 students",
         ),
         check_exact_numbers("Assignment-payoff movers", tables["assignment_payoff"], "Movers ITT", [0.030, 0.053, 1816]),
         check_exact_numbers("Assignment-payoff stayers", tables["assignment_payoff"], "Stayers ITT", [0.035, 0.073, 3138]),
@@ -323,7 +348,7 @@ def main() -> int:
         check_table_snippet(
             "Predicted assignment-gain prose",
             manuscript,
-            r"the interaction with treatment is 0.008 SD per one standard deviation of predicted assignment gain (SE $=0.068$)",
+            r"An omnibus predicted-assignment-gain index also has a near-zero interaction with treatment: 0.008 SD per one standard deviation of predicted assignment gain (SE $=0.068$).",
         ),
         check_table_snippet(
             "Dispersion Kenya full sample",
@@ -335,10 +360,13 @@ def main() -> int:
             tables["dispersion"],
             r"Full Sample &  0.542 &  -0.022 & 4784",
         ),
-        check_table_snippet(
+        contains_all(
             "Dispersion prose",
             manuscript,
-            r"treatment reduces each student's absolute deviation from the classroom mean by 0.257 standardized-score units in Kenya but only 0.022 in Liberia",
+            [
+                r"Kenya is the clean first-stage success: within-class dispersion compresses substantially",
+                r"within-class dispersion barely compresses because the diagnostic carries too little information",
+            ],
         ),
         check_exact_numbers("Approximate peer/rank coefficients", tables["peer"], "Peer mean EB ability", [-0.133, -0.048]),
         check_table_snippet(
@@ -355,12 +383,12 @@ def main() -> int:
         check_table_snippet(
             "Peer/rank prose",
             manuscript,
-            "Approximate peer/rank specifications point to adverse classroom-composition changes, while exact control function and recentering checks show that this evidence should not be interpreted as an identified causal peer/rank coefficient.",
+            r"This adverse composite is large enough to matter, but Appendix Table~\ref{tab:peer_effects_exact_kenya} shows that exact control-function and recentered specifications are close to zero.",
         ),
         check_table_snippet(
             "Exact peer/rank prose",
             manuscript,
-            r"When the design-based expected peer regressor $\mu_i^{BH}$ is used either as a control function or to recenter realized exposure, the coefficient on realized or recentered peer exposure is close to zero: $0.001$ in the exact control-function specification and $-0.009$ in the exact recentered specification. The nonzero coefficient on $\mu_i^{BH}$ in the exact control-function columns is a coefficient on predictable exposure, not on the residual peer/rank variation used for identification; it is therefore not a causal peer/rank coefficient.",
+            r"The correct interpretation is therefore not that a clean adverse peer effect explains Kenya's null.",
         ),
         check_table_snippet(
             "Kenya accounting peer contribution",
@@ -384,18 +412,24 @@ def main() -> int:
             r"T $\times$ Upper",
             [-0.023, -0.023, -0.328, -0.237],
         ),
-        check_table_snippet(
+        contains_all(
             "Class-size-control prose",
             manuscript,
-            r"The total upper-track effect in Liberia is essentially unchanged after adjustment ($-0.348$ without the control and $-0.345$ with it), and the class size coefficient itself is small. In Kenya, adding class size leaves the track coefficients essentially unchanged.",
+            [
+                r"Class-size changes do not explain the main track-position results.",
+                r"In Kenya and Liberia, adding realized class size leaves the upper-track estimates essentially unchanged",
+            ],
         ),
         check_exact_numbers("Ceiling robustness treatment row", tables["ceiling"], "Treatment", [0.031, 0.040, 0.022]),
         check_exact_numbers("Ceiling robustness sample sizes", tables["ceiling"], "N", [4954, 4954, 4471]),
         check_exact_numbers("Ceiling robustness censored observations", tables["ceiling"], "Right-censored obs.", [176]),
-        check_table_snippet(
+        contains_all(
             "Ceiling robustness prose",
             manuscript,
-            r"Table~\ref{tab:ceiling} shows that the point estimate remains close to the baseline OLS estimate when estimated by Tobit with an upper limit at 50 points ($0.040$ SD) or by OLS after dropping the top baseline score decile ($0.022$ SD); 176 endline observations reach the ceiling.",
+            [
+                r"Ceiling effects also do not explain the null or positive estimates.",
+                r"Kenya's ITT remains close to zero under Tobit and trimmed-OLS specifications",
+            ],
         ),
         check_table_snippet(
             "Score-variance table values",
@@ -407,10 +441,13 @@ def main() -> int:
             tables["score_variance"],
             r"Treatment &   0.239*** &  -0.082",
         ),
-        check_table_snippet(
+        contains_all(
             "Score-variance prose",
             manuscript,
-            r"the adjusted treatment coefficient on total variance is small and imprecise ($0.038$ SD$^2$, SE $=0.073$). At the classroom level, tracking significantly reduces within class variance ($-0.228$ SD$^2$, $p<0.01$) and increases between class variance by almost exactly the same amount ($0.239$ SD$^2$, $p<0.01$).",
+            [
+                r"In Kenya, treatment shifts variance from within-class to between-class components, as expected under successful sorting, without increasing aggregate score variance.",
+                r"In Liberia, within-class variance rises rather than falls, consistent with weak sorting and organizational disruption.",
+            ],
         ),
         check_exact_numbers(
             "Specification robustness baseline",
@@ -433,18 +470,36 @@ def main() -> int:
         check_table_snippet(
             "Specification robustness p-values",
             tables["spec_robust"],
-            r"Wild cluster bootstrap $p$ value & \multicolumn{2}{c}{0.622} & \multicolumn{2}{c}{0.126} \\",
+            r"Wild cluster bootstrap $p$-value & \multicolumn{2}{c}{0.622} & \multicolumn{2}{c}{0.126} \\",
         ),
-        check_table_snippet(
+        contains_all(
             "Specification robustness prose",
             manuscript,
-            r"Replacing EB ability with the raw baseline score leaves the estimates unchanged to three decimals. Dropping the baseline control moves the Kenya point estimate upward ($0.110$, SE $=0.071$) and leaves Liberia negative ($-0.240$, SE $=0.139$).",
+            [
+                r"The Kenya estimate is stable under the two controlled specifications and remains statistically indistinguishable from zero under all specifications.",
+                r"The Liberia estimate remains negative throughout.",
+            ],
         ),
-        check_exact_numbers("Lee bounds attrition rates", tables["lee_bounds"], "Control attrition rate", [0.314, 0.341]),
-        check_exact_numbers("Lee bounds treatment attrition rates", tables["lee_bounds"], "Treatment attrition rate", [0.229, 0.340]),
-        check_exact_numbers("Lee bounds attrition differences", tables["lee_bounds"], r"Attrition diff. (T $-$ C)", [-0.085, -0.001]),
-        check_exact_numbers("Lee bounds lower", tables["lee_bounds"], "Lee lower bound", [-0.023, -0.212]),
-        check_exact_numbers("Lee bounds upper", tables["lee_bounds"], "Lee upper bound", [0.154, -0.212]),
+        check_table_snippet(
+            "Lee bounds Kenya row",
+            tables["lee_bounds"],
+            r"Kenya & T3 endline & 0.229 & 0.314 & -0.075 &  0.031 &  0.028 & [-0.023,  0.154] \\",
+        ),
+        check_table_snippet(
+            "Lee bounds Liberia row",
+            tables["lee_bounds"],
+            r"Liberia & endline & 0.340 & 0.341 &  0.000 & -0.212 & -0.214 & [-0.212, -0.212] \\",
+        ),
+        check_table_snippet(
+            "Lee bounds Nigeria T2 row",
+            tables["lee_bounds"],
+            r"Nigeria & T2 ETE & 0.309 & 0.323 &  0.001 &  0.146 &  0.137 & [ 0.146,  0.180] \\",
+        ),
+        check_table_snippet(
+            "Lee bounds Nigeria T3 row",
+            tables["lee_bounds"],
+            r"Nigeria & T3 ETE & 0.350 & 0.490 & -0.135 &  0.105 &  0.111 & [-0.126,  0.298] \\",
+        ),
         contains_regexes(
             "Lee bounds code-method guardrail",
             code["robustness"],
@@ -460,12 +515,15 @@ def main() -> int:
         check_table_snippet(
             "Lee bounds table methods note",
             tables["lee_bounds"],
-            "Lee (2009) bounds trim the distribution of endline scores in the arm with lower attrition to equalize attrition rates",
+            "Lee bounds trim the lower-attrition arm to equalize response rates",
         ),
-        check_table_snippet(
+        contains_all(
             "Lee bounds prose",
             manuscript,
-            r"The resulting Kenya point-estimate bounds are $[-0.023, 0.154]$ SD\@. Thus selective attrition could move the Kenya estimate modestly in either direction, but even the upper point-estimate bound remains below the $0.18$ SD benchmark from within grade tracking.",
+            [
+                r"Kenya's treatment arm has lower attrition than control, but IPW adjustment leaves the ITT at $+0.028$ SD and Lee bounds include zero.",
+                r"T2 endterm bounds are tightly positive, $[0.146,0.180]$, while T3 endterm bounds are wide, $[-0.126,0.298]$.",
+            ],
         ),
     ]
 

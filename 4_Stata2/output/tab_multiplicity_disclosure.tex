@@ -1,0 +1,37 @@
+\begin{table}[!htbp]
+\centering
+\caption{Analysis Status and Multiplicity Disclosure}
+\label{tab:multiplicity_disclosure}
+\begin{threeparttable}
+\scriptsize
+\setlength{\tabcolsep}{3pt}
+\begin{tabular}[t]{p{3.1cm}p{4.8cm}p{1.8cm}cccc}
+\toprule
+Family & Estimate & Status & Coef. & SE & Raw $p$ & BH $q$ \\
+\midrule
+Primary endpoints & Kenya primary ITT & Primary &   0.031 & (  0.053) & 0.564 & 0.564 \\
+Primary endpoints & Liberia primary ITT & Primary &  -0.212 & (  0.135) & 0.120 & 0.359 \\
+Primary endpoints & Nigeria primary ITT & Primary &   0.093 & (  0.133) & 0.492 & 0.564 \\
+\addlinespace
+Track-position & Kenya: lower-track effect & Heterogeneity &   0.046 & (  0.137) & 0.737 & 0.962 \\
+Track-position & Kenya: higher-track differential & Heterogeneity &  -0.023 & (  0.147) & 0.877 & 0.962 \\
+Track-position & Kenya: higher-track effect & Heterogeneity &   0.023 & (  0.044) & 0.597 & 0.962 \\
+Track-position & Liberia: lower-track effect & Heterogeneity &  -0.019 & (  0.181) & 0.915 & 0.962 \\
+Track-position & Liberia: higher-track differential & Heterogeneity &  -0.328 & (  0.201) & 0.106 & 0.239 \\
+Track-position & Liberia: higher-track effect & Heterogeneity &  -0.348 & (  0.154) & 0.027 & 0.120 \\
+Track-position & Nigeria: lower-track effect & Heterogeneity &   0.007 & (  0.152) & 0.962 & 0.962 \\
+Track-position & Nigeria: higher-track differential & Heterogeneity &   0.239 & (  0.098) & 0.020 & 0.120 \\
+Track-position & Nigeria: higher-track effect & Heterogeneity &   0.246 & (  0.129) & 0.065 & 0.195 \\
+\addlinespace
+Kenya payoff diagnostics & Treat x mover interaction & Mechanism &  -0.000 & (  0.082) & 0.996 & 0.996 \\
+Kenya payoff diagnostics & Predicted assignment gain: Treat x gain (1 SD) & Mechanism &   0.008 & (  0.068) & 0.908 & 0.996 \\
+Kenya payoff diagnostics & Top assignment-gain tercile ITT & Mechanism &  -0.004 & (  0.056) & 0.940 & 0.996 \\
+Kenya payoff diagnostics & Treat x top assignment-gain tercile & Mechanism &  -0.036 & (  0.089) & 0.686 & 0.996 \\
+\bottomrule
+\end{tabular}
+\begin{tablenotes}[para,flushleft]
+\footnotesize
+\item \textit{Notes:} The table reports Benjamini-Hochberg false-discovery-rate q-values within each displayed family. The primary-endpoint family contains the country-specific ITTs that anchor the reduced form. The track-position family uses the primary endpoint in each country and the support-aware Nigeria two-group collapse. The Kenya payoff-diagnostic family contains mechanism tests used to ask whether students with larger predicted assignment gains benefited more. Multiplicity adjustments are reported for transparency; the paper's main conclusions rely on the pattern of estimates, implementation evidence, and structural benchmarking rather than on any single adjusted rejection.
+\end{tablenotes}
+\end{threeparttable}
+\end{table}

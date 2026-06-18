@@ -29,7 +29,7 @@ build/logs/stata_master_paper.log
 ## What The Master Runs
 
 The paper master regenerates the reduced-form tables used in
-`main_3country_new.tex`:
+`main_3country_new.structural_edit.tex`:
 
 1. `00_clean_liberia.do`
 2. `00_clean_kenya.do`
@@ -40,10 +40,12 @@ The paper master regenerates the reduced-form tables used in
 7. `04c_assignment_channel_tests.do`
 8. `06_robustness.do`
 9. `07_lesson_completion.do`
-10. `00_clean_nigeria.do`
-11. `02_nigeria_main_analysis.do`
-12. `02b_nigeria_two_group.do`
-13. `03_pooled_analysis.do`
+10. `08_rnr_inference_attrition.do`
+11. `00_clean_nigeria.do`
+12. `02_nigeria_main_analysis.do`
+13. `02b_nigeria_two_group.do`
+14. `03_pooled_analysis.do`
+15. `09_multiplicity_disclosure.do`
 
 Primary generated outputs go to:
 
@@ -96,13 +98,11 @@ These are descriptive pooled specifications for power and cross-country
 comparison. Interpret them using the manuscript text rather than as a separate
 fourth experiment.
 
-## Legacy Files
+## Validation and Release Helpers
 
-Several scripts in this folder still exist for provenance from earlier
-Kenya/Liberia drafts, especially the old `main2.tex` workflow. They are not the
-active replication entry point:
+Several helper scripts audit the repository-local paper build and release
+package:
 
-- `build_main2_tables.py`
 - `check_release_readiness.py`
 - `check_numeric_claims.py`
 - `check_public_version.py`
@@ -110,7 +110,12 @@ active replication entry point:
 - `triage_release_worktree.py`
 - `embed_active_figure_fonts.py`
 
-Use them only when auditing the archived `main2.tex` line.
+`check_release_readiness.py` is the main pre-sharing gate. It checks the active
+PDF, active generated inputs, response-letter labels and numeric claims,
+release pathspecs, and cleanup-decision memo.
+
+`build_main2_tables.py` remains only for provenance from the older Kenya/Liberia
+draft line and is not part of the active three-country build.
 
 ## Practical Debugging
 

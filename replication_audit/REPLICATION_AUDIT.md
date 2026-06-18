@@ -1,9 +1,9 @@
-# Replication Audit: AbilityGrouping Three-Country Paper
+# Replication Audit: Three-Country Paper
 
-Audit date: 2026-06-07  
-Repo root: `/Users/mriduljoshi/Github/AbilityGrouping`  
-Manuscript source audited: `main_3country_new.structural_edit.tex`  
-Repo source compared: `/Users/mriduljoshi/Github/reading-groups-struc/main_3country_new.tex`  
+Audit date: 2026-06-07
+Repo root: `/Users/mriduljoshi/Github/reading-groups-struc`
+Manuscript source audited: `main_3country_new.structural_edit.tex`
+Repo source compared: `/Users/mriduljoshi/Github/reading-groups-struc/main_3country_new.tex`
 Repo PDF compared: `/Users/mriduljoshi/Github/reading-groups-struc/main_3country_new.pdf`
 
 ## Bottom line
@@ -38,7 +38,7 @@ find "/Users/mriduljoshi/Github/reading-groups-struc" -maxdepth 3 -type f \( -na
 python3 4_Stata2/audit_overleaf_artifacts.py --overleaf-dir "/Users/mriduljoshi/Github/reading-groups-struc" --entrypoint main_3country_new.tex --repo-output-dir 4_Stata2/output --check-labels
 python3 4_Stata2/audit_overleaf_artifacts.py --overleaf-dir "/Users/mriduljoshi/Github/reading-groups-struc" --entrypoint main2.tex --repo-output-dir 4_Stata2/output --check-labels
 python3 3_Python/verify_structural_package.py
-/Applications/StataNow/StataMP.app/Contents/MacOS/stata-mp -b do /Users/mriduljoshi/Github/AbilityGrouping/replication_audit/stata_scratch_core.do
+/Applications/StataNow/StataMP.app/Contents/MacOS/stata-mp -b do /Users/mriduljoshi/Github/reading-groups-struc/replication_audit/stata_scratch_core.do
 tail -n 100 replication_audit/stata_scratch_core.log
 rg -n "r\([0-9]+\)|no observations|not found|file .* not found|invalid|conformability|already defined|cannot|fail|error" replication_audit/stata_scratch_core.log
 diff -qr structural_output "/Users/mriduljoshi/Github/reading-groups-struc/structural_output"
@@ -100,7 +100,7 @@ rg -n "Warning|Error|Undefined|Citation|Reference|Overfull|Underfull|rerun|TODO|
 `python3 4_Stata2/check_numeric_claims.py` fails immediately:
 
 ```text
-FileNotFoundError: Missing required file: /Users/mriduljoshi/Github/AbilityGrouping/4_Stata2/output/tab_itt.tex
+FileNotFoundError: Missing required file: /Users/mriduljoshi/Github/reading-groups-struc/4_Stata2/output/tab_itt.tex
 ```
 
 The active manuscript now uses pooled tables such as `tab_pooled_itt.tex`, while this checker still requires deleted older outputs. This is a real reproducibility gate failure, not a manuscript artifact failure.
@@ -166,7 +166,7 @@ The active TeX source references `stata_output/...` and `structural_output/...`.
 Command:
 
 ```bash
-/Applications/StataNow/StataMP.app/Contents/MacOS/stata-mp -b do /Users/mriduljoshi/Github/AbilityGrouping/replication_audit/stata_scratch_core.do
+/Applications/StataNow/StataMP.app/Contents/MacOS/stata-mp -b do /Users/mriduljoshi/Github/reading-groups-struc/replication_audit/stata_scratch_core.do
 ```
 
 Log checked:

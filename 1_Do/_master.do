@@ -25,7 +25,7 @@ if "`c(username)'" == "mriduljoshi" {
 	global maindir 	"/Users/mriduljoshi/Dropbox/Bridge TARL/AbilityGrouping"
 	global gitdir   "/Users/mriduljoshi/Github/AbilityGrouping"
 	*global outdir	"/Users/mriduljoshi/Dropbox/Overleaf/Reading groups/Tables_combined"
-	global outdir	"${gitdir}/archive/old_fragments/Liberia2024"
+	global outdir	"/Users/mriduljoshi/Dropbox/Apps/Overleaf/Reading groups/Liberia2024"
 
 
 }
@@ -81,6 +81,7 @@ do "${dodir}/9_structural_pooled.do"
 do "${dodir}/10_structural_finalscores.do"
 
 do "${dodir}/11_structural_balance.do"
+
 
 
 

@@ -1,0 +1,27 @@
+\begin{table}[H]
+\centering
+\caption{Attrition, IPW, and Lee-Bound Checks}
+\label{tab:rnr_attrition_bounds}
+\begin{threeparttable}
+\scriptsize
+\setlength{\tabcolsep}{3pt}
+\begin{tabular}[t]{llcccccc}
+\toprule
+Experiment & Endpoint & T attr. & C attr. & Adj. diff. & OLS ITT & IPW ITT & Lee bounds \\
+\midrule
+Kenya & T3 endline & 0.229 & 0.314 & -0.075 &  0.031 &  0.028 & [-0.023,  0.154] \\
+ & & & & ( 0.045) & ( 0.053) & ( 0.053) & \\
+Liberia & endline & 0.340 & 0.341 &  0.000 & -0.212 & -0.214 & [-0.212, -0.212] \\
+ & & & & ( 0.062) & ( 0.135) & ( 0.135) & \\
+Nigeria & T2 ETE & 0.309 & 0.323 &  0.001 &  0.146 &  0.137 & [ 0.146,  0.180] \\
+ & & & & ( 0.034) & ( 0.082) & ( 0.082) & \\
+Nigeria & T3 ETE & 0.350 & 0.490 & -0.135 &  0.105 &  0.111 & [-0.126,  0.298] \\
+ & & & & ( 0.084) & ( 0.132) & ( 0.130) & \\
+\bottomrule
+\end{tabular}
+\begin{tablenotes}[para,flushleft]
+\footnotesize
+\item \textit{Notes:} Attrition is missing outcome for the listed endpoint. Adjusted attrition differences use the same fixed effects as the corresponding outcome model. OLS ITT is the preferred endpoint regression. IPW estimates weight observed outcome regressions by the inverse predicted response probability from a logit on treatment, baseline score, and design fixed effects. Lee bounds trim the lower-attrition arm to equalize response rates and then re-estimate the covariate-adjusted endpoint regression. Standard errors in parentheses are clustered at the preferred assignment unit.
+\end{tablenotes}
+\end{threeparttable}
+\end{table}

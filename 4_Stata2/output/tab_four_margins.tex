@@ -1,4 +1,4 @@
-\begin{table}[H]
+\begin{table}[!h]
 \centering
 \caption{Four-Margin Summary: Kenya vs.\ Liberia}
 \label{tab:four_margins}
@@ -12,13 +12,13 @@
  & Kenya & Liberia \\
 \midrule
 Weighted R-squared (R2_g) &  0.533 &  0.055 \\
-Cutoff compliance &  1.000 &  1.000 \\
-Absolute mismatch reduction (C-T) &  0.421 &  0.348 \\
-Class size difference (T-C) &   -3.1 &   11.3 \\
+Assignment sharpness & 1.000 & 1.000 \\
+Mismatch reduction (C-T) &  0.421 &  0.348 \\
+Class size change (T-C) &   -3.1 &   11.3 \\
 \bottomrule
 \end{tabular}
 \begin{tablenotes}[para]
-\item Notes: Weighted R-squared (R2_g) averages across grades by control\mbox{-}group size. Cutoff compliance = 1 indicates that observed track assignments exactly follow the published deterministic cutoffs. Absolute mismatch reduction is the control-minus-treatment difference in mean $\lvert\hat{\theta}^{EB}_i - \bar{I}_k\rvert$. Class size difference is treatment-minus-control difference in mean classroom size.
+\item Notes: Weighted R-squared (R2_g) averages across grades by control-group size. Assignment sharpness = 1 indicates zero misclassification (deterministic cutoffs). Mismatch reduction is the control-minus-treatment difference in mean $\lvert\hat{\theta}_i - \bar{I}_k\rvert$. Class size change is treatment-minus-control difference in mean classroom size.
 \end{tablenotes}
 \end{threeparttable}
 \end{table}

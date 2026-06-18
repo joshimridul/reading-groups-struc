@@ -4,7 +4,7 @@ This folder contains the paper-facing materialization utilities for the active
 manuscript:
 
 ```text
-main_3country_new.tex
+main_3country_new.structural_edit.tex
 ```
 
 The goal is simple: the pipeline should produce the exact tables and figures
@@ -36,7 +36,8 @@ Run this after regenerating outputs:
 python3 paper_pipeline/materialize_latex_inputs.py
 ```
 
-The script parses `main_3country_new.tex`, finds every active
+The script parses the active manuscript, currently
+`main_3country_new.structural_edit.tex`, finds every active
 `\input{stata_output/...}`, `\input{structural_output/...}`, and
 `\includegraphics{structural_output/...}`, and materializes only those files.
 It also writes:

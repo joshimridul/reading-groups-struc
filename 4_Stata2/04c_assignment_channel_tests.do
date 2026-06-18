@@ -286,6 +286,36 @@ local n_t8z = e(N)
 di "  Treat x assignment gain, 1 SD: " %7.3f `b_t8_intz' " (" %5.3f `se_t8_intz' ")"
 post pf ("T8") ("Predicted assignment gain: Treat x gain (1 SD)") (`b_t8_intz') (`se_t8_intz') (`pv_t8_intz') (`n_t8z')
 
+* ═══════════════════════════════════════════════════════════════════════════
+* T9. Largest predicted assignment-gain cells
+* ═══════════════════════════════════════════════════════════════════════════
+di _n "=== T9. Largest predicted assignment-gain cells ==="
+
+cap drop gain_tercile top_gain
+xtile gain_tercile = assign_gain if !missing(assign_gain), nq(3)
+gen top_gain = gain_tercile == 3 if !missing(gain_tercile)
+
+qui reg std_score_el treat `flex' i.strata if top_gain == 1, vce(cluster academycode)
+local b_t9_top = _b[treat]
+local se_t9_top = _se[treat]
+local pv_t9_top = 2 * ttail(e(df_r), abs(`b_t9_top'/`se_t9_top'))
+local n_t9_top = e(N)
+di "  Top assignment-gain tercile ITT: " %7.3f `b_t9_top' " (" %5.3f `se_t9_top' ")"
+post pf ("T9") ("Top assignment-gain tercile ITT") (`b_t9_top') (`se_t9_top') (`pv_t9_top') (`n_t9_top')
+
+qui reg std_score_el ib0.treat##ib0.top_gain `flex' i.strata, vce(cluster academycode)
+local b_t9_int = _b[1.treat#1.top_gain]
+local se_t9_int = _se[1.treat#1.top_gain]
+local pv_t9_int = 2 * ttail(e(df_r), abs(`b_t9_int'/`se_t9_int'))
+local n_t9_int = e(N)
+di "  Treat x top assignment-gain tercile: " %7.3f `b_t9_int' " (" %5.3f `se_t9_int' ")"
+post pf ("T9") ("Treat x top assignment-gain tercile") (`b_t9_int') (`se_t9_int') (`pv_t9_int') (`n_t9_int')
+
+local mde_t1_int = (invnormal(0.975) + invnormal(0.80)) * `se_t1_int'
+local mde_t8_intz = (invnormal(0.975) + invnormal(0.80)) * `se_t8_intz'
+local mde_t9_top = (invnormal(0.975) + invnormal(0.80)) * `se_t9_top'
+local mde_t9_int = (invnormal(0.975) + invnormal(0.80)) * `se_t9_int'
+
 postclose pf
 
 use `res', clear
@@ -500,6 +530,20 @@ get_stars `pv_t8_intz'
 local st_t8_intz "`r(stars)'"
 file write `fh' "Treatment \(\times\) predicted assignment gain (1 SD) & `b_t8_intz_f'`st_t8_intz' & (`se_t8_intz_f') & `n_t8z_f' \\" _n
 
+local b_t9_top_f : di %7.3f `b_t9_top'
+local se_t9_top_f : di %7.3f `se_t9_top'
+local n_t9_top_f : di %7.0f `n_t9_top'
+get_stars `pv_t9_top'
+local st_t9_top "`r(stars)'"
+file write `fh' "Top predicted-gain tercile ITT & `b_t9_top_f'`st_t9_top' & (`se_t9_top_f') & `n_t9_top_f' \\" _n
+
+local b_t9_int_f : di %7.3f `b_t9_int'
+local se_t9_int_f : di %7.3f `se_t9_int'
+local n_t9_int_f : di %7.0f `n_t9_int'
+get_stars `pv_t9_int'
+local st_t9_int "`r(stars)'"
+file write `fh' "Treatment \(\times\) top predicted-gain tercile & `b_t9_int_f'`st_t9_int' & (`se_t9_int_f') & `n_t9_int_f' \\" _n
+
 file write `fh' "\addlinespace" _n
 file write `fh' "\multicolumn{4}{l}{\textit{D. Descriptive control-group revealed-value checks}} \\" _n
 
@@ -521,12 +565,57 @@ file write `fh' "\bottomrule" _n
 file write `fh' "\end{tabular}" _n
 file write `fh' "\begin{tablenotes}[para,flushleft]" _n
 file write `fh' "\footnotesize" _n
-file write `fh' "\item \textit{Notes:} Outcome is the standardized endline test score. Movers are students whose treatment reading-group assignment differs from their enrolled grade: Grade 1 students above the upper-track cutoff and Grade 2 students at or below the lower-track cutoff. Cutoff distance is signed so larger values indicate more clearly assigned movers. Predicted assignment gain is the standardized reduction in squared EB-score mismatch from replacing the grade target with the treatment-track target; the regression also controls for its square. Panel D is estimated only in control classrooms and is descriptive rather than randomized. Standard errors are clustered at the school level." _n
+file write `fh' "\item \textit{Notes:} Outcome is the standardized endline test score. Movers are students whose treatment reading-group assignment differs from their enrolled grade: Grade 1 students above the upper-track cutoff and Grade 2 students at or below the lower-track cutoff. Cutoff distance is signed so larger values indicate more clearly assigned movers. Predicted assignment gain is the standardized reduction in squared EB-score mismatch from replacing the grade target with the treatment-track target; the regression also controls for its square. Top predicted-gain tercile is defined over the same predicted assignment-gain measure. Panel D is estimated only in control classrooms and is descriptive rather than randomized. Standard errors are clustered at the school level." _n
 file write `fh' "\end{tablenotes}" _n
 file write `fh' "\end{threeparttable}" _n
 file write `fh' "\end{table}" _n
 file close `fh'
 di "  -> tab_assignment_payoff_kenya.tex"
+
+* Power/MDE table for the main Kenya payoff diagnostics.
+tempname fh
+file open `fh' using "$out/tab_assignment_payoff_kenya_power.tex", write replace
+file write `fh' "\begin{table}[!htbp]" _n
+file write `fh' "\centering" _n
+file write `fh' "\caption{Kenya: Power for Assignment-Payoff Diagnostics}" _n
+file write `fh' "\label{tab:assignment_payoff_kenya_power}" _n
+file write `fh' "\begin{threeparttable}" _n
+file write `fh' "\small" _n
+file write `fh' "\begin{tabular}[t]{lcccc}" _n
+file write `fh' "\toprule" _n
+file write `fh' "Diagnostic & Estimate & SE & 80\% MDE & N \\" _n
+file write `fh' "\midrule" _n
+
+local b_t1_int_f : di %7.3f `b_t1_int'
+local se_t1_int_f : di %7.3f `se_t1_int'
+local mde_t1_int_f : di %7.3f `mde_t1_int'
+file write `fh' "Treatment \(\times\) mover & `b_t1_int_f' & (`se_t1_int_f') & `mde_t1_int_f' & `n_t1_int' \\" _n
+
+local b_t8_intz_f : di %7.3f `b_t8_intz'
+local se_t8_intz_f : di %7.3f `se_t8_intz'
+local mde_t8_intz_f : di %7.3f `mde_t8_intz'
+file write `fh' "Treatment \(\times\) predicted gain (1 SD) & `b_t8_intz_f' & (`se_t8_intz_f') & `mde_t8_intz_f' & `n_t8z' \\" _n
+
+local b_t9_top_f : di %7.3f `b_t9_top'
+local se_t9_top_f : di %7.3f `se_t9_top'
+local mde_t9_top_f : di %7.3f `mde_t9_top'
+file write `fh' "Top predicted-gain tercile ITT & `b_t9_top_f' & (`se_t9_top_f') & `mde_t9_top_f' & `n_t9_top' \\" _n
+
+local b_t9_int_f : di %7.3f `b_t9_int'
+local se_t9_int_f : di %7.3f `se_t9_int'
+local mde_t9_int_f : di %7.3f `mde_t9_int'
+file write `fh' "Treatment \(\times\) top predicted-gain tercile & `b_t9_int_f' & (`se_t9_int_f') & `mde_t9_int_f' & `n_t9_int' \\" _n
+
+file write `fh' "\bottomrule" _n
+file write `fh' "\end{tabular}" _n
+file write `fh' "\begin{tablenotes}[para,flushleft]" _n
+file write `fh' "\footnotesize" _n
+file write `fh' "\item \textit{Notes:} The MDE is the approximate two-sided 5\% significance, 80\% power minimum detectable effect, computed as \((1.96+0.84)\times\text{SE}\) using the realized cluster-robust standard error. The table is descriptive of the realized design's power for the assignment-payoff diagnostics; it is not used to select specifications." _n
+file write `fh' "\end{tablenotes}" _n
+file write `fh' "\end{threeparttable}" _n
+file write `fh' "\end{table}" _n
+file close `fh'
+di "  -> tab_assignment_payoff_kenya_power.tex"
 
 * Short markdown note
 local b_t1_m_f   : di %7.3f `b_t1_m'
@@ -549,6 +638,14 @@ local b_t7_q4_f : di %7.3f `b_t7_q4'
 local b_t7_q5_f : di %7.3f `b_t7_q5'
 local b_t8_int_f : di %7.3f `b_t8_int'
 local b_t8_intz_f : di %7.3f `b_t8_intz'
+local b_t9_top_f : di %7.3f `b_t9_top'
+local se_t9_top_f : di %7.3f `se_t9_top'
+local b_t9_int_f : di %7.3f `b_t9_int'
+local se_t9_int_f : di %7.3f `se_t9_int'
+local mde_t1_int_f : di %7.3f `mde_t1_int'
+local mde_t8_intz_f : di %7.3f `mde_t8_intz'
+local mde_t9_top_f : di %7.3f `mde_t9_top'
+local mde_t9_int_f : di %7.3f `mde_t9_int'
 
 tempname fh
 file open `fh' using "$out/assignment_channel_tests_kenya.md", write replace
@@ -561,6 +658,8 @@ file write `fh' "- Grade-direction ITTs: G1 stayers = `b_t6_g1s_f', G1 movers up
 file write `fh' "- Direct treatment-by-baseline-quintile ITTs: Q1 = `b_t7_q1_f', Q2 = `b_t7_q2_f', Q3 = `b_t7_q3_f', Q4 = `b_t7_q4_f', Q5 = `b_t7_q5_f'." _n
 file write `fh' "- Predicted assignment-gain interaction: treat x assign_gain = `b_t8_int_f'." _n
 file write `fh' "- Predicted assignment-gain interaction per 1 SD: `b_t8_intz_f'." _n
+file write `fh' "- Top predicted-gain tercile ITT = `b_t9_top_f' (SE `se_t9_top_f'); treatment-by-top-tercile interaction = `b_t9_int_f' (SE `se_t9_int_f')." _n
+file write `fh' "- Realized 80 percent MDEs: mover interaction = `mde_t1_int_f', predicted-gain interaction = `mde_t8_intz_f', top-tercile ITT = `mde_t9_top_f', top-tercile interaction = `mde_t9_int_f'." _n
 file close `fh'
 di "  -> assignment_channel_tests_kenya.md"
 

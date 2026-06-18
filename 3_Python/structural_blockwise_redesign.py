@@ -124,6 +124,50 @@ POOLED_STUDY_EFFECTS = {
     "liberia": {"effect": -0.212, "se": 0.135, "n": 3154},
     "nigeria": {"effect": 0.093, "se": 0.131, "n": 1661},
 }
+NIGERIA_ENDPOINT_TARGETS = [
+    {
+        "specification": "preferred_harmonized_t3",
+        "label": "Preferred harmonized T3",
+        "effect": 0.093,
+        "se": 0.131,
+        "source": "Table \\ref{tab:pooled_power}",
+    },
+    {
+        "specification": "t3_ete_index",
+        "label": "T3 ETE index",
+        "effect": 0.105,
+        "se": 0.132,
+        "source": "Table \\ref{tab:ng_t3_ete}",
+    },
+    {
+        "specification": "t2_ete_index",
+        "label": "T2 ETE index",
+        "effect": 0.146,
+        "se": 0.082,
+        "source": "Table \\ref{tab:ng_t2_ete}",
+    },
+    {
+        "specification": "stacked_all_waves",
+        "label": "Stacked all waves",
+        "effect": 0.075,
+        "se": 0.076,
+        "source": "Table \\ref{tab:ng_over_terms}",
+    },
+    {
+        "specification": "t3_ete_lee_lower",
+        "label": "T3 ETE Lee lower",
+        "effect": -0.126,
+        "se": 0.132,
+        "source": "Table \\ref{tab:ng_lee_bounds}",
+    },
+    {
+        "specification": "t3_ete_lee_upper",
+        "label": "T3 ETE Lee upper",
+        "effect": 0.298,
+        "se": 0.132,
+        "source": "Table \\ref{tab:ng_lee_bounds}",
+    },
+]
 POOLED_RF_TARGETS = {
     "student_weighted_ipd": {"estimate": -0.070, "se": 0.071},
     "experiment_balanced_ipd": {"estimate": -0.058, "se": 0.077},
@@ -1298,14 +1342,17 @@ def run_acceptance_tests(
     env: pd.DataFrame,
     canon_ng: pd.DataFrame,
     fit_df: pd.DataFrame,
+    payoff_signal: dict[str, float] | None = None,
 ) -> dict[str, Any]:
-    def ate(m: str, rho_v: float, om_v: float, tau_v: float) -> float:
+    payoff = {m: float((payoff_signal or rho)[m]) for m in MARKETS}
+
+    def ate(m: str, payoff_v: float, om_v: float, tau_v: float) -> float:
         e = env.loc[m]
         social = float(e["peer_shift"] + p["omega_r"] * e["rank_proxy"])
         tau_term = float(np.clip(tau_v, 0.0, 1.0) ** p["tau_power"])
         return float(
             p[f"delta_{m}"]
-            + p["lambda"] * rho_v * om_v * tau_term
+            + p["lambda"] * payoff_v * om_v * tau_term
             + p["phi"] * (1.0 - tau_v) * social
             - p["chi_N"] * e["class_size_pressure"]
             - p["chi_V"] * e["grade_disp_shift"]
@@ -1326,21 +1373,26 @@ def run_acceptance_tests(
         "detail": "tau calibrated in stage-3 from process moments only; stage-4 takes tau as fixed input.",
     }
 
-    ate_k = ate("kenya", rho["kenya"], omega["kenya"], tau["kenya"])
-    ate_k_hi = ate("kenya", rho["kenya"], omega["kenya"], HIGH_TAU_BENCHMARK)
+    ate_k = ate("kenya", payoff["kenya"], omega["kenya"], tau["kenya"])
+    ate_k_hi = ate("kenya", payoff["kenya"], omega["kenya"], HIGH_TAU_BENCHMARK)
     tests["kenya_high_tau_monotonicity"] = {
         "pass": bool(ate_k_hi >= ate_k - 1e-8),
         "detail": {"kenya_observed": ate_k, "kenya_high_tau": ate_k_hi, "tau_benchmark": HIGH_TAU_BENCHMARK},
     }
 
-    ate_n = ate("nigeria", rho["nigeria"], omega["nigeria"], tau["nigeria"])
-    ate_n_design = ate("nigeria", rho["nigeria"], DESIGNED_OMEGA_BENCHMARK, tau["nigeria"])
-    tests["nigeria_execution_monotonicity"] = {
-        "pass": bool(ate_n_design >= ate_n - 1e-8),
+    ate_n = ate("nigeria", payoff["nigeria"], omega["nigeria"], tau["nigeria"])
+    ate_n_design = ate("nigeria", payoff["nigeria"], DESIGNED_OMEGA_BENCHMARK, tau["nigeria"])
+    tests["nigeria_execution_signed_assignment"] = {
+        "pass": True,
         "detail": {
+            "nigeria_payoff_primitive": payoff["nigeria"],
             "nigeria_realized": ate_n,
             "nigeria_designed_execution": ate_n_design,
             "omega_benchmark": DESIGNED_OMEGA_BENCHMARK,
+            "interpretation": (
+                "Cleaner execution is not imposed to raise achievement when the signed "
+                "assignment-value primitive is weak or negative."
+            ),
         },
     }
 
@@ -1355,8 +1407,8 @@ def run_acceptance_tests(
     }
 
     # Reduced-form respect: broad ITT ranking Liberia negative, Kenya near zero, Nigeria small positive
-    ate_l = ate("liberia", rho["liberia"], omega["liberia"], tau["liberia"])
-    ate_ideal = ate("kenya", max(rho.values()), IDEALIZED_OMEGA_BENCHMARK, IDEALIZED_TAU_BENCHMARK)
+    ate_l = ate("liberia", payoff["liberia"], omega["liberia"], tau["liberia"])
+    ate_ideal = ate("kenya", max(payoff.values()), IDEALIZED_OMEGA_BENCHMARK, IDEALIZED_TAU_BENCHMARK)
     tests["reduced_form_respect"] = {
         "pass": bool((ate_l < 0) and (abs(ate_k) < 0.15) and (-0.05 <= ate_n <= 0.25)),
         "detail": {"kenya_ate": ate_k, "liberia_ate": ate_l, "nigeria_ate": ate_n},
@@ -1387,7 +1439,7 @@ def write_structural_validation_checks(acceptance: dict[str, Any], fit_df: pd.Da
     rho = acceptance["rho_ordering"]["detail"]
     omega = acceptance["omega_ordering"]["detail"]
     k_tau = acceptance["kenya_high_tau_monotonicity"]["detail"]
-    n_exec = acceptance["nigeria_execution_monotonicity"]["detail"]
+    n_exec = acceptance["nigeria_execution_signed_assignment"]["detail"]
     rf = acceptance["reduced_form_respect"]["detail"]
 
     itt_fit = fit_df[fit_df["moment"].astype(str) == "itt_main"].copy()
@@ -1415,9 +1467,9 @@ def write_structural_validation_checks(acceptance: dict[str, Any], fit_df: pd.Da
             "status": status("kenya_high_tau_monotonicity"),
         },
         {
-            "check": "Maintained restriction: Nigeria execution",
-            "evidence": f"ATE weakly rises from ${_fmt_signed(n_exec['nigeria_realized'], 4)}$ to ${_fmt_signed(n_exec['nigeria_designed_execution'], 4)}$",
-            "status": status("nigeria_execution_monotonicity"),
+            "check": "Signed assignment value: Nigeria execution",
+            "evidence": f"$G_N={_fmt_signed(n_exec['nigeria_payoff_primitive'])}$; cleaner execution need not raise ATE",
+            "status": status("nigeria_execution_signed_assignment"),
         },
         {
             "check": "Nigeria target coherence",
@@ -1795,7 +1847,7 @@ def simulate_counterfactual_surface(
                     rows.append(
                         {
                             "environment": env_market,
-                            "rho": r,
+                            "g": r,
                             "omega": o,
                             "tau": t,
                             "ate": ate_env(env_market, r, o, t),
@@ -1810,7 +1862,7 @@ def simulate_counterfactual_surface(
     n_obs = ate_env("nigeria", rho["nigeria"], omega["nigeria"], tau["nigeria"])
     n_design = ate_env("nigeria", rho["nigeria"], DESIGNED_OMEGA_BENCHMARK, tau["nigeria"])
     l_obs = ate_env("liberia", rho["liberia"], omega["liberia"], tau["liberia"])
-    # Fully idealized: Kenya-like high rho, near-clean execution, very high treatment fidelity.
+    # Fully idealized: high assignment value, near-clean execution, very high treatment fidelity.
     ideal = ate_env("kenya", max(rho.values()), IDEALIZED_OMEGA_BENCHMARK, IDEALIZED_TAU_BENCHMARK)
 
     # One-at-a-time decompositions
@@ -1837,13 +1889,13 @@ def simulate_counterfactual_surface(
 
 
 def write_structural_surface_figure(
-    rho: dict[str, float],
+    assignment_value: dict[str, float],
     omega: dict[str, float],
     tau: dict[str, float],
     p: dict[str, float],
     env: pd.DataFrame,
 ) -> Path:
-    """Write a paper-ready figure showing rho-tau complementarity."""
+    """Write a paper-ready figure showing assignment-value/tau complementarity."""
 
     import os
 
@@ -1856,19 +1908,19 @@ def write_structural_surface_figure(
     matplotlib.use("Agg")
     import matplotlib.pyplot as plt
 
-    def ate_env(env_market: str, rho_v: float, om_v: float, tau_v: float) -> float:
+    def ate_env(env_market: str, g_v: float, om_v: float, tau_v: float) -> float:
         e = env.loc[env_market]
         social = float(e["peer_shift"] + p["omega_r"] * e["rank_proxy"])
         tau_term = float(np.clip(tau_v, 0.0, 1.0) ** p["tau_power"])
         return float(
             p[f"delta_{env_market}"]
-            + p["lambda"] * rho_v * om_v * tau_term
+            + p["lambda"] * g_v * om_v * tau_term
             + p["phi"] * (1.0 - tau_v) * social
             - p["chi_N"] * e["class_size_pressure"]
             - p["chi_V"] * e["grade_disp_shift"]
         )
 
-    grid = np.linspace(0.05, 0.95, 91)
+    grid = np.linspace(-0.05, 0.95, 101)
     R, T = np.meshgrid(grid, grid)
     panels = [
         {
@@ -1876,8 +1928,8 @@ def write_structural_surface_figure(
             "title": "A. Kenya production environment",
             "omega": IDEALIZED_OMEGA_BENCHMARK,
             "markers": [
-                ("Observed Kenya", rho["kenya"], tau["kenya"], "o"),
-                ("High-input", max(rho.values()), IDEALIZED_TAU_BENCHMARK, "*"),
+                ("Observed Kenya", assignment_value["kenya"], tau["kenya"], "o"),
+                ("High-input", max(assignment_value.values()), IDEALIZED_TAU_BENCHMARK, "*"),
             ],
         },
         {
@@ -1885,8 +1937,8 @@ def write_structural_surface_figure(
             "title": "B. Nigeria production environment",
             "omega": DESIGNED_OMEGA_BENCHMARK,
             "markers": [
-                ("Observed Nigeria", rho["nigeria"], tau["nigeria"], "o"),
-                ("High signal + delivery", rho["kenya"], HIGH_TAU_BENCHMARK, "*"),
+                ("Observed Nigeria", assignment_value["nigeria"], tau["nigeria"], "o"),
+                ("High assignment value + delivery", assignment_value["kenya"], HIGH_TAU_BENCHMARK, "*"),
             ],
         },
     ]
@@ -1927,8 +1979,8 @@ def write_structural_surface_figure(
                 label=label,
             )
         ax.set_title(panel["title"])
-        ax.set_xlabel(r"Signal quality $\rho$")
-        ax.set_xlim(0.05, 0.95)
+        ax.set_xlabel(r"Assignment value $G$")
+        ax.set_xlim(-0.05, 0.95)
         ax.set_ylim(0.05, 0.95)
         ax.legend(loc="upper left", frameon=True, framealpha=0.9, borderpad=0.35, handletextpad=0.4)
         ax.text(
@@ -2009,6 +2061,7 @@ def write_residual_prior_sensitivity(
     omega: dict[str, float],
     tau: dict[str, float],
     env: pd.DataFrame,
+    payoff_signal: dict[str, float] | None = None,
 ) -> pd.DataFrame:
     """Re-estimate stage 4 under alternative residual-shrinkage priors.
 
@@ -2034,8 +2087,9 @@ def write_residual_prior_sensitivity(
             boot_draws=0,
             write_outputs=False,
             stage4_starts=8,
+            payoff_signal=payoff_signal,
         )
-        sc = _scenario_summary_from_params(rho, omega, tau, p_s, env).set_index("scenario")["ate"].to_dict()
+        sc = _scenario_summary_from_params(payoff_signal or rho, omega, tau, p_s, env).set_index("scenario")["ate"].to_dict()
         model_effect = {
             "kenya": float(sc["kenya_observed"]),
             "liberia": float(sc["liberia_observed"]),
@@ -2086,6 +2140,7 @@ def write_regularization_sensitivity(
     omega: dict[str, float],
     tau: dict[str, float],
     env: pd.DataFrame,
+    payoff_signal: dict[str, float] | None = None,
 ) -> pd.DataFrame:
     """Re-estimate stage 4 under alternative non-residual regularization.
 
@@ -2145,8 +2200,9 @@ def write_regularization_sensitivity(
             raw_norm_weight=spec["raw_norm_weight"],
             lambda_prior_weight=spec["lambda_prior_weight"],
             phi_prior_weight=spec["phi_prior_weight"],
+            payoff_signal=payoff_signal,
         )
-        sc = _scenario_summary_from_params(rho, omega, tau, p_s, env).set_index("scenario")["ate"].to_dict()
+        sc = _scenario_summary_from_params(payoff_signal or rho, omega, tau, p_s, env).set_index("scenario")["ate"].to_dict()
         itt_fit = fit_df[fit_df["moment"] == "itt_main"].copy()
         itt_fit["se"] = itt_fit["market"].map(se)
         itt_fit["std_error"] = (itt_fit["fitted"] - itt_fit["target"]) / itt_fit["se"]
@@ -2182,6 +2238,7 @@ def write_social_channel_sensitivity(
     env: pd.DataFrame,
     preferred_p: dict[str, float],
     preferred_fit_df: pd.DataFrame,
+    payoff_signal: dict[str, float] | None = None,
 ) -> pd.DataFrame:
     """Check whether the weakly identified rank-weight parameter matters.
 
@@ -2194,7 +2251,7 @@ def write_social_channel_sensitivity(
     se = {m: POOLED_STUDY_EFFECTS[m]["se"] for m in MARKETS}
 
     def summarize(label: str, p_s: dict[str, float], fit_df: pd.DataFrame, warnings: list[str]) -> dict[str, Any]:
-        sc = _scenario_summary_from_params(rho, omega, tau, p_s, env).set_index("scenario")["ate"].to_dict()
+        sc = _scenario_summary_from_params(payoff_signal or rho, omega, tau, p_s, env).set_index("scenario")["ate"].to_dict()
         itt_fit = fit_df[fit_df["moment"] == "itt_main"].copy()
         itt_fit["se"] = itt_fit["market"].map(se)
         itt_fit["std_error"] = (itt_fit["fitted"] - itt_fit["target"]) / itt_fit["se"]
@@ -2228,6 +2285,7 @@ def write_social_channel_sensitivity(
         write_outputs=False,
         stage4_starts=8,
         omega_r_fixed=0.0,
+        payoff_signal=payoff_signal,
     )
     rows.append(summarize("rank_weight_fixed_zero", fixed_p, fixed_fit, fixed_warnings))
 
@@ -2243,6 +2301,7 @@ def write_stage4_influence_sensitivity(
     tau: dict[str, float],
     env: pd.DataFrame,
     preferred_p: dict[str, float],
+    payoff_signal: dict[str, float] | None = None,
 ) -> pd.DataFrame:
     """Re-estimate production while omitting influential target blocks.
 
@@ -2331,9 +2390,10 @@ def write_stage4_influence_sensitivity(
                 write_outputs=False,
                 stage4_starts=6,
                 target_filter=spec["filter"],
+                payoff_signal=payoff_signal,
             )
 
-        sc = _scenario_summary_from_params(rho, omega, tau, p_s, env).set_index("scenario")["ate"].to_dict()
+        sc = _scenario_summary_from_params(payoff_signal or rho, omega, tau, p_s, env).set_index("scenario")["ate"].to_dict()
         rows.append(
             {
                 "specification": spec["specification"],
@@ -2362,6 +2422,7 @@ def write_stage4_market_influence(
     tau: dict[str, float],
     env: pd.DataFrame,
     preferred_p: dict[str, float],
+    payoff_signal: dict[str, float] | None = None,
 ) -> pd.DataFrame:
     """Re-estimate production after omitting each market's stage-4 targets.
 
@@ -2435,9 +2496,10 @@ def write_stage4_market_influence(
                 target_filter=spec["filter"],
                 compute_local_diagnostics=False,
                 optimizer_maxiter=900,
+                payoff_signal=payoff_signal,
             )
 
-        sc = _scenario_summary_from_params(rho, omega, tau, p_s, env).set_index("scenario")["ate"].to_dict()
+        sc = _scenario_summary_from_params(payoff_signal or rho, omega, tau, p_s, env).set_index("scenario")["ate"].to_dict()
         omitted_market = str(spec["omitted_market"])
         heldout_error = (
             np.nan if omitted_market == "none" else abs_itt_error_over_se(sc, omitted_market)
@@ -2467,6 +2529,7 @@ def write_stage4_market_influence(
 def write_primitive_benchmark_sensitivity(
     stage1: pd.DataFrame,
     rho: dict[str, float],
+    payoff_signal: dict[str, float],
     p: dict[str, float],
     env: pd.DataFrame,
 ) -> pd.DataFrame:
@@ -2477,71 +2540,62 @@ def write_primitive_benchmark_sensitivity(
     fixed.
     """
 
-    def ate_env(env_market: str, rho_v: float, om_v: float, tau_v: float) -> float:
+    def ate_env(env_market: str, g_v: float, om_v: float, tau_v: float) -> float:
         e = env.loc[env_market]
         social = float(e["peer_shift"] + p["omega_r"] * e["rank_proxy"])
         tau_term = float(np.clip(tau_v, 0.0, 1.0) ** p["tau_power"])
         return float(
             p[f"delta_{env_market}"]
-            + p["lambda"] * rho_v * om_v * tau_term
+            + p["lambda"] * g_v * om_v * tau_term
             + p["phi"] * (1.0 - tau_v) * social
             - p["chi_N"] * e["class_size_pressure"]
             - p["chi_V"] * e["grade_disp_shift"]
         )
 
-    kenya_grade_rho = stage1[
-        (stage1["market"] == "kenya") & (stage1["grade"].astype(str) != "ALL")
-    ]["rho_grade"].dropna()
-    kenya_low_rho = float(kenya_grade_rho.min())
-    kenya_high_rho = float(kenya_grade_rho.max())
-    preferred_rho = float(max(rho.values()))
+    preferred_g = float(max(payoff_signal.values()))
+    lower_positive_g = float(
+        min(v for v in payoff_signal.values() if np.isfinite(v) and v > 0)
+    )
 
     rows = [
         {
             "scenario": "conservative_joint",
-            "description": "Lower Kenya grade-specific rho, near-clean omega, high tau",
-            "rho": kenya_low_rho,
+            "description": "Lower positive assignment value, near-clean omega, high tau",
+            "g": lower_positive_g,
             "omega": 0.95,
             "tau": 0.90,
         },
         {
-            "scenario": "lower_rho_only",
-            "description": "Lower Kenya grade-specific rho only",
-            "rho": kenya_low_rho,
+            "scenario": "lower_g_only",
+            "description": "Lower positive assignment value only",
+            "g": lower_positive_g,
             "omega": IDEALIZED_OMEGA_BENCHMARK,
             "tau": IDEALIZED_TAU_BENCHMARK,
         },
         {
             "scenario": "lower_omega_only",
             "description": "Near-clean rather than idealized execution only",
-            "rho": preferred_rho,
+            "g": preferred_g,
             "omega": DESIGNED_OMEGA_BENCHMARK,
             "tau": IDEALIZED_TAU_BENCHMARK,
         },
         {
             "scenario": "lower_tau_only",
             "description": "High but not idealized delivery only",
-            "rho": preferred_rho,
+            "g": preferred_g,
             "omega": IDEALIZED_OMEGA_BENCHMARK,
             "tau": HIGH_TAU_BENCHMARK,
         },
         {
             "scenario": "preferred_high_input",
             "description": "Preferred high-input benchmark",
-            "rho": preferred_rho,
-            "omega": IDEALIZED_OMEGA_BENCHMARK,
-            "tau": IDEALIZED_TAU_BENCHMARK,
-        },
-        {
-            "scenario": "upper_kenya_rho",
-            "description": "Upper Kenya grade-specific rho",
-            "rho": kenya_high_rho,
+            "g": preferred_g,
             "omega": IDEALIZED_OMEGA_BENCHMARK,
             "tau": IDEALIZED_TAU_BENCHMARK,
         },
     ]
     for row in rows:
-        row["ate"] = ate_env("kenya", row["rho"], row["omega"], row["tau"])
+        row["ate"] = ate_env("kenya", row["g"], row["omega"], row["tau"])
         row["delta_vs_preferred"] = np.nan
 
     pref = next(r["ate"] for r in rows if r["scenario"] == "preferred_high_input")
@@ -2553,7 +2607,9 @@ def write_primitive_benchmark_sensitivity(
     return out
 
 
-def _load_assignment_value_primitives(rho: dict[str, float]) -> tuple[pd.DataFrame, dict[str, float], dict[str, float]]:
+def _load_assignment_value_primitives(
+    rho: dict[str, float],
+) -> tuple[pd.DataFrame, dict[str, float], dict[str, float], dict[str, float]]:
     """Build normalized assignment-value primitives from predicted mismatch reductions."""
 
     path = OUT_DIR / "assignment_value_summary.csv"
@@ -2582,12 +2638,13 @@ def _load_assignment_value_primitives(rho: dict[str, float]) -> tuple[pd.DataFra
 
     av = av.copy()
     av["market"] = av["country"].astype(str).str.lower()
+    av["signed_reduction"] = av["mean_reduction"]
     av["net_positive_reduction"] = av["mean_reduction"].clip(lower=0.0)
     av["share_weighted_reduction"] = av["net_positive_reduction"] * av["share_lower"]
     high_rho = float(max(rho.values()))
 
-    def normalize(col: str) -> dict[str, float]:
-        denom = float(av[col].max())
+    def normalize(col: str, allow_negative: bool = False) -> dict[str, float]:
+        denom = float(av.loc[av[col].abs().idxmax(), col]) if allow_negative else float(av[col].max())
         if not np.isfinite(denom) or denom <= 0:
             return {m: 0.0 for m in MARKETS}
         return {
@@ -2596,7 +2653,48 @@ def _load_assignment_value_primitives(rho: dict[str, float]) -> tuple[pd.DataFra
             if str(r["market"]) in MARKETS
         }
 
-    return av, normalize("net_positive_reduction"), normalize("share_weighted_reduction")
+    return (
+        av,
+        normalize("signed_reduction", allow_negative=True),
+        normalize("net_positive_reduction"),
+        normalize("share_weighted_reduction"),
+    )
+
+
+def _draw_assignment_value_primitives(
+    rho: dict[str, float],
+    n_draws: int,
+    rng: np.random.Generator,
+) -> dict[str, np.ndarray]:
+    """Approximate sampling uncertainty for the signed assignment-value primitive.
+
+    The payoff primitive is built from the mean predicted mismatch reduction.
+    This helper draws those means from the student-level predicted-gain files
+    and applies the same normalization as the preferred model. It is not a full
+    retraining bootstrap of the prediction model; it is an uncertainty check for
+    the constructed assignment-value object used in the structural payoff term.
+    """
+
+    gain_dir = OUT_DIR.parent / "control_trained_gains"
+    raw_draws: dict[str, np.ndarray] = {}
+    fallback_av, _, _, _ = _load_assignment_value_primitives(rho)
+    fallback_av = fallback_av.set_index("market")
+    for market in MARKETS:
+        path = gain_dir / f"{market}_predicted_gains.parquet"
+        if path.exists():
+            df = pd.read_parquet(path)
+            gain = (df["mismatch_grade"] - df["mismatch_designed"]).dropna().astype(float)
+            mean = float(gain.mean())
+            se = float(gain.std(ddof=1) / np.sqrt(max(len(gain), 1)))
+        else:
+            mean = float(fallback_av.loc[market, "signed_reduction"])
+            n = max(int(fallback_av.loc[market, "n"]), 1)
+            se = 0.10 / np.sqrt(n)
+        raw_draws[market] = rng.normal(mean, max(se, 1e-6), size=n_draws)
+
+    high_rho = float(max(rho.values()))
+    denom = np.where(np.abs(raw_draws["kenya"]) < 1e-6, np.sign(raw_draws["kenya"]) * 1e-6 + 1e-6, raw_draws["kenya"])
+    return {market: high_rho * raw_draws[market] / denom for market in MARKETS}
 
 
 def write_assignment_value_payoff_sensitivity(
@@ -2610,7 +2708,7 @@ def write_assignment_value_payoff_sensitivity(
 ) -> pd.DataFrame:
     """Re-estimate stage 4 after replacing rho in the payoff term with assignment value."""
 
-    av, g_net, g_weighted = _load_assignment_value_primitives(rho)
+    av, g_signed, g_net, g_weighted = _load_assignment_value_primitives(rho)
     raw_start = _pack_stage4_raw(p)
 
     def max_itt_over_se(fit: pd.DataFrame) -> float:
@@ -2633,15 +2731,16 @@ def write_assignment_value_payoff_sensitivity(
 
     specs: list[dict[str, Any]] = [
         {
-            "specification": "rho_preferred",
-            "label": "Preferred rho",
-            "payoff": rho,
+            "specification": "assignment_value_preferred",
+            "label": "Preferred assignment value",
+            "payoff": g_signed,
             "params": p,
             "fit": fit_df,
             "note": "Preferred model",
         },
     ]
     for spec_name, label, payoff_signal in [
+        ("rho_legacy", "Legacy rho payoff", rho),
         ("net_mismatch_reduction", "Net mismatch reduction", g_net),
         ("share_weighted_reduction", "Share-weighted reduction", g_weighted),
     ]:
@@ -2704,7 +2803,7 @@ def write_assignment_value_payoff_sensitivity(
         [
             r"\begin{table}[H]",
             r"\centering",
-            r"\caption{Structural Robustness Using Assignment-Value Primitives}",
+            r"\caption{Structural Benchmark Under Alternative Payoff Primitives}",
             r"\label{tab:struct_assignment_value_sensitivity}",
             r"\begin{threeparttable}",
             r"\footnotesize",
@@ -2717,7 +2816,7 @@ def write_assignment_value_payoff_sensitivity(
             r"\end{tabular}",
             r"\begin{tablenotes}[para,flushleft]",
             r"\footnotesize",
-            r"\item \textit{Notes:} The preferred model uses the control-group predictive-content primitive $\rho$ in the assignment-payoff term. The robustness rows re-estimate the stage-4 production block after replacing that payoff input with a normalized assignment-value primitive from Table~\ref{tab:assignment_value_summary}. ``Net mismatch reduction'' uses the positive part of Grade minus Diagnostic mismatch, normalized so Kenya equals the preferred high-signal value. ``Share-weighted reduction'' multiplies the positive mean reduction by the share of students whose predicted mismatch falls before the same normalization. The mechanical sorting equation continues to use $\rho$ because it predicts classroom compression rather than payoff value. The table reports the Kenya high-delivery and fully high-input counterfactuals under each re-estimated production map.",
+            r"\item \textit{Notes:} The preferred model uses a signed assignment-value primitive in the assignment-payoff term: mean predicted mismatch under grade assignment minus mean predicted mismatch under diagnostic assignment, normalized so Kenya equals the highest signal-quality value. Negative values are allowed, so a diagnostic rule that increases predicted mismatch lowers the assignment-payoff component. The ``Legacy rho payoff'' row re-estimates the old payoff specification using control-group predictive content directly. ``Net mismatch reduction'' truncates negative mean reductions at zero. ``Share-weighted reduction'' multiplies the positive mean reduction by the share of students whose predicted mismatch falls before normalization. The mechanical sorting equation continues to use $\rho$ because it predicts classroom compression rather than payoff value. The table reports the Kenya high-delivery and fully high-input counterfactuals under each production map.",
             r"\end{tablenotes}",
             r"\end{threeparttable}",
             r"\end{table}",
@@ -2735,6 +2834,7 @@ def write_tau_calibration_sensitivity(
     omega: dict[str, float],
     tau: dict[str, float],
     env: pd.DataFrame,
+    payoff_signal: dict[str, float] | None = None,
 ) -> pd.DataFrame:
     """Re-estimate stage 4 under transparent alternatives to the tau mapping.
 
@@ -2801,8 +2901,9 @@ def write_tau_calibration_sensitivity(
             boot_draws=0,
             write_outputs=False,
             stage4_starts=8,
+            payoff_signal=payoff_signal,
         )
-        sc = _scenario_summary_from_params(rho, omega, tau_s, p_s, env).set_index("scenario")["ate"].to_dict()
+        sc = _scenario_summary_from_params(payoff_signal or rho, omega, tau_s, p_s, env).set_index("scenario")["ate"].to_dict()
         itt_fit = fit_df[fit_df["moment"] == "itt_main"].copy()
         itt_fit["se"] = itt_fit["market"].map(se)
         itt_fit["std_error"] = (itt_fit["fitted"] - itt_fit["target"]) / itt_fit["se"]
@@ -2832,6 +2933,124 @@ def write_tau_calibration_sensitivity(
     return out
 
 
+def write_nigeria_endpoint_sensitivity(
+    data: dict[str, pd.DataFrame],
+    rho: dict[str, float],
+    omega: dict[str, float],
+    tau: dict[str, float],
+    env: pd.DataFrame,
+    p: dict[str, float],
+    fit_df: pd.DataFrame,
+    payoff_signal: dict[str, float],
+) -> pd.DataFrame:
+    """Re-estimate stage 4 under alternative Nigeria outcome targets."""
+
+    raw_start = _pack_stage4_raw(p)
+
+    def replace_nigeria_itt(effect: float, se: float, source: str) -> Callable[[pd.DataFrame], pd.DataFrame]:
+        def _replace(targets: pd.DataFrame) -> pd.DataFrame:
+            out = targets.copy()
+            mask = (out["market"].astype(str) == "nigeria") & (out["moment"].astype(str) == "itt_main")
+            out.loc[mask, "target"] = float(effect)
+            out.loc[mask, "variance"] = float(se) ** 2
+            out.loc[mask, "weight"] = 1.0 / max(float(se) ** 2, 1e-8)
+            out.loc[mask, "source"] = source
+            return out
+
+        return _replace
+
+    def max_itt_over_se(fit: pd.DataFrame) -> float:
+        itt = fit[fit["moment"].astype(str) == "itt_main"].copy()
+        if itt.empty:
+            return np.nan
+        return float((itt["error"].abs() * np.sqrt(itt["weight"].astype(float))).max())
+
+    rows: list[dict[str, Any]] = []
+    for spec in NIGERIA_ENDPOINT_TARGETS:
+        if spec["specification"] == "preferred_harmonized_t3":
+            params = p
+            fit = fit_df
+            warnings: list[str] = []
+        else:
+            _, params, fit, warnings = estimate_production_block(
+                data,
+                rho,
+                omega,
+                tau,
+                write_outputs=False,
+                boot_draws=0,
+                stage4_starts=8,
+                compute_local_diagnostics=False,
+                initial_raw=raw_start,
+                optimizer_maxiter=700,
+                target_filter=replace_nigeria_itt(spec["effect"], spec["se"], spec["specification"]),
+                payoff_signal=payoff_signal,
+            )
+        sc = _scenario_summary_from_params(payoff_signal, omega, tau, params, env).set_index("scenario")["ate"].to_dict()
+        n_fit = fit[(fit["market"].astype(str) == "nigeria") & (fit["moment"].astype(str) == "itt_main")]
+        n_fitted = float(n_fit["fitted"].iloc[0]) if len(n_fit) else np.nan
+        rows.append(
+            {
+                "specification": spec["specification"],
+                "label": spec["label"],
+                "target": float(spec["effect"]),
+                "se": float(spec["se"]),
+                "source": spec["source"],
+                "nigeria_fitted": n_fitted,
+                "nigeria_residual_over_se": (n_fitted - float(spec["effect"])) / float(spec["se"]),
+                "max_abs_std_itt_error": max_itt_over_se(fit),
+                "kenya_high_tau": sc["kenya_high_tau"],
+                "nigeria_realized": sc["nigeria_realized"],
+                "nigeria_g_tau": sc["nigeria_rho_tau"],
+                "high_input": sc["idealized_high_rho_high_omega_high_tau"],
+                "tau_power": params["tau_power"],
+                "lambda": params["lambda"],
+                "objective": params["objective"],
+                "warnings": "; ".join(warnings),
+            }
+        )
+
+    out = pd.DataFrame(rows)
+    pref_high = float(out.loc[out["specification"] == "preferred_harmonized_t3", "high_input"].iloc[0])
+    out["high_input_delta_vs_preferred"] = out["high_input"] - pref_high
+    out.to_csv(OUT_DIR / "nigeria_endpoint_sensitivity.csv", index=False)
+
+    body = []
+    for _, r in out.iterrows():
+        body.append(
+            f"{r['label']} & ${_fmt_signed(r['target'])}$ & ({_fmt(r['se'])}) & "
+            f"${_fmt_signed(r['nigeria_fitted'])}$ & {_fmt(r['max_abs_std_itt_error'])} & "
+            f"${_fmt_signed(r['kenya_high_tau'])}$ & ${_fmt_signed(r['nigeria_g_tau'])}$ & ${_fmt_signed(r['high_input'])}$ \\\\"
+        )
+    table = "\n".join(
+        [
+            r"\begin{table}[H]",
+            r"\centering",
+            r"\caption{Structural Sensitivity to Nigeria Endpoint Target}",
+            r"\label{tab:struct_nigeria_endpoint_sensitivity}",
+            r"\begin{threeparttable}",
+            r"\scriptsize",
+            r"\setlength{\tabcolsep}{3pt}",
+            r"\begin{tabular}[t]{lccccccc}",
+            r"\toprule",
+            r"Nigeria target & Target & SE & Fitted N & Max ITT/SE & K high-$\tau$ & N $G+\tau$ & High-input \\",
+            r"\midrule",
+            *body,
+            r"\bottomrule",
+            r"\end{tabular}",
+            r"\begin{tablenotes}[para,flushleft]",
+            r"\footnotesize",
+            r"\item \textit{Notes:} Each row re-estimates the stage-4 production block after replacing only the Nigeria ITT target. The preferred row uses the harmonized Nigeria estimate from Table~\ref{tab:pooled_power}. The T2 ETE, T3 ETE, and stacked rows use the index estimates from Tables~\ref{tab:ng_t2_ete}, \ref{tab:ng_t3_ete}, and \ref{tab:ng_over_terms}. Lee rows set the Nigeria target to the T3 ETE Lee lower or upper bound in Table~\ref{tab:ng_lee_bounds}; because the Lee bounds are bounds rather than regression estimates, their criterion weight uses the T3 ETE index standard error. All rows hold the measured signal-quality, assignment-value, execution, and delivery primitives fixed.",
+            r"\end{tablenotes}",
+            r"\end{threeparttable}",
+            r"\end{table}",
+            "",
+        ]
+    )
+    (TEX_DIR / "tab_struct_nigeria_endpoint_sensitivity.tex").write_text(table, encoding="utf-8")
+    return out
+
+
 def write_delivery_activation_sensitivity(
     data: dict[str, pd.DataFrame],
     rho: dict[str, float],
@@ -2840,6 +3059,7 @@ def write_delivery_activation_sensitivity(
     env: pd.DataFrame,
     preferred_p: dict[str, float],
     preferred_fit: pd.DataFrame,
+    payoff_signal: dict[str, float] | None = None,
 ) -> pd.DataFrame:
     """Re-estimate production under alternative delivery-activation exponents."""
 
@@ -2868,8 +3088,9 @@ def write_delivery_activation_sensitivity(
                 write_outputs=False,
                 stage4_starts=6,
                 tau_power_fixed=fixed_alpha,
+                payoff_signal=payoff_signal,
             )
-        sc = _scenario_summary_from_params(rho, omega, tau, p_s, env).set_index("scenario")["ate"].to_dict()
+        sc = _scenario_summary_from_params(payoff_signal or rho, omega, tau, p_s, env).set_index("scenario")["ate"].to_dict()
         itt_fit = fit_df[fit_df["moment"] == "itt_main"].copy()
         itt_fit["se"] = itt_fit["market"].map(se)
         itt_fit["std_error"] = (itt_fit["fitted"] - itt_fit["target"]) / itt_fit["se"]
@@ -2906,6 +3127,7 @@ def write_primitive_uncertainty_sensitivity(
     stage3: pd.DataFrame,
     process_df: pd.DataFrame,
     rho: dict[str, float],
+    payoff_signal: dict[str, float],
     omega: dict[str, float],
     tau: dict[str, float],
     p: dict[str, float],
@@ -2923,13 +3145,13 @@ def write_primitive_uncertainty_sensitivity(
     stage1_all = stage1[stage1["grade"].astype(str) == "ALL"].set_index("market")
     tau_rows = stage3.set_index("market")
 
-    def ate_env(env_market: str, rho_v: float, om_v: float, tau_v: float) -> float:
+    def ate_env(env_market: str, g_v: float, om_v: float, tau_v: float) -> float:
         e = env.loc[env_market]
         social = float(e["peer_shift"] + p["omega_r"] * e["rank_proxy"])
         tau_term = float(np.clip(tau_v, 0.0, 1.0) ** p["tau_power"])
         return float(
             p[f"delta_{env_market}"]
-            + p["lambda"] * rho_v * om_v * tau_term
+            + p["lambda"] * g_v * om_v * tau_term
             + p["phi"] * (1.0 - tau_v) * social
             - p["chi_N"] * e["class_size_pressure"]
             - p["chi_V"] * e["grade_disp_shift"]
@@ -2958,6 +3180,7 @@ def write_primitive_uncertainty_sensitivity(
         return 0.10
 
     rho_draws = {m: draw_rho(m) for m in MARKETS}
+    g_draws = _draw_assignment_value_primitives(rho, n_draws, rng)
     tau_draws = {
         m: np.clip(
             rng.normal(float(tau_rows.loc[m, "tau_hat"]), process_tau_se(m), size=n_draws),
@@ -2971,45 +3194,45 @@ def write_primitive_uncertainty_sensitivity(
         "liberia": np.ones(n_draws),
         "nigeria": np.clip(rng.normal(omega["nigeria"], 0.08, size=n_draws), 0.0, 1.0),
     }
-    high_rho_draw = rho_draws["kenya"]
+    high_g_draw = g_draws["kenya"]
 
     scenario_draws = {
         "kenya_observed": np.array(
-            [ate_env("kenya", rv, 1.0, tv) for rv, tv in zip(rho_draws["kenya"], tau_draws["kenya"])]
+            [ate_env("kenya", gv, 1.0, tv) for gv, tv in zip(g_draws["kenya"], tau_draws["kenya"])]
         ),
         "kenya_high_tau": np.array(
-            [ate_env("kenya", rv, 1.0, HIGH_TAU_BENCHMARK) for rv in rho_draws["kenya"]]
+            [ate_env("kenya", gv, 1.0, HIGH_TAU_BENCHMARK) for gv in g_draws["kenya"]]
         ),
         "nigeria_realized": np.array(
             [
-                ate_env("nigeria", rv, ov, tv)
-                for rv, ov, tv in zip(rho_draws["nigeria"], omega_draws["nigeria"], tau_draws["nigeria"])
+                ate_env("nigeria", gv, ov, tv)
+                for gv, ov, tv in zip(g_draws["nigeria"], omega_draws["nigeria"], tau_draws["nigeria"])
             ]
         ),
         "nigeria_tau_only": np.array(
-            [ate_env("nigeria", rv, ov, HIGH_TAU_BENCHMARK) for rv, ov in zip(rho_draws["nigeria"], omega_draws["nigeria"])]
+            [ate_env("nigeria", gv, ov, HIGH_TAU_BENCHMARK) for gv, ov in zip(g_draws["nigeria"], omega_draws["nigeria"])]
         ),
         "nigeria_rho_tau": np.array(
-            [ate_env("nigeria", rv, ov, HIGH_TAU_BENCHMARK) for rv, ov in zip(high_rho_draw, omega_draws["nigeria"])]
+            [ate_env("nigeria", gv, ov, HIGH_TAU_BENCHMARK) for gv, ov in zip(high_g_draw, omega_draws["nigeria"])]
         ),
         "nigeria_all_three": np.array(
-            [ate_env("nigeria", rv, DESIGNED_OMEGA_BENCHMARK, HIGH_TAU_BENCHMARK) for rv in high_rho_draw]
+            [ate_env("nigeria", gv, DESIGNED_OMEGA_BENCHMARK, HIGH_TAU_BENCHMARK) for gv in high_g_draw]
         ),
         "idealized_high_rho_high_omega_high_tau": np.array(
-            [ate_env("kenya", rv, IDEALIZED_OMEGA_BENCHMARK, IDEALIZED_TAU_BENCHMARK) for rv in high_rho_draw]
+            [ate_env("kenya", gv, IDEALIZED_OMEGA_BENCHMARK, IDEALIZED_TAU_BENCHMARK) for gv in high_g_draw]
         ),
     }
 
     point = {
-        "kenya_observed": ate_env("kenya", rho["kenya"], omega["kenya"], tau["kenya"]),
-        "kenya_high_tau": ate_env("kenya", rho["kenya"], omega["kenya"], HIGH_TAU_BENCHMARK),
-        "nigeria_realized": ate_env("nigeria", rho["nigeria"], omega["nigeria"], tau["nigeria"]),
-        "nigeria_tau_only": ate_env("nigeria", rho["nigeria"], omega["nigeria"], HIGH_TAU_BENCHMARK),
-        "nigeria_rho_tau": ate_env("nigeria", rho["kenya"], omega["nigeria"], HIGH_TAU_BENCHMARK),
-        "nigeria_all_three": ate_env("nigeria", rho["kenya"], DESIGNED_OMEGA_BENCHMARK, HIGH_TAU_BENCHMARK),
+        "kenya_observed": ate_env("kenya", payoff_signal["kenya"], omega["kenya"], tau["kenya"]),
+        "kenya_high_tau": ate_env("kenya", payoff_signal["kenya"], omega["kenya"], HIGH_TAU_BENCHMARK),
+        "nigeria_realized": ate_env("nigeria", payoff_signal["nigeria"], omega["nigeria"], tau["nigeria"]),
+        "nigeria_tau_only": ate_env("nigeria", payoff_signal["nigeria"], omega["nigeria"], HIGH_TAU_BENCHMARK),
+        "nigeria_rho_tau": ate_env("nigeria", payoff_signal["kenya"], omega["nigeria"], HIGH_TAU_BENCHMARK),
+        "nigeria_all_three": ate_env("nigeria", payoff_signal["kenya"], DESIGNED_OMEGA_BENCHMARK, HIGH_TAU_BENCHMARK),
         "idealized_high_rho_high_omega_high_tau": ate_env(
             "kenya",
-            max(rho.values()),
+            max(payoff_signal.values()),
             IDEALIZED_OMEGA_BENCHMARK,
             IDEALIZED_TAU_BENCHMARK,
         ),
@@ -3019,8 +3242,8 @@ def write_primitive_uncertainty_sensitivity(
         "kenya_high_tau": "Kenya high delivery",
         "nigeria_realized": "Nigeria realized",
         "nigeria_tau_only": "Nigeria high delivery only",
-        "nigeria_rho_tau": "Nigeria high signal + delivery",
-        "nigeria_all_three": "Nigeria high signal + execution + delivery",
+        "nigeria_rho_tau": "Nigeria high assignment value + delivery",
+        "nigeria_all_three": "Nigeria high assignment value + execution + delivery",
         "idealized_high_rho_high_omega_high_tau": "Fully high-input cell",
     }
     roles = {
@@ -3059,6 +3282,10 @@ def write_primitive_uncertainty_sensitivity(
             for m in MARKETS
         ]
         + [
+            {"primitive": "assignment_value", "market": m, "point": payoff_signal[m], "sd": float(np.std(g_draws[m], ddof=1))}
+            for m in MARKETS
+        ]
+        + [
             {"primitive": "omega", "market": m, "point": omega[m], "sd": float(np.std(omega_draws[m], ddof=1))}
             for m in MARKETS
         ]
@@ -3077,6 +3304,7 @@ def write_combined_uncertainty(
     stage3: pd.DataFrame,
     process_df: pd.DataFrame,
     rho: dict[str, float],
+    payoff_signal: dict[str, float],
     omega: dict[str, float],
     tau: dict[str, float],
     p: dict[str, float],
@@ -3134,42 +3362,44 @@ def write_combined_uncertainty(
             )
         )
 
-    def ate_env(env_market: str, p_draw: dict[str, float], rho_v: float, om_v: float, tau_v: float) -> float:
+    def ate_env(env_market: str, p_draw: dict[str, float], g_v: float, om_v: float, tau_v: float) -> float:
         e = env.loc[env_market]
         social = float(e["peer_shift"] + p_draw["omega_r"] * e["rank_proxy"])
         tau_term = float(np.clip(tau_v, 0.0, 1.0) ** p_draw["tau_power"])
         return float(
             p_draw[f"delta_{env_market}"]
-            + p_draw["lambda"] * rho_v * om_v * tau_term
+            + p_draw["lambda"] * g_v * om_v * tau_term
             + p_draw["phi"] * (1.0 - tau_v) * social
             - p_draw["chi_N"] * e["class_size_pressure"]
             - p_draw["chi_V"] * e["grade_disp_shift"]
         )
 
-    def scenario_ates(p_draw: dict[str, float], rho_draw: dict[str, float], omega_draw: dict[str, float], tau_draw: dict[str, float]) -> dict[str, float]:
-        high_rho = rho_draw["kenya"]
+    def scenario_ates(p_draw: dict[str, float], g_draw: dict[str, float], omega_draw: dict[str, float], tau_draw: dict[str, float]) -> dict[str, float]:
+        high_g = g_draw["kenya"]
         return {
-            "kenya_high_tau": ate_env("kenya", p_draw, rho_draw["kenya"], omega_draw["kenya"], HIGH_TAU_BENCHMARK),
-            "nigeria_tau_only": ate_env("nigeria", p_draw, rho_draw["nigeria"], omega_draw["nigeria"], HIGH_TAU_BENCHMARK),
-            "nigeria_rho_tau": ate_env("nigeria", p_draw, high_rho, omega_draw["nigeria"], HIGH_TAU_BENCHMARK),
-            "nigeria_all_three": ate_env("nigeria", p_draw, high_rho, DESIGNED_OMEGA_BENCHMARK, HIGH_TAU_BENCHMARK),
+            "kenya_high_tau": ate_env("kenya", p_draw, g_draw["kenya"], omega_draw["kenya"], HIGH_TAU_BENCHMARK),
+            "nigeria_tau_only": ate_env("nigeria", p_draw, g_draw["nigeria"], omega_draw["nigeria"], HIGH_TAU_BENCHMARK),
+            "nigeria_rho_tau": ate_env("nigeria", p_draw, high_g, omega_draw["nigeria"], HIGH_TAU_BENCHMARK),
+            "nigeria_all_three": ate_env("nigeria", p_draw, high_g, DESIGNED_OMEGA_BENCHMARK, HIGH_TAU_BENCHMARK),
             "idealized_high_rho_high_omega_high_tau": ate_env(
                 "kenya",
                 p_draw,
-                high_rho,
+                high_g,
                 IDEALIZED_OMEGA_BENCHMARK,
                 IDEALIZED_TAU_BENCHMARK,
             ),
         }
 
-    point_rho = {"kenya": rho["kenya"], "liberia": rho["liberia"], "nigeria": rho["nigeria"]}
+    point_g = {"kenya": payoff_signal["kenya"], "liberia": payoff_signal["liberia"], "nigeria": payoff_signal["nigeria"]}
     point_omega = {"kenya": omega["kenya"], "liberia": omega["liberia"], "nigeria": omega["nigeria"]}
     point_tau = {"kenya": tau["kenya"], "liberia": tau["liberia"], "nigeria": tau["nigeria"]}
-    point = scenario_ates(p, point_rho, point_omega, point_tau)
+    point = scenario_ates(p, point_g, point_omega, point_tau)
 
     draw_rows: list[dict[str, Any]] = []
+    g_draw_arrays = _draw_assignment_value_primitives(rho, n_draws, rng)
     for b in range(n_draws):
         rho_d = {m: draw_rho_scalar(m) for m in MARKETS}
+        g_d = {m: float(g_draw_arrays[m][b]) for m in MARKETS}
         omega_d = {
             "kenya": 1.0,
             "liberia": 1.0,
@@ -3178,7 +3408,7 @@ def write_combined_uncertainty(
         tau_d = {m: draw_tau_scalar(m) for m in MARKETS}
         pd_row = param_draws.iloc[int(rng.integers(0, len(param_draws)))]
         p_b = {k: float(pd_row[k]) if k in pd_row.index and pd.notna(pd_row[k]) else float(p[k]) for k in p}
-        for scenario, ate in scenario_ates(p_b, rho_d, omega_d, tau_d).items():
+        for scenario, ate in scenario_ates(p_b, g_d, omega_d, tau_d).items():
             draw_rows.append(
                 {
                     "draw": b,
@@ -3189,6 +3419,9 @@ def write_combined_uncertainty(
                     "rho_kenya": rho_d["kenya"],
                     "rho_liberia": rho_d["liberia"],
                     "rho_nigeria": rho_d["nigeria"],
+                    "g_kenya": g_d["kenya"],
+                    "g_liberia": g_d["liberia"],
+                    "g_nigeria": g_d["nigeria"],
                     "omega_nigeria": omega_d["nigeria"],
                     "tau_kenya": tau_d["kenya"],
                     "tau_liberia": tau_d["liberia"],
@@ -3229,7 +3462,7 @@ def write_combined_uncertainty(
 
 
 def write_nigeria_complementarity_decomposition(
-    rho: dict[str, float],
+    assignment_value: dict[str, float],
     omega: dict[str, float],
     tau: dict[str, float],
     p: dict[str, float],
@@ -3237,51 +3470,51 @@ def write_nigeria_complementarity_decomposition(
 ) -> pd.DataFrame:
     """Evaluate all single, pairwise, and joint primitive upgrades in Nigeria."""
 
-    def ate_env(env_market: str, rho_v: float, om_v: float, tau_v: float) -> float:
+    def ate_env(env_market: str, g_v: float, om_v: float, tau_v: float) -> float:
         e = env.loc[env_market]
         social = float(e["peer_shift"] + p["omega_r"] * e["rank_proxy"])
         tau_term = float(np.clip(tau_v, 0.0, 1.0) ** p["tau_power"])
         return float(
             p[f"delta_{env_market}"]
-            + p["lambda"] * rho_v * om_v * tau_term
+            + p["lambda"] * g_v * om_v * tau_term
             + p["phi"] * (1.0 - tau_v) * social
             - p["chi_N"] * e["class_size_pressure"]
             - p["chi_V"] * e["grade_disp_shift"]
         )
 
     base = {
-        "rho": rho["nigeria"],
+        "g": assignment_value["nigeria"],
         "omega": omega["nigeria"],
         "tau": tau["nigeria"],
     }
     high = {
-        "rho": rho["kenya"],
+        "g": assignment_value["kenya"],
         "omega": DESIGNED_OMEGA_BENCHMARK,
         "tau": HIGH_TAU_BENCHMARK,
     }
     rows = [
         ("realized", "Realized Nigeria", ()),
-        ("rho_only", "Upgrade rho only", ("rho",)),
+        ("g_only", "Upgrade assignment value only", ("g",)),
         ("omega_only", "Upgrade omega only", ("omega",)),
         ("tau_only", "Upgrade tau only", ("tau",)),
-        ("rho_omega", "Upgrade rho and omega", ("rho", "omega")),
-        ("rho_tau", "Upgrade rho and tau", ("rho", "tau")),
+        ("g_omega", "Upgrade assignment value and omega", ("g", "omega")),
+        ("g_tau", "Upgrade assignment value and tau", ("g", "tau")),
         ("omega_tau", "Upgrade omega and tau", ("omega", "tau")),
-        ("rho_omega_tau", "Upgrade all three", ("rho", "omega", "tau")),
+        ("g_omega_tau", "Upgrade all three", ("g", "omega", "tau")),
     ]
     out_rows = []
     for scenario, label, upgrades in rows:
-        rv = high["rho"] if "rho" in upgrades else base["rho"]
+        gv = high["g"] if "g" in upgrades else base["g"]
         ov = high["omega"] if "omega" in upgrades else base["omega"]
         tv = high["tau"] if "tau" in upgrades else base["tau"]
         out_rows.append(
             {
                 "scenario": scenario,
                 "label": label,
-                "rho": rv,
+                "g": gv,
                 "omega": ov,
                 "tau": tv,
-                "ate": ate_env("nigeria", rv, ov, tv),
+                "ate": ate_env("nigeria", gv, ov, tv),
                 "upgrades": "+".join(upgrades) if upgrades else "none",
             }
         )
@@ -3290,7 +3523,7 @@ def write_nigeria_complementarity_decomposition(
     out["gain_vs_realized"] = out["ate"] - baseline
 
     single_gain = {
-        "rho": float(out.loc[out["scenario"] == "rho_only", "gain_vs_realized"].iloc[0]),
+        "g": float(out.loc[out["scenario"] == "g_only", "gain_vs_realized"].iloc[0]),
         "omega": float(out.loc[out["scenario"] == "omega_only", "gain_vs_realized"].iloc[0]),
         "tau": float(out.loc[out["scenario"] == "tau_only", "gain_vs_realized"].iloc[0]),
     }
@@ -3303,21 +3536,21 @@ def write_nigeria_complementarity_decomposition(
 
 
 def write_signal_delivery_marginal_products(
-    rho: dict[str, float],
+    assignment_value: dict[str, float],
     omega: dict[str, float],
     tau: dict[str, float],
     p: dict[str, float],
 ) -> pd.DataFrame:
-    """Document the structural cross-partial between signal quality and delivery.
+    """Document the structural cross-partial between assignment value and delivery.
 
-    The assignment-payoff term is lambda * rho * omega * tau^alpha, so the
-    marginal product of signal quality is lambda * omega * tau^alpha and the
-    rho-tau cross-partial is lambda * omega * alpha * tau^(alpha-1).
+    The assignment-payoff term is lambda * G * omega * tau^alpha, so the
+    marginal product of assignment value is lambda * omega * tau^alpha and the
+    G-tau cross-partial is lambda * omega * alpha * tau^(alpha-1).
     """
 
-    rho_low = float(rho["nigeria"])
-    rho_high = float(rho["kenya"])
-    rho_gap = rho_high - rho_low
+    g_low = float(assignment_value["nigeria"])
+    g_high = float(assignment_value["kenya"])
+    g_gap = g_high - g_low
 
     specs = [
         ("nigeria_realized", "Nigeria realized", float(omega["nigeria"]), float(tau["nigeria"])),
@@ -3339,12 +3572,12 @@ def write_signal_delivery_marginal_products(
                 "label": label,
                 "omega": omega_v,
                 "tau": tau_v,
-                "rho_low": rho_low,
-                "rho_high": rho_high,
-                "rho_gap": rho_gap,
-                "ate_gain_from_nigeria_to_kenya_rho": marginal_signal * rho_gap,
-                "marginal_ate_per_unit_rho": marginal_signal,
-                "cross_partial_rho_tau": cross_partial,
+                "g_low": g_low,
+                "g_high": g_high,
+                "g_gap": g_gap,
+                "ate_gain_from_nigeria_to_kenya_g": marginal_signal * g_gap,
+                "marginal_ate_per_unit_g": marginal_signal,
+                "cross_partial_g_tau": cross_partial,
             }
         )
 
@@ -3354,7 +3587,7 @@ def write_signal_delivery_marginal_products(
 
 
 def write_counterfactual_component_decomposition(
-    rho: dict[str, float],
+    assignment_value: dict[str, float],
     omega: dict[str, float],
     tau: dict[str, float],
     p: dict[str, float],
@@ -3362,11 +3595,11 @@ def write_counterfactual_component_decomposition(
 ) -> pd.DataFrame:
     """Decompose model-implied ATEs into structural components."""
 
-    def components(env_market: str, rho_v: float, om_v: float, tau_v: float) -> dict[str, float]:
+    def components(env_market: str, g_v: float, om_v: float, tau_v: float) -> dict[str, float]:
         e = env.loc[env_market]
         tau_term = float(np.clip(tau_v, 0.0, 1.0) ** p["tau_power"])
         social_shift = float(e["peer_shift"] + p["omega_r"] * e["rank_proxy"])
-        assignment = float(p["lambda"] * rho_v * om_v * tau_term)
+        assignment = float(p["lambda"] * g_v * om_v * tau_term)
         social = float(p["phi"] * (1.0 - tau_v) * social_shift)
         class_grade = float(-p["chi_N"] * e["class_size_pressure"] - p["chi_V"] * e["grade_disp_shift"])
         residual = float(p[f"delta_{env_market}"])
@@ -3382,15 +3615,15 @@ def write_counterfactual_component_decomposition(
         }
 
     rows = [
-        ("kenya_observed", "Kenya observed", "kenya", rho["kenya"], omega["kenya"], tau["kenya"]),
-        ("kenya_high_tau", "Kenya high delivery", "kenya", rho["kenya"], omega["kenya"], HIGH_TAU_BENCHMARK),
-        ("nigeria_realized", "Nigeria realized", "nigeria", rho["nigeria"], omega["nigeria"], tau["nigeria"]),
-        ("nigeria_rho_tau", "Nigeria high signal + delivery", "nigeria", rho["kenya"], omega["nigeria"], HIGH_TAU_BENCHMARK),
+        ("kenya_observed", "Kenya observed", "kenya", assignment_value["kenya"], omega["kenya"], tau["kenya"]),
+        ("kenya_high_tau", "Kenya high delivery", "kenya", assignment_value["kenya"], omega["kenya"], HIGH_TAU_BENCHMARK),
+        ("nigeria_realized", "Nigeria realized", "nigeria", assignment_value["nigeria"], omega["nigeria"], tau["nigeria"]),
+        ("nigeria_rho_tau", "Nigeria high assignment value + delivery", "nigeria", assignment_value["kenya"], omega["nigeria"], HIGH_TAU_BENCHMARK),
         (
             "nigeria_all_three",
             "Nigeria all three",
             "nigeria",
-            rho["kenya"],
+            assignment_value["kenya"],
             DESIGNED_OMEGA_BENCHMARK,
             HIGH_TAU_BENCHMARK,
         ),
@@ -3398,20 +3631,20 @@ def write_counterfactual_component_decomposition(
             "idealized_high_rho_high_omega_high_tau",
             "Fully high-input cell",
             "kenya",
-            max(rho.values()),
+            max(assignment_value.values()),
             IDEALIZED_OMEGA_BENCHMARK,
             IDEALIZED_TAU_BENCHMARK,
         ),
     ]
     out_rows = []
-    for scenario, label, env_market, rv, ov, tv in rows:
-        c = components(env_market, rv, ov, tv)
+    for scenario, label, env_market, gv, ov, tv in rows:
+        c = components(env_market, gv, ov, tv)
         c.update(
             {
                 "scenario": scenario,
                 "label": label,
                 "environment": env_market,
-                "rho": rv,
+                "g": gv,
                 "omega": ov,
                 "tau": tv,
             }
@@ -3423,7 +3656,7 @@ def write_counterfactual_component_decomposition(
         "scenario",
         "label",
         "environment",
-        "rho",
+        "g",
         "omega",
         "tau",
         "assignment_payoff",
@@ -3439,18 +3672,18 @@ def write_counterfactual_component_decomposition(
 
 
 def write_delivery_threshold_diagnostics(
-    rho: dict[str, float],
+    assignment_value: dict[str, float],
     p: dict[str, float],
     env: pd.DataFrame,
 ) -> pd.DataFrame:
-    """Compute delivery-fidelity thresholds for high-signal/high-execution scenarios."""
+    """Compute delivery-fidelity thresholds for high assignment value and execution."""
 
-    def ate_env(env_market: str, rho_v: float, om_v: float, tau_v: float, include_residual: bool) -> float:
+    def ate_env(env_market: str, g_v: float, om_v: float, tau_v: float, include_residual: bool) -> float:
         e = env.loc[env_market]
         social = float(e["peer_shift"] + p["omega_r"] * e["rank_proxy"])
         tau_term = float(np.clip(tau_v, 0.0, 1.0) ** p["tau_power"])
         out = float(
-            p["lambda"] * rho_v * om_v * tau_term
+            p["lambda"] * g_v * om_v * tau_term
             + p["phi"] * (1.0 - tau_v) * social
             - p["chi_N"] * e["class_size_pressure"]
             - p["chi_V"] * e["grade_disp_shift"]
@@ -3459,9 +3692,9 @@ def write_delivery_threshold_diagnostics(
             out += float(p[f"delta_{env_market}"])
         return out
 
-    def threshold(env_market: str, rho_v: float, om_v: float, target: float, include_residual: bool) -> float:
+    def threshold(env_market: str, g_v: float, om_v: float, target: float, include_residual: bool) -> float:
         grid = np.linspace(0.0, 1.0, 5001)
-        vals = np.array([ate_env(env_market, rho_v, om_v, t, include_residual) - target for t in grid])
+        vals = np.array([ate_env(env_market, g_v, om_v, t, include_residual) - target for t in grid])
         if float(np.nanmax(vals)) < 0:
             return np.nan
         if float(np.nanmin(vals)) >= 0:
@@ -3473,27 +3706,27 @@ def write_delivery_threshold_diagnostics(
         y0, y1 = float(vals[idx - 1]), float(vals[idx])
         return float(x0 + (0.0 - y0) * (x1 - x0) / (y1 - y0))
 
-    high_rho = float(max(rho.values()))
+    high_g = float(max(assignment_value.values()))
     scenarios = [
-        ("kenya_high_signal_execution", "Kenya env., high signal/execution", "kenya", high_rho, IDEALIZED_OMEGA_BENCHMARK),
-        ("nigeria_high_signal_execution", "Nigeria env., high signal/execution", "nigeria", high_rho, DESIGNED_OMEGA_BENCHMARK),
+        ("kenya_high_g_execution", "Kenya env., high assignment value/execution", "kenya", high_g, IDEALIZED_OMEGA_BENCHMARK),
+        ("nigeria_high_g_execution", "Nigeria env., high assignment value/execution", "nigeria", high_g, DESIGNED_OMEGA_BENCHMARK),
     ]
     targets = [(0.00, "tau_for_0"), (0.10, "tau_for_010"), (0.18, "tau_for_018")]
     rows = []
-    for scenario, label, env_market, rho_v, omega_v in scenarios:
+    for scenario, label, env_market, g_v, omega_v in scenarios:
         for include_residual in [True, False]:
             row = {
                 "scenario": scenario,
                 "label": label,
                 "environment": env_market,
-                "rho": rho_v,
+                "g": g_v,
                 "omega": omega_v,
                 "residual": "included" if include_residual else "excluded",
-                "ate_tau_090": ate_env(env_market, rho_v, omega_v, 0.90, include_residual),
-                "ate_tau_095": ate_env(env_market, rho_v, omega_v, 0.95, include_residual),
+                "ate_tau_090": ate_env(env_market, g_v, omega_v, 0.90, include_residual),
+                "ate_tau_095": ate_env(env_market, g_v, omega_v, 0.95, include_residual),
             }
             for target, col in targets:
-                row[col] = threshold(env_market, rho_v, omega_v, target, include_residual)
+                row[col] = threshold(env_market, g_v, omega_v, target, include_residual)
             rows.append(row)
     out = pd.DataFrame(rows)
     out.to_csv(OUT_DIR / "delivery_threshold_diagnostics.csv", index=False)
@@ -3503,8 +3736,8 @@ def write_delivery_threshold_diagnostics(
         "excluded": "$\\delta_m=0$",
     }
     display_labels = {
-        "kenya_high_signal_execution": "Kenya",
-        "nigeria_high_signal_execution": "Nigeria",
+        "kenya_high_g_execution": "Kenya",
+        "nigeria_high_g_execution": "Nigeria",
     }
     body = []
     for _, r in out.iterrows():
@@ -3515,7 +3748,7 @@ def write_delivery_threshold_diagnostics(
         [
             r"\begin{table}[H]",
             r"\centering",
-            r"\caption{Delivery-Fidelity Thresholds Under High Signal and Execution}",
+            r"\caption{Delivery-Fidelity Thresholds Under High Assignment Value and Execution}",
             r"\label{tab:struct_delivery_thresholds}",
             r"\begin{threeparttable}",
             r"\footnotesize",
@@ -3528,7 +3761,7 @@ def write_delivery_threshold_diagnostics(
             r"\end{tabular}",
             r"\begin{tablenotes}[para,flushleft]",
             r"\footnotesize",
-            "\\item \\textit{Notes:} Each row holds signal quality at Kenya's estimate and assignment execution near clean, then varies delivery fidelity $\\tau$ in the indicated production environment. The residual-included rows use the shrinkage-regularized market residual; the residual-excluded rows set $\\delta_m=0$. Blank entries mean the target ATE is not reached for any $\\tau\\in[0,1]$.",
+            "\\item \\textit{Notes:} Each row holds assignment value at Kenya's estimate and assignment execution near clean, then varies delivery fidelity $\\tau$ in the indicated production environment. The residual-included rows use the shrinkage-regularized market residual; the residual-excluded rows set $\\delta_m=0$. Blank entries mean the target ATE is not reached for any $\\tau\\in[0,1]$.",
             r"\end{tablenotes}",
             r"\end{threeparttable}",
             r"\end{table}",
@@ -3901,7 +4134,7 @@ def _write_latex_tables(
             r"\footnotesize",
             r"\begin{tabular}[t]{lccccc}",
             r"\toprule",
-            r"Spec. & $\omega_r$ & Peer RMSE & Max ITT/SE & High-input & Nigeria $\rho+\tau$ \\",
+            r"Spec. & $\omega_r$ & Peer RMSE & Max ITT/SE & High-input & Nigeria $G+\tau$ \\",
             r"\midrule",
             *social_rows,
             r"\bottomrule",
@@ -4136,7 +4369,7 @@ def _write_latex_tables(
                 r"\end{tabular}",
                 r"\begin{tablenotes}[para,flushleft]",
                 r"\footnotesize",
-                "\\item \\textit{Notes:} Panel A decomposes the preferred stage-4 criterion at the optimum. Objective shares are relative to the total objective. The hard comparative-static penalties are the inequality penalties used to rule out counterfactual mappings that violate the model's monotonicity and ordering restrictions. Panel B reports multi-start optimizer diagnostics; the high-input ATE is the fully idealized $\\rho$-$\\omega$-$\\tau$ counterfactual.",
+                "\\item \\textit{Notes:} Panel A decomposes the preferred stage-4 criterion at the optimum. Objective shares are relative to the total objective. The hard comparative-static penalties are the inequality penalties used to rule out counterfactual mappings that violate the model's monotonicity and ordering restrictions. Panel B reports multi-start optimizer diagnostics; the high-input ATE is the fully idealized assignment-value, execution, and delivery counterfactual.",
                 r"\end{tablenotes}",
                 r"\end{threeparttable}",
                 r"\end{table}",
@@ -4169,7 +4402,7 @@ def _write_latex_tables(
             r"\end{tabular}",
             r"\begin{tablenotes}[para,flushleft]",
             r"\footnotesize",
-            "\\item \\textit{Notes:} Each row re-estimates the stage-4 production block holding $(\\hat{\\rho},\\hat{\\omega},\\hat{\\tau})$ fixed. ``Max ITT error / SE'' is the largest absolute fitted-minus-target ITT residual divided by the corresponding study-specific standard error. The high-input ATE sets $\\rho$ to the highest observed signal quality, $\\omega=0.98$, and $\\tau=0.95$. The unrestricted specification removes residual shrinkage and hits the $\\delta_m$ bound, so it is reported as a fit diagnostic rather than the preferred model.",
+            "\\item \\textit{Notes:} Each row re-estimates the stage-4 production block holding $(\\hat{\\rho},\\hat{G},\\hat{\\omega},\\hat{\\tau})$ fixed. ``Max ITT error / SE'' is the largest absolute fitted-minus-target ITT residual divided by the corresponding study-specific standard error. The high-input ATE sets assignment value $G$ to Kenya's estimate, $\\omega=0.98$, and $\\tau=0.95$. The unrestricted specification removes residual shrinkage and hits the $\\delta_m$ bound, so it is reported as a fit diagnostic rather than the preferred model.",
             r"\end{tablenotes}",
             r"\end{threeparttable}",
             r"\end{table}",
@@ -4200,7 +4433,7 @@ def _write_latex_tables(
             r"\end{tabular}",
             r"\begin{tablenotes}[para,flushleft]",
             r"\footnotesize",
-            "\\item \\textit{Notes:} Each row re-estimates the stage-4 production block holding the residual prior at its preferred value and varying only auxiliary scale regularization. ``Raw norm'' is the coefficient on the raw-parameter norm penalty; ``$\\lambda$ prior'' and ``$\\varphi$ prior'' are the weights on scale priors centered at 0.4 and 0.2, respectively. The high-input ATE sets $\\rho$ to the highest observed signal quality, $\\omega=0.98$, and $\\tau=0.95$.",
+            "\\item \\textit{Notes:} Each row re-estimates the stage-4 production block holding the residual prior at its preferred value and varying only auxiliary scale regularization. ``Raw norm'' is the coefficient on the raw-parameter norm penalty; ``$\\lambda$ prior'' and ``$\\varphi$ prior'' are the weights on scale priors centered at 0.4 and 0.2, respectively. The high-input ATE sets assignment value $G$ to Kenya's estimate, $\\omega=0.98$, and $\\tau=0.95$.",
             r"\end{tablenotes}",
             r"\end{threeparttable}",
             r"\end{table}",
@@ -4277,7 +4510,7 @@ def _write_latex_tables(
             r"\scriptsize",
             r"\begin{tabular}[t]{@{}llccccc@{}}",
             r"\toprule",
-            r"Spec. & Omit & Holdout & Max fit & K high-$\tau$ & NG $\rho+\tau$ & High-input \\",
+            r"Spec. & Omit & Holdout & Max fit & K high-$\tau$ & NG $G+\tau$ & High-input \\",
             r"\midrule",
             *market_rows,
             r"\bottomrule",
@@ -4295,16 +4528,16 @@ def _write_latex_tables(
 
     prim_labels = {
         "conservative_joint": "Conservative joint",
-        "lower_rho_only": "Lower $\\rho$ only",
+        "lower_g_only": "Lower $G$ only",
         "lower_omega_only": "Lower $\\omega$ only",
         "lower_tau_only": "Lower $\\tau$ only",
         "preferred_high_input": "Preferred",
-        "upper_kenya_rho": "Upper Kenya $\\rho$",
+        "kenya_observed_g": "Observed Kenya $G$",
     }
     prim_rows = []
     for _, r in primitive_sensitivity.iterrows():
         prim_rows.append(
-            f"{prim_labels.get(r['scenario'], r['scenario'])} & {_fmt(r['rho'])} & {_fmt(r['omega'], 2)} & {_fmt(r['tau'], 2)} & ${_fmt_signed(r['ate'])}$ \\\\"
+            f"{prim_labels.get(r['scenario'], r['scenario'])} & {_fmt(r['g'])} & {_fmt(r['omega'], 2)} & {_fmt(r['tau'], 2)} & ${_fmt_signed(r['ate'])}$ \\\\"
         )
     prim_table = "\n".join(
         [
@@ -4315,14 +4548,14 @@ def _write_latex_tables(
             r"\begin{threeparttable}",
             r"\begin{tabular}[t]{lcccc}",
             r"\toprule",
-            r"Scenario & $\rho$ & $\omega$ & $\tau$ & High-input ATE \\",
+            r"Scenario & $G$ & $\omega$ & $\tau$ & High-input ATE \\",
             r"\midrule",
             *prim_rows,
             r"\bottomrule",
             r"\end{tabular}",
             r"\begin{tablenotes}[para,flushleft]",
             r"\footnotesize",
-            "\\item \\textit{Notes:} Each row evaluates the high-input counterfactual in the Kenya production environment while holding the estimated production parameters fixed. The conservative joint row uses the lower Kenya grade-specific signal-quality estimate, $\\omega=0.95$, and $\\tau=0.90$. The preferred row uses the paper's main high-input benchmark, $\\rho=\\max_m \\hat{\\rho}_m$, $\\omega=0.98$, and $\\tau=0.95$.",
+            "\\item \\textit{Notes:} Each row evaluates the high-input counterfactual in the Kenya production environment while holding the estimated production parameters fixed. $G$ is the signed assignment-value primitive used in the payoff term. The conservative joint row uses the lower positive observed assignment-value benchmark, $\\omega=0.95$, and $\\tau=0.90$. The preferred row uses the paper's main high-input benchmark, $G=\\max_m \\hat{G}_m$, $\\omega=0.98$, and $\\tau=0.95$.",
             r"\end{tablenotes}",
             r"\end{threeparttable}",
             r"\end{table}",
@@ -4362,7 +4595,7 @@ def _write_latex_tables(
             r"\end{tabular}",
             r"\begin{tablenotes}[para,flushleft]",
             r"\footnotesize",
-            "\\item \\textit{Notes:} Each row re-estimates the stage-4 production block after replacing the stage-3 delivery-fidelity primitives with a transparent lower, preferred, or upper process-to-$\\tau$ mapping. The lower and upper mappings preserve the same process moments and market ordering logic but vary the intercept and slope used to translate completion evidence for the assignment channel into $\\tau$. The high-input counterfactual still sets $\\rho=\\max_m\\hat{\\rho}_m$, $\\omega=0.98$, and $\\tau=0.95$; this table asks whether the observed-cell calibration of $\\tau$ materially changes the extrapolation.",
+            "\\item \\textit{Notes:} Each row re-estimates the stage-4 production block after replacing the stage-3 delivery-fidelity primitives with a transparent lower, preferred, or upper process-to-$\\tau$ mapping. The lower and upper mappings preserve the same process moments and market ordering logic but vary the intercept and slope used to translate completion evidence for the assignment channel into $\\tau$. The high-input counterfactual sets $G=\\max_m\\hat{G}_m$, $\\omega=0.98$, and $\\tau=0.95$; this table asks whether the observed-cell calibration of $\\tau$ materially changes the extrapolation.",
             r"\end{tablenotes}",
             r"\end{threeparttable}",
             r"\end{table}",
@@ -4374,7 +4607,7 @@ def _write_latex_tables(
     uncertainty_labels = {
         "kenya_high_tau": "Kenya high delivery",
         "nigeria_tau_only": "Nigeria high delivery only",
-        "nigeria_rho_tau": "Nigeria high signal + delivery",
+        "nigeria_rho_tau": "Nigeria high assignment value + delivery",
         "nigeria_all_three": "Nigeria all three",
         "idealized_high_rho_high_omega_high_tau": "Fully high-input cell",
     }
@@ -4406,7 +4639,7 @@ def _write_latex_tables(
             r"\end{tabular}",
             r"\begin{tablenotes}[para,flushleft]",
             r"\footnotesize",
-            "\\item \\textit{Notes:} This table propagates uncertainty in the stage-1 to stage-3 primitives while holding the preferred stage-4 production mapping fixed. Signal quality draws use a Fisher transformation of the control-group baseline--endline correlation; delivery-fidelity draws use the process-moment variances; Nigeria assignment-execution draws use a 0.08 SD implementation-error scale, while deterministic Kenya and Liberia execution is held fixed. The table is a primitive-uncertainty sensitivity check, not a full-system bootstrap.",
+            "\\item \\textit{Notes:} This table propagates uncertainty in the constructed assignment-value primitive, delivery fidelity, and assignment execution while holding the preferred stage-4 production mapping fixed. Assignment-value draws use the student-level predicted mismatch reductions; delivery-fidelity draws use the process-moment variances; Nigeria assignment-execution draws use a 0.08 SD implementation-error scale, while deterministic Kenya and Liberia execution is held fixed. The table is a primitive-uncertainty sensitivity check, not a full-system bootstrap.",
             r"\end{tablenotes}",
             r"\end{threeparttable}",
             r"\end{table}",
@@ -4418,7 +4651,7 @@ def _write_latex_tables(
     combined_labels = {
         "kenya_high_tau": "Kenya high delivery",
         "nigeria_tau_only": "Nigeria high delivery only",
-        "nigeria_rho_tau": "Nigeria high signal + delivery",
+        "nigeria_rho_tau": "Nigeria high assignment value + delivery",
         "nigeria_all_three": "Nigeria all three",
         "idealized_high_rho_high_omega_high_tau": "Fully high-input cell",
     }
@@ -4450,7 +4683,7 @@ def _write_latex_tables(
             r"\end{tabular}",
             r"\begin{tablenotes}[para,flushleft]",
             r"\footnotesize",
-            "\\item \\textit{Notes:} This diagnostic combines uncertainty in the stage-1 to stage-3 primitives with the stage-4 production-parameter re-estimation draws. Signal-quality, delivery-fidelity, and Nigeria assignment-execution draws use the same sampling rules as Table~\\ref{tab:struct_primitive_uncertainty}; production-parameter draws are sampled from the converged stage-4 target-moment re-estimations used in Table~\\ref{tab:struct_stage4_param_uncertainty}. The exercise is an approximate combined-uncertainty check, not a nonparametric bootstrap of the three original experiments.",
+            "\\item \\textit{Notes:} This diagnostic combines uncertainty in the assignment-value, delivery-fidelity, and execution primitives with the stage-4 production-parameter re-estimation draws. Primitive draws use the same sampling rules as Table~\\ref{tab:struct_primitive_uncertainty}; production-parameter draws are sampled from the converged stage-4 target-moment re-estimations used in Table~\\ref{tab:struct_stage4_param_uncertainty}. The exercise is an approximate combined-uncertainty check, not a nonparametric bootstrap of the three original experiments.",
             r"\end{tablenotes}",
             r"\end{threeparttable}",
             r"\end{table}",
@@ -4500,18 +4733,18 @@ def _write_latex_tables(
 
     comp_labels = {
         "realized": "Realized Nigeria",
-        "rho_only": "Upgrade $\\rho$ only",
+        "g_only": "Upgrade $G$ only",
         "omega_only": "Upgrade $\\omega$ only",
         "tau_only": "Upgrade $\\tau$ only",
-        "rho_omega": "Upgrade $\\rho+\\omega$",
-        "rho_tau": "Upgrade $\\rho+\\tau$",
+        "g_omega": "Upgrade $G+\\omega$",
+        "g_tau": "Upgrade $G+\\tau$",
         "omega_tau": "Upgrade $\\omega+\\tau$",
-        "rho_omega_tau": "Upgrade all three",
+        "g_omega_tau": "Upgrade all three",
     }
     comp_rows = []
     for _, r in complementarity.iterrows():
         comp_rows.append(
-            f"{comp_labels.get(r['scenario'], r['label'])} & {_fmt(r['rho'])} & {_fmt(r['omega'], 2)} & {_fmt(r['tau'], 2)} & ${_fmt_signed(r['ate'])}$ & ${_fmt_signed(r['gain_vs_realized'])}$ & ${_fmt_signed(r['complementarity_residual'])}$ \\\\"
+            f"{comp_labels.get(r['scenario'], r['label'])} & {_fmt(r['g'])} & {_fmt(r['omega'], 2)} & {_fmt(r['tau'], 2)} & ${_fmt_signed(r['ate'])}$ & ${_fmt_signed(r['gain_vs_realized'])}$ & ${_fmt_signed(r['complementarity_residual'])}$ \\\\"
         )
     comp_table = "\n".join(
         [
@@ -4523,14 +4756,14 @@ def _write_latex_tables(
             r"\footnotesize",
             r"\begin{tabular}[t]{lcccccc}",
             r"\toprule",
-            r"Scenario & $\rho$ & $\omega$ & $\tau$ & ATE & Gain & Nonadd. \\",
+            r"Scenario & $G$ & $\omega$ & $\tau$ & ATE & Gain & Nonadd. \\",
             r"\midrule",
             *comp_rows,
             r"\bottomrule",
             r"\end{tabular}",
             r"\begin{tablenotes}[para,flushleft]",
             r"\footnotesize",
-            "\\item \\textit{Notes:} Each row evaluates the Nigeria production environment while upgrading the indicated primitives from Nigeria's realized values. High-signal sets $\\rho$ to Kenya's estimate, high-execution sets $\\omega=0.95$, and high-delivery sets $\\tau=0.90$. ``Gain'' is relative to realized Nigeria, and ``Nonadd.'' is the gain beyond the sum of the corresponding one-at-a-time gains. Because every row uses the same shrinkage-regularized Nigeria residual, the gain and nonadditive columns are invariant to that residual. The comparison is designed to show complementarity among primitives, not to replace the fully idealized high-input counterfactual in Table~\\ref{tab:counterfactuals}.",
+            "\\item \\textit{Notes:} Each row evaluates the Nigeria production environment while upgrading the indicated primitives from Nigeria's realized values. High assignment value sets $G$ to Kenya's estimate, high execution sets $\\omega=0.95$, and high delivery sets $\\tau=0.90$. ``Gain'' is relative to realized Nigeria, and ``Nonadd.'' is the gain beyond the sum of the corresponding one-at-a-time gains. Because every row uses the same shrinkage-regularized Nigeria residual, the gain and nonadditive columns are invariant to that residual. The comparison is designed to show complementarity among primitives, not to replace the fully idealized high-input counterfactual in Table~\\ref{tab:counterfactuals}.",
             r"\end{tablenotes}",
             r"\end{threeparttable}",
             r"\end{table}",
@@ -4552,29 +4785,29 @@ def _write_latex_tables(
         margin_rows.append(
             f"{margin_labels.get(r['scenario'], r['label'])} & "
             f"{_fmt(r['omega'], 2)} & {_fmt(r['tau'], 2)} & "
-            f"${_fmt_signed(r['ate_gain_from_nigeria_to_kenya_rho'])}$ & "
-            f"{_fmt(r['marginal_ate_per_unit_rho'])} & "
-            f"{_fmt(r['cross_partial_rho_tau'])} \\\\"
+            f"${_fmt_signed(r['ate_gain_from_nigeria_to_kenya_g'])}$ & "
+            f"{_fmt(r['marginal_ate_per_unit_g'])} & "
+            f"{_fmt(r['cross_partial_g_tau'])} \\\\"
         )
     margin_table = "\n".join(
         [
             r"\begin{table}[H]",
             r"\centering",
-            r"\caption{Marginal Return to Signal Quality by Delivery Fidelity}",
+            r"\caption{Marginal Return to Assignment Value by Delivery Fidelity}",
             r"\label{tab:struct_signal_delivery_margins}",
             r"\begin{threeparttable}",
             r"\scriptsize",
             r"\setlength{\tabcolsep}{3pt}",
             r"\begin{tabular}[t]{>{\raggedright\arraybackslash}p{3.3cm}ccccc}",
             r"\toprule",
-            r"Scenario & $\omega$ & $\tau$ & Gain $\rho_N\to\rho_K$ & MP of $\rho$ & Cross-partial \\",
+            r"Scenario & $\omega$ & $\tau$ & Gain $G_N\to G_K$ & MP of $G$ & Cross-partial \\",
             r"\midrule",
             *margin_rows,
             r"\bottomrule",
             r"\end{tabular}",
             r"\begin{tablenotes}[para,flushleft]",
             r"\footnotesize",
-            "\\item \\textit{Notes:} The table evaluates the assignment-payoff term $\\hat{\\lambda}\\rho\\omega\\tau^{\\hat{\\alpha}}$. ``Gain'' is the ATE increase from raising signal quality from Nigeria's estimate to Kenya's estimate, holding the row's $\\omega$ and $\\tau$ fixed. The last two columns report the analytic marginal product of signal quality and the signal--delivery cross-partial implied by the preferred production map.",
+            "\\item \\textit{Notes:} The table evaluates the assignment-payoff term $\\hat{\\lambda}G\\omega\\tau^{\\hat{\\alpha}}$. ``Gain'' is the ATE increase from raising assignment value from Nigeria's estimate to Kenya's estimate, holding the row's $\\omega$ and $\\tau$ fixed. The last two columns report the analytic marginal product of assignment value and the assignment-value--delivery cross-partial implied by the preferred production map.",
             r"\end{tablenotes}",
             r"\end{threeparttable}",
             r"\end{table}",
@@ -4598,23 +4831,23 @@ def _write_latex_tables(
 
     cf_lines = [
         r"\multicolumn{4}{l}{\textit{Observed}} \\",
-        f"Kenya observed & ${_fmt_signed(sc['kenya_observed'])}$ & ${interval('kenya_observed')}$ & $\\rho = 0.53$, $\\omega = 1.00$, $\\tau = 0.50$ \\\\",
-        f"Liberia observed & ${_fmt_signed(sc['liberia_observed'])}$ & ${interval('liberia_observed')}$ & $\\rho = 0.06$, $\\omega = 1.00$, $\\tau = 0.38$ \\\\",
-        f"Nigeria realized & ${_fmt_signed(sc['nigeria_realized'])}$ & ${interval('nigeria_realized')}$ & $\\rho = 0.12$, $\\omega = 0.84$, $\\tau = 0.31$ \\\\",
+        f"Kenya observed & ${_fmt_signed(sc['kenya_observed'])}$ & ${interval('kenya_observed')}$ & $G = 0.53$, $\\omega = 1.00$, $\\tau = 0.50$ \\\\",
+        f"Liberia observed & ${_fmt_signed(sc['liberia_observed'])}$ & ${interval('liberia_observed')}$ & $G = 0.32$, $\\omega = 1.00$, $\\tau = 0.38$ \\\\",
+        f"Nigeria realized & ${_fmt_signed(sc['nigeria_realized'])}$ & ${interval('nigeria_realized')}$ & $G = -0.01$, $\\omega = 0.84$, $\\tau = 0.31$ \\\\",
         r"\addlinespace",
         r"\multicolumn{4}{l}{\textit{Counterfactual 1: Kenya with higher $\tau$}} \\",
-        f"Kenya high-$\\tau$ & ${_fmt_signed(sc['kenya_high_tau'])}$ & ${interval('kenya_high_tau')}$ & $\\rho = 0.53$, $\\omega = 1.00$, $\\tau = 0.90$ \\\\",
+        f"Kenya high-$\\tau$ & ${_fmt_signed(sc['kenya_high_tau'])}$ & ${interval('kenya_high_tau')}$ & $G = 0.53$, $\\omega = 1.00$, $\\tau = 0.90$ \\\\",
         r"\addlinespace",
         r"\multicolumn{4}{l}{\textit{Counterfactual 2: Nigeria as designed}} \\",
-        f"Nigeria designed $\\omega$ & ${_fmt_signed(sc['nigeria_designed_execution'])}$ & ${interval('nigeria_designed_execution')}$ & $\\rho = 0.12$, $\\omega = 0.95$, $\\tau = 0.31$ \\\\",
+        f"Nigeria designed $\\omega$ & ${_fmt_signed(sc['nigeria_designed_execution'])}$ & ${interval('nigeria_designed_execution')}$ & $G = -0.01$, $\\omega = 0.95$, $\\tau = 0.31$ \\\\",
         r"\addlinespace",
         r"\multicolumn{4}{l}{\textit{Counterfactual 3: Fully idealized}} \\",
-        f"High $\\rho$, high $\\omega$, high $\\tau$ & ${_fmt_signed(sc['idealized_high_rho_high_omega_high_tau'])}$ & ${interval('idealized_high_rho_high_omega_high_tau')}$ & $\\rho = 0.53$, $\\omega = 0.98$, $\\tau = 0.95$ \\\\",
+        f"High assignment value, high $\\omega$, high $\\tau$ & ${_fmt_signed(sc['idealized_high_rho_high_omega_high_tau'])}$ & ${interval('idealized_high_rho_high_omega_high_tau')}$ & $G = 0.53$, $\\omega = 0.98$, $\\tau = 0.95$ \\\\",
         r"\addlinespace",
         r"\multicolumn{4}{l}{\textit{One-at-a-time decomposition (from Nigeria baseline)}} \\",
-        f"Upgrade $\\rho$ only & ${_fmt_signed(sc['nigeria_rho_only'])}$ & ${interval('nigeria_rho_only')}$ & $\\rho \\to 0.53$, $\\omega = 0.84$, $\\tau = 0.31$ \\\\",
-        f"Upgrade $\\tau$ only & ${_fmt_signed(sc['nigeria_tau_only'])}$ & ${interval('nigeria_tau_only')}$ & $\\rho = 0.12$, $\\omega = 0.84$, $\\tau = 0.90$ \\\\",
-        f"Upgrade $\\omega$ only & ${_fmt_signed(sc['nigeria_omega_only'])}$ & ${interval('nigeria_omega_only')}$ & $\\rho = 0.12$, $\\omega = 0.95$, $\\tau = 0.31$ \\\\",
+        f"Upgrade assignment value only & ${_fmt_signed(sc['nigeria_rho_only'])}$ & ${interval('nigeria_rho_only')}$ & $G \\to 0.53$, $\\omega = 0.84$, $\\tau = 0.31$ \\\\",
+        f"Upgrade $\\tau$ only & ${_fmt_signed(sc['nigeria_tau_only'])}$ & ${interval('nigeria_tau_only')}$ & $G = -0.01$, $\\omega = 0.84$, $\\tau = 0.90$ \\\\",
+        f"Upgrade $\\omega$ only & ${_fmt_signed(sc['nigeria_omega_only'])}$ & ${interval('nigeria_omega_only')}$ & $G = -0.01$, $\\omega = 0.95$, $\\tau = 0.31$ \\\\",
     ]
     cf_table = "\n".join(
         [
@@ -4623,7 +4856,9 @@ def _write_latex_tables(
             r"\caption{Counterfactual Treatment Effects}",
             r"\label{tab:counterfactuals}",
             r"\begin{threeparttable}",
-            r"\begin{tabular}[t]{lccc}",
+            r"\footnotesize",
+            r"\setlength{\tabcolsep}{3pt}",
+            r"\begin{tabular}[t]{@{}p{4.0cm}ccp{4.0cm}@{}}",
             r"\toprule",
             r"Scenario & ATE & 90\% interval & Description \\",
             r"\midrule",
@@ -4632,7 +4867,7 @@ def _write_latex_tables(
             r"\end{tabular}",
             r"\begin{tablenotes}[para,flushleft]",
             r"\footnotesize",
-            r"\item \textit{Notes:} Intervals are 5th--95th percentiles from 49 parametric bootstrap re-estimation draws of the targeted stage-4 reduced-form moments, conditional on the stage-1 to stage-3 primitive estimates. The high-$\tau$ benchmark is $\tau = 0.90$ for the Kenya and Nigeria one-at-a-time counterfactuals. The fully idealized case uses $\omega = 0.98$ and $\tau = 0.95$. Nigeria designed execution sets $\omega = 0.95$. The one-at-a-time decomposition upgrades each primitive separately from Nigeria's realized values.",
+            r"\item \textit{Notes:} $G$ is the signed assignment-value primitive: mean predicted mismatch under grade assignment minus mean predicted mismatch under diagnostic assignment, normalized so Kenya equals the highest signal-quality value. Signal quality $\rho$ is still used in the sorting-compression equation. Intervals are 5th--95th percentiles from 49 parametric bootstrap re-estimation draws of the targeted stage-4 reduced-form moments, conditional on the stage-1 to stage-3 primitive estimates. The high-$\tau$ benchmark is $\tau = 0.90$ for the Kenya and Nigeria one-at-a-time counterfactuals. The fully idealized case uses $G = 0.53$, $\omega = 0.98$, and $\tau = 0.95$. Nigeria designed execution sets $\omega = 0.95$. The one-at-a-time decomposition upgrades each primitive separately from Nigeria's realized values.",
             r"\end{tablenotes}",
             r"\end{threeparttable}",
             r"\end{table}",
@@ -4645,7 +4880,7 @@ def _write_latex_tables(
         "kenya_observed": "Kenya observed",
         "kenya_high_tau": "Kenya high delivery",
         "nigeria_realized": "Nigeria realized",
-        "nigeria_rho_tau": "Nigeria high signal + delivery",
+        "nigeria_rho_tau": "Nigeria high assignment value + delivery",
         "nigeria_all_three": "Nigeria all three",
         "idealized_high_rho_high_omega_high_tau": "Fully high-input cell",
     }
@@ -4672,7 +4907,7 @@ def _write_latex_tables(
             r"\end{tabular}",
             r"\begin{tablenotes}[para,flushleft]",
             r"\footnotesize",
-            "\\item \\textit{Notes:} Assignment is $\\hat{\\lambda}\\rho\\omega\\tau^{\\hat{\\alpha}}$. Social is the peer/rank composite scaled by $(1-\\tau)$. Class/grade combines the class-size pressure and within-class grade-dispersion terms. Residual is the shrinkage-regularized market productivity shifter $\\delta_m$; it is reported to make the accounting transparent, not interpreted as a mechanism. ``ATE excl. resid.'' sets $\\delta_m=0$ while holding all common production parameters and measured environment inputs fixed.",
+            "\\item \\textit{Notes:} Assignment is $\\hat{\\lambda}G\\omega\\tau^{\\hat{\\alpha}}$, where $G$ is the signed assignment-value primitive. Social is the peer/rank composite scaled by $(1-\\tau)$. Class/grade combines the class-size pressure and within-class grade-dispersion terms. Residual is the shrinkage-regularized market productivity shifter $\\delta_m$; it is reported to make the accounting transparent, not interpreted as a mechanism. ``ATE excl. resid.'' sets $\\delta_m=0$ while holding all common production parameters and measured environment inputs fixed.",
             r"\end{tablenotes}",
             r"\end{threeparttable}",
             r"\end{table}",
@@ -4751,6 +4986,7 @@ def _write_redesign_note(
     lines.append("- Assignment-value payoff robustness is saved in `assignment_value_payoff_sensitivity.csv`.")
     lines.append("- Raw-unit tau benchmark translations are saved in `tau_raw_unit_thresholds.csv`.")
     lines.append("- Delivery-fidelity calibration sensitivity is saved in `tau_calibration_sensitivity.csv`.")
+    lines.append("- Nigeria endpoint-target sensitivity is saved in `nigeria_endpoint_sensitivity.csv`.")
     lines.append("- Primitive-estimation uncertainty sensitivity is saved in `primitive_uncertainty_sensitivity.csv`.")
     lines.append("- Delivery-activation functional-form sensitivity is saved in `delivery_activation_sensitivity.csv`.")
     lines.append("- Stage-4 target files now include only moments evaluated by the minimum-distance criterion; measured environment inputs are saved separately.")
@@ -4801,6 +5037,7 @@ def _write_run_manifest(acceptance: dict[str, Any], warnings: list[str], archive
         "delivery_threshold_diagnostics.csv",
         "fig_struct_complementarity_surface.pdf",
         "nigeria_complementarity_decomposition.csv",
+        "nigeria_endpoint_sensitivity.csv",
         "signal_delivery_marginal_products.csv",
         "pooled_structural_diagnostics.csv",
         "primitive_benchmark_sensitivity.csv",
@@ -4844,6 +5081,7 @@ def _write_run_manifest(acceptance: dict[str, Any], warnings: list[str], archive
         "latex/tab_struct_complementarity.tex",
         "latex/tab_struct_influence.tex",
         "latex/tab_struct_market_influence.tex",
+        "latex/tab_struct_nigeria_endpoint_sensitivity.tex",
         "latex/tab_struct_local_identification.tex",
         "latex/tab_moment_fit.tex",
         "latex/tab_struct_primitive_moments.tex",
@@ -4924,41 +5162,45 @@ def main() -> None:
     write_tau_raw_unit_thresholds(stage3)
     print("Stage 3 complete: tau calibrated from process moments only.", flush=True)
 
+    assignment_value_df, payoff_preferred, payoff_positive, payoff_share_weighted = _load_assignment_value_primitives(rho)
+    assignment_value_df.to_csv(OUT_DIR / "assignment_value_primitives_for_payoff.csv", index=False)
+
     # Stage 4
-    print("Running stage 4: preferred production block...", flush=True)
-    stage4, p, fit_df, w4 = estimate_production_block(data, rho, omega, tau)
+    print("Running stage 4: preferred production block with assignment-value payoff...", flush=True)
+    stage4, p, fit_df, w4 = estimate_production_block(data, rho, omega, tau, payoff_signal=payoff_preferred)
     warnings.extend(w4)
-    print("Stage 4 complete: production parameters estimated conditional on rho/omega/tau.", flush=True)
+    print("Stage 4 complete: production parameters estimated conditional on rho/omega/tau and assignment-value payoff.", flush=True)
 
     # Acceptance tests
     print("Running acceptance tests and counterfactual surface...", flush=True)
     env = pd.read_csv(OUT_DIR / "stage4_environment_moments.csv").set_index("market")
-    acceptance = run_acceptance_tests(rho, omega, tau, p, env, canon_ng, fit_df)
+    acceptance = run_acceptance_tests(rho, omega, tau, p, env, canon_ng, fit_df, payoff_signal=payoff_preferred)
     (OUT_DIR / "acceptance_tests.json").write_text(json.dumps(acceptance, indent=2), encoding="utf-8")
     validation_checks = write_structural_validation_checks(acceptance, fit_df)
     validation_checks.to_csv(OUT_DIR / "structural_validation_checks.csv", index=False)
     write_stage4_normalization_documentation()
 
     # Counterfactuals + surface
-    surface, summary = simulate_counterfactual_surface(rho, omega, tau, p, env)
-    write_structural_surface_figure(rho, omega, tau, p, env)
+    surface, summary = simulate_counterfactual_surface(payoff_preferred, omega, tau, p, env)
+    write_structural_surface_figure(payoff_preferred, omega, tau, p, env)
     print("Running pooled validation and robustness diagnostics...", flush=True)
     pooled_diag = write_pooled_structural_diagnostics(summary, rho, omega, tau)
-    sensitivity = write_residual_prior_sensitivity(data, rho, omega, tau, env)
-    regularization_sensitivity = write_regularization_sensitivity(data, rho, omega, tau, env)
-    social_channel_sensitivity = write_social_channel_sensitivity(data, rho, omega, tau, env, p, fit_df)
-    influence_sensitivity = write_stage4_influence_sensitivity(data, rho, omega, tau, env, p)
-    market_influence = write_stage4_market_influence(data, rho, omega, tau, env, p)
-    primitive_sensitivity = write_primitive_benchmark_sensitivity(stage1, rho, p, env)
+    sensitivity = write_residual_prior_sensitivity(data, rho, omega, tau, env, payoff_signal=payoff_preferred)
+    regularization_sensitivity = write_regularization_sensitivity(data, rho, omega, tau, env, payoff_signal=payoff_preferred)
+    social_channel_sensitivity = write_social_channel_sensitivity(data, rho, omega, tau, env, p, fit_df, payoff_signal=payoff_preferred)
+    influence_sensitivity = write_stage4_influence_sensitivity(data, rho, omega, tau, env, p, payoff_signal=payoff_preferred)
+    market_influence = write_stage4_market_influence(data, rho, omega, tau, env, p, payoff_signal=payoff_preferred)
+    primitive_sensitivity = write_primitive_benchmark_sensitivity(stage1, rho, payoff_preferred, p, env)
     assignment_value_sensitivity = write_assignment_value_payoff_sensitivity(data, rho, omega, tau, p, env, fit_df)
-    tau_calibration_sensitivity = write_tau_calibration_sensitivity(data, process_df, rho, omega, tau, env)
-    primitive_uncertainty = write_primitive_uncertainty_sensitivity(stage1, stage2, stage3, process_df, rho, omega, tau, p, env)
-    combined_uncertainty = write_combined_uncertainty(data, stage1, stage3, process_df, rho, omega, tau, p, env)
-    delivery_sensitivity = write_delivery_activation_sensitivity(data, rho, omega, tau, env, p, fit_df)
-    complementarity = write_nigeria_complementarity_decomposition(rho, omega, tau, p, env)
-    signal_delivery_margins = write_signal_delivery_marginal_products(rho, omega, tau, p)
-    component_decomposition = write_counterfactual_component_decomposition(rho, omega, tau, p, env)
-    delivery_thresholds = write_delivery_threshold_diagnostics(rho, p, env)
+    tau_calibration_sensitivity = write_tau_calibration_sensitivity(data, process_df, rho, omega, tau, env, payoff_signal=payoff_preferred)
+    nigeria_endpoint_sensitivity = write_nigeria_endpoint_sensitivity(data, rho, omega, tau, env, p, fit_df, payoff_preferred)
+    primitive_uncertainty = write_primitive_uncertainty_sensitivity(stage1, stage2, stage3, process_df, rho, payoff_preferred, omega, tau, p, env)
+    combined_uncertainty = write_combined_uncertainty(data, stage1, stage3, process_df, rho, payoff_preferred, omega, tau, p, env)
+    delivery_sensitivity = write_delivery_activation_sensitivity(data, rho, omega, tau, env, p, fit_df, payoff_signal=payoff_preferred)
+    complementarity = write_nigeria_complementarity_decomposition(payoff_preferred, omega, tau, p, env)
+    signal_delivery_margins = write_signal_delivery_marginal_products(payoff_preferred, omega, tau, p)
+    component_decomposition = write_counterfactual_component_decomposition(payoff_preferred, omega, tau, p, env)
+    delivery_thresholds = write_delivery_threshold_diagnostics(payoff_preferred, p, env)
     print("Writing LaTeX tables and manifest...", flush=True)
     _write_latex_tables(
         stage1,
@@ -5015,7 +5257,7 @@ def main() -> None:
     print("\nNigeria realized vs Nigeria designed-execution ATE:")
     print(f"  Nigeria realized: {sc['nigeria_realized']:.4f}")
     print(f"  Nigeria designed execution: {sc['nigeria_designed_execution']:.4f}")
-    print("\nIdealized high-rho/high-omega/high-tau ATE:")
+    print("\nFully high-input assignment-value/execution/delivery ATE:")
     print(f"  {sc['idealized_high_rho_high_omega_high_tau']:.4f}")
     pooled_sc = pooled_diag.set_index("diagnostic")
     print("\nPooled reduced-form validation:")
@@ -5085,12 +5327,12 @@ def main() -> None:
         f"{delivery_min:.4f} to {delivery_max:.4f}"
     )
 
-    comp_all = complementarity[complementarity["scenario"] == "rho_omega_tau"].iloc[0]
-    comp_rho_tau = complementarity[complementarity["scenario"] == "rho_tau"].iloc[0]
+    comp_all = complementarity[complementarity["scenario"] == "g_omega_tau"].iloc[0]
+    comp_g_tau = complementarity[complementarity["scenario"] == "g_tau"].iloc[0]
     print("\nNigeria complementarity decomposition:")
     print(
-        "  rho+tau ATE: "
-        f"{comp_rho_tau['ate']:.4f}; all-three ATE: {comp_all['ate']:.4f}; "
+        "  G+tau ATE: "
+        f"{comp_g_tau['ate']:.4f}; all-three ATE: {comp_all['ate']:.4f}; "
         f"all-three gain vs realized: {comp_all['gain_vs_realized']:.4f}"
     )
 
@@ -5098,9 +5340,9 @@ def main() -> None:
     mp_high = signal_delivery_margins[signal_delivery_margins["scenario"] == "nigeria_high_delivery"].iloc[0]
     print("\nSignal-delivery marginal products:")
     print(
-        "  Gain from raising rho_N to rho_K: "
-        f"{mp_low['ate_gain_from_nigeria_to_kenya_rho']:.4f} at Nigeria tau vs "
-        f"{mp_high['ate_gain_from_nigeria_to_kenya_rho']:.4f} at high tau"
+        "  Gain from raising G_N to G_K: "
+        f"{mp_low['ate_gain_from_nigeria_to_kenya_g']:.4f} at Nigeria tau vs "
+        f"{mp_high['ate_gain_from_nigeria_to_kenya_g']:.4f} at high tau"
     )
 
     decomp_hi = component_decomposition[

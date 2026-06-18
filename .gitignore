@@ -22,6 +22,8 @@ __pycache__/
 Rplots.pdf
 
 # LaTeX build artifacts
+build/mplconfig/
+build/xdg-cache/
 *.aux
 *.bbl
 *.blg
@@ -35,3 +37,45 @@ Rplots.pdf
 *.swp
 *.swo
 *~
+
+# Replication scratch output
+replication_audit/stata_scratch/
+
+# Local-only reference/data materials not included in the shareable release
+/2011-peer-effects-teacher-incentives-and-the-impact-of-tracking-evidence-from-a-randomized-evaluation-in-kenya (1).pdf
+/VSC (Current WP).pdf
+/ai23-802.pdf
+/ddk data/
+/archive/main2_release_notes_2026-06-07/
+/archive/stale_paper_inputs/
+/HANDOVER_NIGERIA.md
+/STRUCTURAL_RESULTS_NOTE.md
+
+# Exploratory helpers not included in the active HAI-facing replication package
+/3_Python/00_clean_nigeria.py
+/3_Python/bootstrap_counterfactuals.py
+/3_Python/build_nigeria_assessments_long.py
+/3_Python/build_nigeria_raw_panels.py
+/3_Python/control_trained_assignment_gains.py
+/3_Python/empirical_moments.py
+/3_Python/estimate_smm.py
+/3_Python/make_tables_figures.py
+/3_Python/model_primitives.py
+/3_Python/nigeria_full_stack_replication.py
+/3_Python/run_nigeria_irt_outcomes.py
+/3_Python/simulate_markets.py
+/4_Stata2/04b_peer_diagnostics.do
+/4_Stata2/_master_nigeria.do
+/4_Stata2/output/assignment_channel_tests_kenya.md
+/4_Stata2/output/kenya_exact_bh_note.md
+/4_Stata2/output/ng_two_group_note.md
+/4_Stata2/output/tab_assignment_channel_tests_kenya.tex
+/4_Stata2/output/tab_ng_irt.tex
+/4_Stata2/output/tab_ng_t2_mte.tex
+/4_Stata2/output/tab_ng_t2_over_time.tex
+/4_Stata2/output/tab_ng_t3_mte.tex
+/4_Stata2/output/tab_ng_t3_over_time.tex
+/4_Stata2/output/tab_ng_upper_lower.tex
+/4_Stata2/output/tab_peer_effects_exact_kenya_controls.tex
+/4_Stata2/output/tab_peer_effects_exact_kenya_diag.tex
+/4_Stata2/output/tab_pooled_gradient.tex

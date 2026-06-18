@@ -18,7 +18,7 @@ from pathlib import Path
 from audit_overleaf_artifacts import DEFAULT_OVERLEAF, scan_tex_references
 
 
-DEFAULT_REPO = Path("/Users/mriduljoshi/Github/AbilityGrouping")
+DEFAULT_REPO = Path("/Users/mriduljoshi/Github/reading-groups-struc")
 DEFAULT_MANIFEST = DEFAULT_REPO / "PAPER_REPRODUCIBILITY_FREEZE.md"
 DEFAULT_REPO_OUTPUT = DEFAULT_REPO / "4_Stata2" / "output"
 

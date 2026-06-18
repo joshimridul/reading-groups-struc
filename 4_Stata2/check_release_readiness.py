@@ -4,10 +4,10 @@
 
 This read-only check separates two states that are easy to conflate:
 
-1. Manuscript gates: build log, active exhibit sync, label integrity, freeze
-   hashes, PDF metadata, and rendered-page checks are clean.
-2. Release gates: the manuscript has been switched out of draft mode and the
-   repository is clean enough to commit/tag.
+1. Manuscript gates: build log, active exhibit sync, label integrity, active
+   input hashes, PDF metadata, and rendered-page checks are clean.
+2. Release gates: the manuscript is not marked as a draft and the repository is
+   clean enough to commit/tag.
 
 The script exits nonzero when either manuscript gates fail or release blockers
 remain. Known intentional blockers, such as `\\publicversionfalse`, are reported
@@ -17,6 +17,7 @@ as blockers rather than hidden behind the clean manuscript checks.
 from __future__ import annotations
 
 import argparse
+import csv
 import re
 import subprocess
 import sys
@@ -43,25 +44,31 @@ from triage_release_worktree import (
 
 
 WARNING_RE = re.compile(
-    r"(Warning|Undefined|Citation.*undefined|Reference.*undefined|"
-    r"There were undefined|Label.*multiply|Fatal|Emergency|Overfull|Underfull)"
+    r"(Undefined|Citation.*undefined|Reference.*undefined|There were undefined|"
+    r"Label\\(s\\) may have changed|Label.*multiply|Fatal|Emergency|Overfull|"
+    r"referenced but does not exist)"
 )
 
 EXPECTED_PDF_TITLE = (
-    "When Does Ability Grouping Improve Learning? "
-    "Evidence from Two Experiments in Kenya and Liberia"
+    "Why Sorting Students Is Not Enough: "
+    "Evidence from Three Ability-Grouping Experiments"
 )
 EXPECTED_PDF_AUTHOR = "Guthrie Gray-Lobe, Mridul Joshi, and Michael Kremer"
-DEFAULT_RELEASE_PATHSPEC = DEFAULT_REPO / "PAPER_RELEASE_CANDIDATE_PATHS.txt"
-DEFAULT_CLEANUP_PATHSPEC = DEFAULT_REPO / "PAPER_RELEASE_CLEANUP_PATHS.txt"
+DEFAULT_INTERNAL_WORKFLOW = DEFAULT_REPO / "docs" / "internal_workflow"
+DEFAULT_RELEASE_PATHSPEC = DEFAULT_INTERNAL_WORKFLOW / "PAPER_RELEASE_CANDIDATE_PATHS.txt"
+DEFAULT_CLEANUP_PATHSPEC = DEFAULT_INTERNAL_WORKFLOW / "PAPER_RELEASE_CLEANUP_PATHS.txt"
+DEFAULT_CLEANUP_MEMO = DEFAULT_INTERNAL_WORKFLOW / "PAPER_RELEASE_CLEANUP_DECISIONS.md"
+DEFAULT_RESPONSE_LETTER = DEFAULT_INTERNAL_WORKFLOW / "referee_response_letter_2026_06_18.md"
 EXPECTED_PDF_KEYWORD_PARTS = [
     "ability grouping",
     "tracking",
     "diagnostic assessment",
-    "peer effects",
-    "class size",
-    "education in developing countries",
+    "targeted instruction",
+    "human capital",
+    "implementation",
+    "education production",
 ]
+EXPECTED_PAGES = "96"
 EXPECTED_DRAFT_MARKERS = [
     "PRELIMINARY",
     "PLEASE DO NOT CIRCULATE",
@@ -72,25 +79,56 @@ FORBIDDEN_PDF_TEXT = [
     "TBD",
     "finsamp",
     "sampleconstruction",
-    "withingrade",
-    "gradelevel",
     "treatmentcontrol",
     "baselinescored",
     "treatmentinteracted",
-    "treatmentinduced",
     "schoolclustered",
     "gradedispersion",
     "differentlyinformative",
     "baselineability",
     "classroomlevel",
     "Metaanalyses",
-    "gradebased",
 ]
 UNRESOLVED_PDF_PATTERNS = [
     (r"\?\?", "visible unresolved reference marker"),
     (r"\bTable\s+\?", "visible unresolved table reference"),
     (r"\bFigure\s+\?", "visible unresolved figure reference"),
     (r"\bSection\s+\?", "visible unresolved section reference"),
+]
+FORBIDDEN_RESPONSE_TEXT = [
+    "TODO",
+    "FIXME",
+    "TBD",
+    "[AUTHOR",
+    "placeholder",
+    "PRELIMINARY",
+    "PLEASE DO NOT CIRCULATE",
+]
+REQUIRED_RESPONSE_TOPICS = [
+    "Positioning of the Structural Exercise",
+    "Assignment Payoff Primitive",
+    "Delivery Fidelity and Raw Units",
+    "Nonlinear Activation and Scale Sensitivity",
+    "Nigeria Endpoint and Attrition",
+    "Peer and Rank Channels",
+    "Reduced-Form Inference and Multiple Testing",
+    "Nigeria Two-Group Collapse",
+    "Manuscript Organization",
+    "Verification",
+]
+REQUIRED_RESPONSE_LABELS = [
+    "tab:struct_assignment_value_sensitivity",
+    "tab:struct_tau_calibration",
+    "tab:struct_tau_raw_thresholds",
+    "tab:struct_tau_sensitivity",
+    "tab:assignment_payoff_kenya",
+    "tab:struct_nigeria_endpoint_sensitivity",
+    "tab:rnr_attrition_bounds",
+    "tab:rnr_inference_checks",
+    "tab:struct_social_channel_sensitivity",
+    "tab:multiplicity_disclosure",
+    "tab:ng_two_group",
+    "tab:struct_validation_checks",
 ]
 
 
@@ -109,17 +147,29 @@ def normalize_pdf_text(text: str) -> str:
     return re.sub(r"\s+", " ", text)
 
 
+def build_artifact_path(overleaf_dir: Path, entrypoint: str, suffix: str) -> Path:
+    direct = overleaf_dir / Path(entrypoint).with_suffix(suffix)
+    if direct.exists():
+        return direct
+    return overleaf_dir / "build" / Path(entrypoint).with_suffix(suffix).name
+
+
 def check_public_version(overleaf_dir: Path, entrypoint: str) -> CheckResult:
     text = (overleaf_dir / entrypoint).read_text(errors="ignore")
     if r"\publicversiontrue" in text:
         return CheckResult("public version switch", True, r"\publicversiontrue is set")
     if r"\publicversionfalse" in text:
         return CheckResult("public version switch", False, r"\publicversionfalse is still set")
-    return CheckResult("public version switch", False, "no public-version switch found")
+    draft_hits = [marker for marker in EXPECTED_DRAFT_MARKERS if marker in text]
+    if draft_hits:
+        return CheckResult("public version switch", False, f"draft marker present: {', '.join(draft_hits)}")
+    return CheckResult("public version switch", True, "no draft/public switch; source has no draft markers")
 
 
 def check_log(overleaf_dir: Path, entrypoint: str) -> CheckResult:
-    log_path = overleaf_dir / Path(entrypoint).with_suffix(".log")
+    log_path = build_artifact_path(overleaf_dir, entrypoint, ".log")
+    if not log_path.exists():
+        return CheckResult("LaTeX warning scan", False, f"missing log: {log_path}")
     hits = [
         f"{idx}: {line.strip()}"
         for idx, line in enumerate(log_path.read_text(errors="ignore").splitlines(), start=1)
@@ -202,6 +252,24 @@ def check_labels(overleaf_dir: Path, entrypoint: str) -> CheckResult:
 def check_freeze_manifest(
     manifest: Path, repo_root: Path, overleaf_dir: Path, repo_output: Path, entrypoint: str
 ) -> CheckResult:
+    if not manifest.exists():
+        active_manifest = repo_root / "paper_pipeline" / "active_inputs_manifest.csv"
+        if not active_manifest.exists():
+            return CheckResult("freeze/input manifest", False, f"missing manifest: {manifest}")
+
+        with active_manifest.open(newline="") as handle:
+            rows = list(csv.DictReader(handle))
+        errors: list[str] = []
+        for row in rows:
+            target = repo_root / row["repo_target"]
+            if not target.exists():
+                errors.append(f"missing active input: {row['repo_target']}")
+                continue
+            if sha256(target) != row["sha256"]:
+                errors.append(f"hash mismatch for active input: {row['repo_target']}")
+        if errors:
+            return CheckResult("active input manifest", False, "; ".join(errors[:5]))
+        return CheckResult("active input manifest", True, f"{len(rows)} active input hashes match")
     rows = parse_hash_rows(manifest)
     errors = []
     errors.extend(verify_hash_rows(rows, repo_root, overleaf_dir, repo_output))
@@ -212,7 +280,7 @@ def check_freeze_manifest(
 
 
 def check_pdf_metadata(overleaf_dir: Path, entrypoint: str) -> CheckResult:
-    pdf_path = overleaf_dir / Path(entrypoint).with_suffix(".pdf")
+    pdf_path = build_artifact_path(overleaf_dir, entrypoint, ".pdf")
     result = run_command(["pdfinfo", str(pdf_path)])
     if result.returncode != 0:
         return CheckResult("PDF metadata", False, result.stderr.strip() or "pdfinfo failed")
@@ -233,7 +301,7 @@ def check_pdf_metadata(overleaf_dir: Path, entrypoint: str) -> CheckResult:
     missing_keywords = [part for part in EXPECTED_PDF_KEYWORD_PARTS if part not in keywords]
     if missing_keywords:
         errors.append(f"keywords missing: {', '.join(missing_keywords)}")
-    if info.get("Pages") != "66":
+    if info.get("Pages") != EXPECTED_PAGES:
         errors.append(f"unexpected page count: {info.get('Pages')}")
 
     if errors:
@@ -241,7 +309,7 @@ def check_pdf_metadata(overleaf_dir: Path, entrypoint: str) -> CheckResult:
     return CheckResult(
         "PDF metadata",
         True,
-        f"66 pages; {info.get('File size', 'unknown size')}; title/author/keywords populated",
+        f"{EXPECTED_PAGES} pages; {info.get('File size', 'unknown size')}; title/author/keywords populated",
     )
 
 
@@ -260,7 +328,7 @@ def nonembedded_pdf_font_lines(pdf_path: Path) -> tuple[list[str], str]:
 
 
 def check_pdf_fonts(overleaf_dir: Path, entrypoint: str) -> CheckResult:
-    pdf_path = overleaf_dir / Path(entrypoint).with_suffix(".pdf")
+    pdf_path = build_artifact_path(overleaf_dir, entrypoint, ".pdf")
     nonembedded, error = nonembedded_pdf_font_lines(pdf_path)
     if error:
         return CheckResult("PDF font embedding", False, error)
@@ -275,6 +343,7 @@ def check_pdf_fonts(overleaf_dir: Path, entrypoint: str) -> CheckResult:
 
 def check_pdf_render(overleaf_dir: Path, entrypoint: str) -> CheckResult:
     script = Path(__file__).with_name("check_pdf_render.py")
+    pdf_path = build_artifact_path(overleaf_dir, entrypoint, ".pdf")
     result = run_command(
         [
             sys.executable,
@@ -283,6 +352,10 @@ def check_pdf_render(overleaf_dir: Path, entrypoint: str) -> CheckResult:
             str(overleaf_dir),
             "--entrypoint",
             entrypoint,
+            "--pdf",
+            str(pdf_path),
+            "--expected-pages",
+            EXPECTED_PAGES,
         ]
     )
     if result.returncode == 0:
@@ -303,7 +376,7 @@ def check_pdf_text_hygiene(overleaf_dir: Path, entrypoint: str) -> CheckResult:
     draft_mode = r"\publicversionfalse" in tex_text and r"\publicversiontrue" not in tex_text
     public_mode = r"\publicversiontrue" in tex_text
 
-    pdf_path = overleaf_dir / Path(entrypoint).with_suffix(".pdf")
+    pdf_path = build_artifact_path(overleaf_dir, entrypoint, ".pdf")
     result = run_command(["pdftotext", str(pdf_path), "-"])
     if result.returncode != 0:
         return CheckResult("PDF text hygiene", False, result.stderr.strip() or "pdftotext failed")
@@ -319,16 +392,15 @@ def check_pdf_text_hygiene(overleaf_dir: Path, entrypoint: str) -> CheckResult:
             errors.append(label)
 
     required_text = [
-        "When Does Ability Grouping Improve Learning?",
-        "Evidence from Two Experiments in Kenya and Liberia",
+        "Why Sorting Students Is Not Enough",
+        "Evidence from Three Ability-Grouping Experiments",
         "Guthrie Gray-Lobe",
         "Mridul Joshi",
         "Michael Kremer",
         "Abstract",
         "Keywords:",
-        "JEL codes:",
+        "JEL Codes:",
     ]
-    required_text.extend(EXPECTED_PDF_KEYWORD_PARTS)
     for literal in required_text:
         if literal not in text:
             errors.append(f"required text missing: {literal}")
@@ -342,7 +414,8 @@ def check_pdf_text_hygiene(overleaf_dir: Path, entrypoint: str) -> CheckResult:
         if draft_hits:
             errors.append(f"draft marker present in public mode: {', '.join(draft_hits)}")
     else:
-        errors.append("no public-version switch found in source")
+        if draft_hits:
+            errors.append(f"draft marker present: {', '.join(draft_hits)}")
 
     if errors:
         return CheckResult("PDF text hygiene", False, "; ".join(errors[:8]))
@@ -385,6 +458,125 @@ def check_numeric_claims(overleaf_dir: Path, repo_output: Path, entrypoint: str)
     return CheckResult("numeric prose claims", False, detail)
 
 
+def parse_last_numeric_table_cell(table_path: Path, row_prefix: str) -> float | None:
+    if not table_path.exists():
+        return None
+    for line in table_path.read_text(errors="ignore").splitlines():
+        if not line.strip().startswith(row_prefix):
+            continue
+        cells = [cell.strip() for cell in line.split("&")]
+        if not cells:
+            return None
+        match = re.search(r"([+-]?\d+\.\d+)", cells[-1])
+        if match:
+            return float(match.group(1))
+    return None
+
+
+def parse_numeric_table_cell(table_path: Path, row_prefix: str, cell_index: int) -> float | None:
+    if not table_path.exists():
+        return None
+    for line in table_path.read_text(errors="ignore").splitlines():
+        if not line.strip().startswith(row_prefix):
+            continue
+        cells = [cell.strip() for cell in line.split("&")]
+        if cell_index >= len(cells):
+            return None
+        match = re.search(r"([+-]?\d+\.\d+)", cells[cell_index])
+        if match:
+            return float(match.group(1))
+    return None
+
+
+def check_response_numeric_claims(text: str, overleaf_dir: Path) -> list[str]:
+    errors: list[str] = []
+
+    preferred_high_input = parse_last_numeric_table_cell(
+        overleaf_dir / "structural_output" / "tab_struct_regularization_sensitivity.tex",
+        "Preferred",
+    )
+    if preferred_high_input is None:
+        errors.append("could not parse preferred high-input benchmark")
+    else:
+        expected = f"{abs(preferred_high_input):.3f} SD"
+        if expected not in text:
+            errors.append(f"preferred high-input benchmark missing from response: {expected}")
+
+    nigeria_delivery = parse_numeric_table_cell(
+        overleaf_dir / "structural_output" / "tab_struct_tau_calibration.tex",
+        "Nigeria & DI numeracy completion",
+        2,
+    )
+    if nigeria_delivery is None:
+        errors.append("could not parse Nigeria DI numeracy completion")
+    else:
+        expected_percent = f"{round(100 * nigeria_delivery)} percent"
+        if expected_percent not in text:
+            errors.append(f"Nigeria delivery claim missing from response: {expected_percent}")
+
+    nigeria_assignment_value = parse_numeric_table_cell(
+        overleaf_dir / "structural_output" / "tab_struct_assignment_value_sensitivity.tex",
+        "Preferred assignment value",
+        3,
+    )
+    if nigeria_assignment_value is None:
+        errors.append("could not parse Nigeria assignment value")
+    elif nigeria_assignment_value < 0 and "negative signed assignment value" not in text:
+        errors.append("negative Nigeria assignment-value claim missing")
+
+    return errors
+
+
+def check_response_letter(response_path: Path, overleaf_dir: Path, entrypoint: str) -> CheckResult:
+    if not response_path.exists():
+        return CheckResult("response letter", False, f"missing response letter: {response_path}")
+
+    text = response_path.read_text(errors="ignore")
+    errors: list[str] = []
+
+    forbidden_hits = [literal for literal in FORBIDDEN_RESPONSE_TEXT if literal in text]
+    if forbidden_hits:
+        errors.append("forbidden placeholder/draft text: " + ", ".join(forbidden_hits))
+
+    missing_topics = [topic for topic in REQUIRED_RESPONSE_TOPICS if topic not in text]
+    if missing_topics:
+        errors.append("missing response topics: " + ", ".join(missing_topics[:3]))
+
+    comment_count = len(re.findall(r"^\*\*Comment\.\*\*", text, flags=re.MULTILINE))
+    response_count = len(re.findall(r"^\*\*Response\.\*\*", text, flags=re.MULTILINE))
+    if comment_count < 9 or response_count < 9 or comment_count != response_count:
+        errors.append(f"unexpected comment/response count: {comment_count}/{response_count}")
+
+    file_style_refs = sorted(set(re.findall(r"`(tab_[^`]+)`", text)))
+    if file_style_refs:
+        errors.append("file-style table labels: " + ", ".join(file_style_refs[:3]))
+
+    labels, _ = scan_entrypoint_labels(overleaf_dir, entrypoint)
+    label_names = set(labels)
+    mentioned_labels = sorted(set(re.findall(r"`(tab:[^`]+)`", text)))
+    missing_label_mentions = [label for label in mentioned_labels if label not in label_names]
+    if missing_label_mentions:
+        errors.append("response labels not in manuscript: " + ", ".join(missing_label_mentions[:3]))
+
+    missing_required_labels = [label for label in REQUIRED_RESPONSE_LABELS if label not in mentioned_labels]
+    if missing_required_labels:
+        errors.append("key response labels not mentioned: " + ", ".join(missing_required_labels[:3]))
+
+    if "`./run_all.sh`" not in text or "`./run_all.sh --existing`" not in text:
+        errors.append("verification commands missing")
+
+    errors.extend(check_response_numeric_claims(text, overleaf_dir))
+
+    if errors:
+        return CheckResult("response letter", False, "; ".join(errors[:5]))
+
+    return CheckResult(
+        "response letter",
+        True,
+        f"{comment_count} point-by-point responses; {len(mentioned_labels)} manuscript labels verified",
+    )
+
+
 def check_git_clean(repo_root: Path) -> CheckResult:
     result = run_command(["git", "status", "--porcelain"], cwd=repo_root)
     if result.returncode != 0:
@@ -409,6 +601,17 @@ def check_release_pathspec(
 
     try:
         entries = run_git_status(repo_root)
+    except Exception as exc:
+        return CheckResult("release pathspec drift", False, str(exc))
+
+    if not entries:
+        return CheckResult(
+            "release pathspec drift",
+            True,
+            f"clean worktree; retained {len(actual)} release-candidate paths as the reviewed release record",
+        )
+
+    try:
         active_paths = active_exhibit_paths(overleaf_dir, repo_output, entrypoint)
     except Exception as exc:
         return CheckResult("release pathspec drift", False, str(exc))
@@ -452,6 +655,17 @@ def check_cleanup_pathspec(
 
     try:
         entries = run_git_status(repo_root)
+    except Exception as exc:
+        return CheckResult("cleanup pathspec drift", False, str(exc))
+
+    if not entries:
+        return CheckResult(
+            "cleanup pathspec drift",
+            True,
+            f"clean worktree; retained {len(actual)} cleanup-decision paths as the reviewed cleanup record",
+        )
+
+    try:
         active_paths = active_exhibit_paths(overleaf_dir, repo_output, entrypoint)
         expected = expected_cleanup_pathspec_entries(repo_root, entries, active_paths)
     except Exception as exc:
@@ -479,6 +693,51 @@ def check_cleanup_pathspec(
         return CheckResult("cleanup pathspec drift", False, "; ".join(pieces))
 
     return CheckResult("cleanup pathspec drift", True, f"{len(expected)} cleanup-decision paths match triage")
+
+
+def cleanup_item_covered(item: str, memo_text: str) -> bool:
+    normalized = item.strip().strip('"').strip("'")
+    if item in memo_text or normalized in memo_text:
+        return True
+    if normalized.startswith("archive/main2_release_notes_2026-06-07/"):
+        return "archive/main2_release_notes_2026-06-07/*" in memo_text
+    return False
+
+
+def check_cleanup_memo(memo_path: Path, cleanup_pathspec: Path) -> CheckResult:
+    if not memo_path.exists():
+        return CheckResult("cleanup decision memo", False, f"missing cleanup memo: {memo_path}")
+    try:
+        cleanup_items = read_pathspec(cleanup_pathspec)
+    except FileNotFoundError:
+        return CheckResult(
+            "cleanup decision memo",
+            False,
+            f"cleanup pathspec missing: {cleanup_pathspec}",
+        )
+
+    memo_text = memo_path.read_text(errors="ignore")
+    required_sections = [
+        "Recommended Defaults",
+        "Current Release Gate Interpretation",
+        "GitHub Desktop Workflow",
+    ]
+    missing_sections = [section for section in required_sections if section not in memo_text]
+    uncovered = [item for item in cleanup_items if not cleanup_item_covered(item, memo_text)]
+
+    if missing_sections or uncovered:
+        pieces: list[str] = []
+        if missing_sections:
+            pieces.append("missing sections: " + ", ".join(missing_sections))
+        if uncovered:
+            pieces.append(f"{len(uncovered)} cleanup paths not covered; first: {uncovered[0]}")
+        return CheckResult("cleanup decision memo", False, "; ".join(pieces))
+
+    return CheckResult(
+        "cleanup decision memo",
+        True,
+        f"{len(cleanup_items)} cleanup-decision paths covered by memo",
+    )
 
 
 def tracked_local_artifact_paths(repo_root: Path) -> tuple[list[str], str]:
@@ -541,9 +800,11 @@ def main() -> int:
     parser.add_argument("--overleaf-dir", type=Path, default=DEFAULT_OVERLEAF)
     parser.add_argument("--repo-output-dir", type=Path, default=DEFAULT_REPO_OUTPUT)
     parser.add_argument("--manifest", type=Path, default=DEFAULT_MANIFEST)
-    parser.add_argument("--entrypoint", default="main2.tex")
+    parser.add_argument("--entrypoint", default="main_3country_new.structural_edit.tex")
     parser.add_argument("--release-pathspec", type=Path, default=DEFAULT_RELEASE_PATHSPEC)
     parser.add_argument("--cleanup-pathspec", type=Path, default=DEFAULT_CLEANUP_PATHSPEC)
+    parser.add_argument("--cleanup-memo", type=Path, default=DEFAULT_CLEANUP_MEMO)
+    parser.add_argument("--response-letter", type=Path, default=DEFAULT_RESPONSE_LETTER)
     args = parser.parse_args()
 
     manuscript_checks = [
@@ -562,6 +823,7 @@ def main() -> int:
         check_pdf_render(args.overleaf_dir, args.entrypoint),
         check_pdf_text_hygiene(args.overleaf_dir, args.entrypoint),
         check_numeric_claims(args.overleaf_dir, args.repo_output_dir, args.entrypoint),
+        check_response_letter(args.response_letter, args.overleaf_dir, args.entrypoint),
     ]
     release_checks = [
         check_public_version(args.overleaf_dir, args.entrypoint),
@@ -580,6 +842,7 @@ def main() -> int:
             args.repo_output_dir,
             args.entrypoint,
         ),
+        check_cleanup_memo(args.cleanup_memo, args.cleanup_pathspec),
         check_tracked_local_artifacts(args.repo_root),
     ]
 

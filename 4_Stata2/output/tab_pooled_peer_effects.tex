@@ -1,6 +1,6 @@
 \begin{table}[!htbp]
 \centering
-\caption{Harmonized Peer/Rank Diagnostic Across Experiments}
+\caption{Pooled Peer Composition Effects (BH-style)}
 \label{tab:pooled_peer_effects}
 \begin{threeparttable}
 \begin{tabular}[t]{lcccc}
@@ -16,7 +16,8 @@ N & 4954 & 3153 & 1659 & 9766 \\
 \bottomrule
 \end{tabular}
 \begin{tablenotes}[para]
-\item Notes: This diagnostic applies a harmonized approximate Borusyak--Hull-style specification across the three experiments, with baseline-decile $\times$ treatment $\times$ grade FE and country-nested strata FE. The peer variable is harmonized leave-self-out baseline ability (\texttt{peer\_eb} for Kenya/Liberia, \texttt{peer\_lo\_bl} for Nigeria). SEs are clustered at the harmonized assignment cluster. The pooled column is a diagnostic common-coefficient summary, not a structural peer-effect estimate.
+\item Notes: Borusyak-Hull-style reduced form with baseline-decile $\times$ treatment $\times$ grade FE and country-nested strata FE.
+Peer variable is harmonized leave-self-out baseline ability (\texttt{peer\_eb} for Kenya/Liberia, \texttt{peer\_lo\_bl} for Nigeria). SEs are clustered at the harmonized assignment cluster.
 \end{tablenotes}
 \end{threeparttable}
 \end{table}

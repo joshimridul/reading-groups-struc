@@ -134,12 +134,15 @@ file open let using "${outdir}/Kenya_new/baseline_balance_K.tex", write replace
 
 	file write let "\midrule" _n
 	*file write let "\multicolumn{2}{l}{Observations} `Nearly_enrollment' \\" _n	
+	file write let "\multicolumn{2}{l}{F-stat of joint test} && `F1' \\" _n		
+	file write let "\multicolumn{2}{l}{P-value} && `p1' \\" _n	
+
 
 	file write let "\bottomrule" _n
 
 	file write let "\end{tabular}" _n
 	file write let "\begin{tablenotes}" _n
-	file write let "\item Notes: All specifications control for randomization strata fixed effects. Standard errors are clustered at the school level. ***, **, and * indicate significance at 1\%, 5\%, and 10\%." 
+	file write let "\item Notes: All specifications control for randomization strata fixed effects. Standard errors are clustered at the academy level. ***, **, and * indicate significance at 1\%, 5\%, and 10\%." 
 	file write let "\end{tablenotes}" _n
 	file write let "\end{threeparttable}" _n
 	file write let "\end{`size'}" _n
@@ -148,6 +151,8 @@ file open let using "${outdir}/Kenya_new/baseline_balance_K.tex", write replace
 	file write let "\clearpage" _n
 
 file close let
+
+
 
 
 

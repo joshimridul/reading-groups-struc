@@ -6,21 +6,21 @@
 \footnotesize
 \begin{tabular}[t]{lcccccc}
 \toprule
-Scenario & $\rho$ & $\omega$ & $\tau$ & ATE & Gain & Nonadd. \\
+Scenario & $G$ & $\omega$ & $\tau$ & ATE & Gain & Nonadd. \\
 \midrule
-Realized Nigeria & 0.121 & 0.84 & 0.31 & $+0.056$ & $+0.000$ & $+0.000$ \\
-Upgrade $\rho$ only & 0.533 & 0.84 & 0.31 & $+0.057$ & $+0.001$ & $+0.000$ \\
-Upgrade $\omega$ only & 0.121 & 0.95 & 0.31 & $+0.056$ & $+0.000$ & $+0.000$ \\
-Upgrade $\tau$ only & 0.121 & 0.84 & 0.90 & $+0.115$ & $+0.059$ & $+0.000$ \\
-Upgrade $\rho+\omega$ & 0.533 & 0.95 & 0.31 & $+0.057$ & $+0.001$ & $+0.000$ \\
-Upgrade $\rho+\tau$ & 0.533 & 0.84 & 0.90 & $+0.203$ & $+0.147$ & $+0.087$ \\
-Upgrade $\omega+\tau$ & 0.121 & 0.95 & 0.90 & $+0.118$ & $+0.062$ & $+0.003$ \\
-Upgrade all three & 0.533 & 0.95 & 0.90 & $+0.217$ & $+0.161$ & $+0.102$ \\
+Realized Nigeria & -0.014 & 0.84 & 0.31 & $+0.056$ & $+0.000$ & $+0.000$ \\
+Upgrade $G$ only & 0.533 & 0.84 & 0.31 & $+0.057$ & $+0.001$ & $+0.000$ \\
+Upgrade $\omega$ only & -0.014 & 0.95 & 0.31 & $+0.056$ & $-0.000$ & $+0.000$ \\
+Upgrade $\tau$ only & -0.014 & 0.84 & 0.90 & $+0.086$ & $+0.030$ & $+0.000$ \\
+Upgrade $G+\omega$ & 0.533 & 0.95 & 0.31 & $+0.057$ & $+0.001$ & $+0.000$ \\
+Upgrade $G+\tau$ & 0.533 & 0.84 & 0.90 & $+0.199$ & $+0.143$ & $+0.112$ \\
+Upgrade $\omega+\tau$ & -0.014 & 0.95 & 0.90 & $+0.086$ & $+0.030$ & $-0.000$ \\
+Upgrade all three & 0.533 & 0.95 & 0.90 & $+0.214$ & $+0.158$ & $+0.127$ \\
 \bottomrule
 \end{tabular}
 \begin{tablenotes}[para,flushleft]
 \footnotesize
-\item \textit{Notes:} Each row evaluates the Nigeria production environment while upgrading the indicated primitives from Nigeria's realized values. High-signal sets $\rho$ to Kenya's estimate, high-execution sets $\omega=0.95$, and high-delivery sets $\tau=0.90$. ``Gain'' is relative to realized Nigeria, and ``Nonadd.'' is the gain beyond the sum of the corresponding one-at-a-time gains. Because every row uses the same shrinkage-regularized Nigeria residual, the gain and nonadditive columns are invariant to that residual. The comparison is designed to show complementarity among primitives, not to replace the fully idealized high-input counterfactual in Table~\ref{tab:counterfactuals}.
+\item \textit{Notes:} Each row evaluates the Nigeria production environment while upgrading the indicated primitives from Nigeria's realized values. High assignment value sets $G$ to Kenya's estimate, high execution sets $\omega=0.95$, and high delivery sets $\tau=0.90$. ``Gain'' is relative to realized Nigeria, and ``Nonadd.'' is the gain beyond the sum of the corresponding one-at-a-time gains. Because every row uses the same shrinkage-regularized Nigeria residual, the gain and nonadditive columns are invariant to that residual. The comparison is designed to show complementarity among primitives, not to replace the fully idealized high-input counterfactual in Table~\ref{tab:counterfactuals}.
 \end{tablenotes}
 \end{threeparttable}
 \end{table}

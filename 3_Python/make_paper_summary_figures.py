@@ -7,6 +7,9 @@ not estimate new effects; it turns reported moments into reader-facing figures.
 
 from pathlib import Path
 
+import matplotlib
+
+matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import numpy as np
 
@@ -166,10 +169,10 @@ def fig_counterfactual_ladder():
         ("High input", 0.187, 0.058, 0.222, "Counterfactual"),
     ]
     gains = [
-        ("$\\rho$ only", 0.001, 0.000),
+        ("$G$ only", 0.001, 0.000),
         ("$\\omega$ only", 0.000, 0.000),
         ("$\\tau$ only", 0.059, 0.000),
-        ("$\\rho+\\tau$", 0.147, 0.087),
+        ("$G+\\tau$", 0.147, 0.087),
         ("All three", 0.161, 0.102),
     ]
 
@@ -208,7 +211,7 @@ def fig_counterfactual_ladder():
     ax.set_title("B. Primitive upgrades in Nigeria")
     ax.set_ylim(0, 0.19)
     ax.legend(frameon=False, loc="upper left")
-    fig.suptitle("Counterfactual gains require joint signal quality and delivery fidelity", y=1.03, fontsize=11)
+    fig.suptitle("Counterfactual gains require joint assignment value and delivery fidelity", y=1.03, fontsize=11)
     save(fig, "fig_counterfactual_ladder.pdf")
 
 
