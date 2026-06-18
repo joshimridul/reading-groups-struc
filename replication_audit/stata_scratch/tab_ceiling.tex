@@ -1,0 +1,22 @@
+\begin{table}[H]
+\centering
+\caption{Robustness to Score Ceiling Effects (Kenya)}
+\label{tab:ceiling}
+\begin{threeparttable}
+\begin{tabular}[t]{lccc}
+\toprule
+ & \makecell{(1) \\ OLS} & \makecell{(2) \\ Tobit} & \makecell{(3) \\ Trimmed OLS} \\
+\midrule
+Treatment &   0.031 &   0.040 &   0.022 \\
+ & (  0.053) & (  0.058) & (  0.057) \\
+\addlinespace
+N & 4954 & 4954 & 4471 \\
+Right-censored obs. & &     176 & \\
+\bottomrule
+\end{tabular}
+\begin{tablenotes}[para,flushleft]
+\footnotesize
+\item \textit{Notes:} Column~(1) reproduces the baseline OLS ITT on standardized endline scores. Column~(2) estimates a Tobit model on the raw endline composite (upper limit = 50 points), controlling for raw baseline score and strata FE; the coefficient and SE are divided by the control\mbox{-}group SD of raw endline scores for comparability with column~(1). Column~(3) re-estimates OLS after dropping students in the top baseline score decile. Columns~(1) and~(3) control for EB ability and strata FE; column~(2) controls for raw baseline score and strata FE\@. Standard errors are clustered at the school level. ***, **, and * indicate significance at 1\%, 5\%, and 10\%.
+\end{tablenotes}
+\end{threeparttable}
+\end{table}

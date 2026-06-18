@@ -1,0 +1,23 @@
+\begin{table}[H]
+\centering
+\caption{Stage-4 Moment Blocks and Inputs}
+\label{tab:struct_target_blocks}
+\begin{threeparttable}
+\footnotesize
+\begin{tabular}[t]{>{\raggedright\arraybackslash}p{2.6cm}>{\raggedright\arraybackslash}p{3.5cm}>{\raggedright\arraybackslash}p{2.8cm}>{\raggedright\arraybackslash}p{4.7cm}}
+\toprule
+Block & Moments / inputs & Criterion weight & Role in estimation \\
+\midrule
+Observed treatment effects & 3 market ITTs & inverse variance (54.9--356.0) & Fit ATEs while residuals are shrinkage-regularized. \\
+Social-channel diagnostics & 3 peer/rank composites & inverse diagnostic variance (100.0--200.0) & Discipline the common peer/rank scale. \\
+Sorting first stage & 3 within-class dispersion changes & scale weight (1000.0) & Separate sorting compression from assignment payoff. \\
+Revealed assignment payoff & Kenya treatment $\times$ predicted assignment-gain slope & inverse variance (216.3) & Pin down delivery activation at realized fidelity. \\
+Fixed primitives and environment & $(\hat{\rho},\hat{\omega},\hat{\tau})$; peer shifts, class size, grade dispersion & not criterion targets & Measured inputs for observed and counterfactual regimes. \\
+\bottomrule
+\end{tabular}
+\begin{tablenotes}[para,flushleft]
+\footnotesize
+\item \textit{Notes:} The stage-4 minimum-distance criterion targets only moments with a criterion weight in this table. Classroom peer shifts, class size, grade dispersion, and the first-three-block primitives enter the production mapping as measured inputs, not as additional fitted moments. This distinction prevents the target list from overstating what the outcome block estimates.
+\end{tablenotes}
+\end{threeparttable}
+\end{table}

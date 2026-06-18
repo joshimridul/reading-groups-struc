@@ -4,7 +4,11 @@ set -euo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 STATA_BIN="${STATA_BIN:-/Applications/StataNow/StataMP.app/Contents/MacOS/stata-mp}"
 PYTHON_BIN="${PYTHON_BIN:-python3}"
-ENTRYPOINT="${ENTRYPOINT:-main_3country_new.structural_edit.tex}"
+if [[ -f "$ROOT/main_3country_new.tex" ]]; then
+  ENTRYPOINT="main_3country_new.tex"
+else
+  ENTRYPOINT="main_3country_new.structural_edit.tex"
+fi
 
 RUN_STATA=1
 RUN_PYTHON=1
@@ -19,9 +23,9 @@ Regenerate and verify the three-country ability-grouping paper.
 Default:
   1. run the Stata reduced-form pipeline;
   2. run the Python structural/figure pipeline;
-  3. materialize exactly the LaTeX inputs referenced by the active manuscript;
+  3. materialize exactly the LaTeX inputs referenced by main_3country_new.tex;
   4. audit active paper inputs;
-  5. compile the active manuscript PDF under build/.
+  5. compile build/main_3country_new.pdf.
 
 Options:
   --existing       Do not rerun Stata or Python; verify existing outputs and compile.
@@ -33,7 +37,6 @@ Options:
 Environment overrides:
   STATA_BIN=/path/to/stata-mp
   PYTHON_BIN=/path/to/python
-  ENTRYPOINT=main_3country_new.structural_edit.tex
 USAGE
 }
 
@@ -68,19 +71,10 @@ while [[ $# -gt 0 ]]; do
   esac
 done
 
-mkdir -p "$ROOT/build/logs" "$ROOT/build/mplconfig" "$ROOT/build/xdg-cache"
-export MPLCONFIGDIR="${MPLCONFIGDIR:-$ROOT/build/mplconfig}"
-export XDG_CACHE_HOME="${XDG_CACHE_HOME:-$ROOT/build/xdg-cache}"
-export MPLBACKEND="${MPLBACKEND:-Agg}"
-
-if [[ ! -f "$ROOT/$ENTRYPOINT" ]]; then
-  echo "Manuscript entry point not found: $ROOT/$ENTRYPOINT" >&2
-  exit 1
-fi
+mkdir -p "$ROOT/build/logs"
 
 echo "== Three-country ability-grouping replication =="
 echo "Repo: $ROOT"
-echo "Manuscript: $ENTRYPOINT"
 echo
 
 if [[ "$RUN_STATA" -eq 1 ]]; then

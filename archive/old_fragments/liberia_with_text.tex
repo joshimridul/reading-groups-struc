@@ -1,0 +1,283 @@
+\documentclass[12pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[letterpaper,top=1in,right=1in,left=1in,bottom=1in]{geometry}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{graphics}
+\usepackage[demo]{graphicx}
+\usepackage{placeins}
+\usepackage[capposition=top]{floatrow}
+\usepackage{subcaption}
+\usepackage{lscape}
+\usepackage{pdflscape}
+\usepackage{setspace}
+\usepackage{standalone}
+\usepackage{fancyhdr}
+\usepackage{framed}
+\usepackage{color}
+\usepackage{tikz}
+\usepackage{pgfplots}
+\usepackage{longtable}
+\usepackage{booktabs,caption}
+\setlength{\marginparwidth}{2cm}
+\usepackage[draft]{todonotes}
+\usepackage{booktabs,caption}
+\usepackage[flushleft]{threeparttable}
+\usepackage{bbm}
+\usepackage{multirow}
+\usepackage{lineno}
+\usepackage{titlesec}
+\usepackage{hyperref}
+\usepackage{comment}
+\usepackage[draft]{todonotes}
+\usepackage[justification=centering]{caption}
+\pgfplotsset{compat=1.15}
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{assumption}{Assumption}[section]
+\usepackage{longtable}
+\usepackage{array}
+
+\usepackage[authoryear]{natbib}
+\bibliographystyle{ecta}
+
+\usepackage{colortbl}
+\usepackage{ragged2e}
+\usepackage{xfp}
+
+\usepackage{stackengine}
+\usepackage{array}
+\newcolumntype{L}[1]{>{\raggedright\arraybackslash}p{#1}}
+\setstackEOL{\#}
+\setstackgap{L}{12pt}
+
+\usepackage[page,toc,titletoc,title]{appendix}
+\usepackage{blindtext}
+\newcommand{\unitlabel}{standard deviations}
+\usepackage{pdfpages}
+
+\hypersetup{
+	colorlinks=true, %set true if you want colored links
+	linktoc=all,     %set to all if you want both sections and subsections linked
+	linkcolor=black,  %choose some color if you want links to stand out
+	citecolor=blue
+}
+
+%\linenumbers 
+
+\title{The Impact of Cross-grade Ability Grouping on Student Achievement in Liberia}
+
+\begin{document}
+
+\begin{titlepage}
+\author{Mridul Joshi\footnote{Stanford University, email: \protect\href{mailto:mriduljoshi@stanford.edu}{mriduljoshi@stanford.edu}}}
+
+\date{ \today \\}
+\maketitle
+
+\begin{abstract}\noindent
+This study examines the impact of a cross-grade ability grouping intervention for reading on early grade literacy in chain of public-private partnership schools in Liberia. The intervention grouped students in adjacent grades into two reading tracks based on their performance on English and literacy assessments. Results reveal that the intervention had a negative overall impact on student achievement, with an effect size of -0.25 SD. The negative effect was primarily driven by grades 3-4 (-0.40 SD), while the impact in grades 1-2 was smaller (-0.10 SD) and imprecisely estimated. The negative effects were concentrated among students assigned to higher ability tracks, who experienced a differential impact of -0.37 SD. The intervention also increased within-class dispersion in achievement, suggesting potential errors in the diagnostic assessment used for group assignment. Exploratory analyses reveal that peer ability positively influenced achievement, while greater distance from optimal instruction had a negative impact. These findings underscore the complexities of implementing ability-based tracking and its potential unintended consequences in low-income settings.
+
+\end{abstract}
+\setcounter{page}{0}
+\thispagestyle{empty}
+\end{titlepage}
+\doublespacing
+
+\section{Introduction}
+%Should students be grouped to instruction based on the number of years of education they have received or based on their mastery of material? 
+Often in the design of education systems, level of instruction is determined by the quantity of education that a student has received. However, such a classification does not necessarily arise from any theory of human capital but is rather a matter of convenience in modeling education. A more complete model of education would try to account for both the quantity of education or grade structure, given the opportunity cost to every additional unit of education as well as actual learning, as this would be informative about returns to further investments in an individual's human capital  \citep{becker2009human}. Researchers and policymakers have tried to make use students' test scores as an instrument to group students based on prior ability and target instruction more efficiently in classrooms. This is often referred to as `tracking' or `ability grouping' in the economics and education literature. 
+
+The notion of grouping children by past academic performance instead of age or quantity of education has a long history. Grouping children by level of achievement instead of age is an increasingly popular idea both rich and developing countries. Programs grouping children between kindergarten and third grade have been experimented with in schools in the United States in many different forms \citep{edweek20191106}. Cross-grade ability grouping for literacy instruction was one of the forms of tracking that was proposed as a way to improve the efficiency of education in Joplin, Missouri in the mid-20th century \citep{floyd:1954}. The Joplin Plan, as it came to be known, was adopted by several school districts in the 1950s and 60s. \cite{slavin:1987} reviewed evidence on tracking programs, and found that cross-grade ability grouping for reading only was among the most effective tracking interventions. 
+
+While tracking, in theory, sounds very promising, grouping students on the basis of a prior test scores has raised several concerns. First, there may be negative distributional effects of ability leading to educational inequities. Students who are assigned to lower levels of instruction may be harmed either through adverse peer effects or by reduced self-esteem \citep{betts:2011} due to salience of their lower estimated ability. Second, there is a risk of misclassification of students in tracking is based on assessment of prior performance. Test scores tend to be noisy measures of ability, and even a high quality test may not be sufficient to capture the domain that is most relevant to targeting instruction. A test that is a noisy measure of the skills that are needed for students to benefit from a given level of instruction may ultimately lead to ineffective, if not worse, targeted instruction. 
+
+Despite its long history, the evidence around the effectiveness of ability grouping is rather mixed (see \cite{betts:2011} for a comprehensive review). Most of the evidence on within-school tracking comes from high income countries, primarily the United States. While this evidence may provide hints about the impact of tracking policies in low-income settings, among other things, there is much higher variability in student learning compared to high-income countries, impeding the generalisability of these studies to low-income countries. However, some high-quality evidence from developing countries showing that alignment of instruction to students' actual learning level, as opposed to their nominal grade, leads to more rapid learning \citep{banerjee/cole/duflo/linden:2007,duflo2011peer,banerjee2017proof,duflo2020experimental,muralidharan2019disrupting} may suggests that if the distribution of learning levels in adjacent grades overlaps substantially, the effectiveness of schools could be improved by grouping children on the basis of learning level. 
+
+This study examines the impact of a tracked reading group intervention in low-cost public-private partnership schools operated by NewGlobe Education in Liberia. We evaluate two versions of an intervention that track students in adjacent grades into one of two reading groups based on their performance on English language and literacy assessments. The two (separate) implementation of the interventions comprise (i) grades 3-4 and (ii) grades 1-2.  The intervention was specifically motivated by studies showing the benefit of differentiated instruction in schools in low- and middle-income countries. The intervention lasted approximately three months, wherein students met with their reading groups, determined by their performance on the assessment, each day for 90 minutes of reading instruction and practice for approximately 3 months. In control schools, students received the status quo 90 minutes of instruction according to the grade they were enrolled. 
+
+This study investigates the impact of a tracking intervention on student achievement, revealing an overall negative effect. The results indicate that the intervention's impact varies by grade level, with larger negative effects observed in higher grades. These findings suggest that the intervention may not have achieved its intended goals of improving student outcomes through ability grouping.
+
+Further analysis highlights that the negative effects are concentrated among students assigned to higher ability tracks. These students experienced substantially lower achievement compared to their peers, with suggestive evidence indicating that the impact is more pronounced in older grades. These patterns raise questions about the effectiveness of the diagnostic tools used to assign students to tracks.
+
+This study also explores the broader implications of the tracking intervention on classroom dynamics and learning environments. The results show an increase in within-class dispersion of student achievement, suggesting that the diagnostic test used to assign students to tracks may have introduced errors. 
+
+We examine key mechanisms of the intervention, including peer ability, instructional fit, and class size. Higher mean peer ability is associated with small positive effects on achievement, while greater distance from optimal instruction negatively impacts outcomes. Notably, these effects are more pronounced in older grades, where misalignment between student ability and instructional levels appears to have the strongest influence. Class size, however, shows minimal impact.
+
+The present study makes the following contributions. First, the study provides experimental evidence on the impact of tracking in low-income settings, a literature that is rather sparse, primarily due to the logistical and political infeasibility of random assignment of tracking interventions. Second, our intervention design assauges concerns about educational inequities due to ability grouping common criticism of tracking. Once the reading group session is over, students return to their original grades for other classes. Third, our unique setting allows for greater control over the instructional level as compared to \cite{duflo2011peer}, allowing us to rule out the possibility of no instructional differences in high- and low-track classrooms.
+
+%Misclassification poses significant challenges in educational tracking systems, potentially leading to students being placed in tracks that do not align with their actual abilities. Brunello, Giannini, and Ariga (2007) highlight that early tracking decisions, often based on limited information, can result in misallocations, adversely affecting students' educational outcomes. Similarly, Bedard (1997) emphasizes that early selection into academic tracks can disproportionately disadvantage younger students within the same cohort, as they may be less mature and thus more likely to be misclassified. Allen and Barnsley (1993) introduce the concept of "relative age," noting that age differences among students grouped by cohort can lead to systematic biases in track placement, with younger students facing higher risks of misclassification. Piopiunik (2013) provides empirical evidence from a Bavarian school reform, demonstrating that earlier tracking increased the share of low-performing students in lower tracks, suggesting that premature tracking decisions can exacerbate educational inequalities. Furthermore, Bergman et al. (2021) discuss the application of predictive analytics in educational settings, indicating that while such tools have potential, they also carry risks of reinforcing existing biases if not carefully implemented. Collectively, these studies underscore the importance of accurate assessment and cautious implementation of tracking systems to mitigate the adverse effects of misclassification on student achievement.  
+
+The paper is organised as follows. Section \ref{sec:back} describes the setting of the experiment and section \ref{sec:data} describes the data and summary statistics. Section \ref{sec:empirical} presents the empirical strategy and section \ref{sec:results} discusses the results. Section \ref{sec:discuss} concludes. 
+
+\begin{comment}
+\section{Review of literature}
+\label{sec:rev}
+
+%Interest in cross-grade ability grouping for reading instruction dates back to mid-20th century, in the context of widespread perception that the United States education system was in crisis and falling behind rivals . The Joplin plan was proposed by \cite{floyd:1954} as a way to target reading instruction more carefully. Early studies found mixed results, although the research designs often did not include a sufficient number of randomized units be convincing one way or another. \cite{slavin:1987} found that Joplin plan 
+The question of whether pupils in a given grade benefit from being tracked into groups based on their initial achievement is a recurring question in the economics of education literature.\footnote{There is also a large body of research on between-school ability grouping, mainly from Europe where tracking between academic and vocational tracks is prevalent. In this paper, we are interested in within-school ability grouping.} Proponents of tracking posit that since it reduces the variation in achievement among pupils, tracking allows teachers to target instruction to the level of the pupils, thus benefiting students in both the higher and the lower tracks. On the other hand, critics of tracking argue that tracking disproportionately hurts the already low-achieving students through negative peer effects as well as loss of self-esteem through knowledge of being placed in the lower track. 
+
+As noted by \cite{betts:2011}, despite its longstanding presence in education settings, the body of evidence regarding the effectiveness of ability grouping demonstrates a heterogeneous array of results. Most of the evidence on within-school tracking comes from high income countries, primarily the United States and hints towards a small to null effect of tracking. \cite{slavin:1987} does not find a statistically significant impact of tracking in his meta-analysis of 14 studies on tracking in elementary schools, of which one had random assignment and three were large-scale, longitudinal studies. At the secondary school level, none of the six randomised studies reviewed in \cite{slavin1990achievement} found a positive effect of tracking, although there was some evidence of a small negative effect \citep{hanushek2006does}. Other recent studies and reviews find that ability grouping has little to no impact on student achievement \citep{kulik1987effects, terrin2022effect}.
+
+Given the nature of tracking, there is likely to be heterogeneity in effects between high and low ability tracks. The overall evidence is inconclusive but usually suggests that tracking may be beneficial for students assigned to the high track and harmful for students assigned to the low track \citep{fu2018ability, lavrijsen2015new, burke2013classroom, hoxby2005taking}. Other studies report large, positive effects of tracking on academic achievement for students in the higher track and no negative impact on lower track students \citep{card2016can, vardardottir2013peer, antonovics/black/cullen/meiselman:2022}. On the other hand, \cite{antecol2016peer} found that tracking benefits the low ability track students and hurts the high achievement class and \cite{garlick} found that tracking (in university dormitories) reduces the GPA of low-scoring students but does not impact high-scoring students. Albeit in the context of higher education, a recent study by \cite{de2022college} employs a regression discontinuity design and reports that students who were marginally admitted to the higher ability class in a public university in Columbia were less likely to pass. 
+
+Well-identified studies on tracking or ability grouping are virtually absent in developing countries.  Among the few, \cite{duflodupaskremer} find positive effects of tracking in schools in Kenya. Students in tracking schools scored 0.18 standard deviations higher than students in non-tracking schools that persisted after the programme ended. The effects were observed on all quantiles of the baseline ability distribution.\footnote{\cite{cummins2017heterogeneous} reanalyzes the data from  \cite{duflodupaskremer} show that there is a positive effect in the low track only when the class is assigned to a contract teacher.} Apart from this, most other studies comprise instructional targeting through various ways in the spirit of Teaching at the Right Level (TaRL) and find significant gains to instructional alignment \citep{banerjee2017proof, duflo2020experimental}. 
+
+Tracking interventions effectively change three components - the level of instruction, the dispersion in classroom achievement as well as the mean classroom achievement.  \cite{duflodupaskremer}, postulate that tracking allows teachers to teach at the level of the students and therefore positively impact both high ability and low ability students. They show that low ability students gain basic knowledge skills while high achieving students gain advanced skills suggesting that tracking allowed teachers to tailor their instruction to the level of the students.   
+%The evidence on the impact of dispersion in the classroom as well the mean classroom achievement is rather mixed. There is evidence that suggests that being surrounded by more able peers leads to an increase in achievement (add cites). However, there are many empirical studies that indicate that classroom peer effects may be neglible (was it Angrist? cites check) or even negative ( Prof. Hoxby's invidious comparisons - see Luc Beheghel's notes).
+
+Studies on classroom inputs often overlook the effects of dispersion in classroom achievement in favour of average classroom achievement \citep{rjosk2022dispersion}. \cite{kuzmina2018effects} show that dispersion in achievement is positively correlated with reading outcomes. Similarly, \cite{vigdor2007peer} found a positive relation between dispersion in classroom achievement and student outcomes. On the other hand, there are handful of studies that find a negative association  \citep{duflo2011peer, ding2007peers} or no association \citep{hanushek2003does} between dispersion in peer achievement and student outcomes
+
+%Add paragraph on educational inequality due to tracking - tons of work on this - Mridul has a list of cites. 
+
+Our study also adds to the literature of classroom mixing. The literature provides no consensus on the effect of mixed grade classrooms. A survey of 56 studies concluded that there are no consistent differences in student outcomes between multi-grade and single grade classrooms.  \cite{sims2008strategic} shows that mixed-grade classrooms are associated with a reduction in test scores for pupils in grade 2 and grade 3 assuming negligible class size effects. On the other hand, \cite{leuven2011classroom} show that students in mixed grades outperform pupils in single grade classroom in both high stakes exams as well as in tests set by their teachers. The authors conclude that whether the overall effect is positive or negative or zero, depends on the type of exposure to high and low ability peers. 
+
+Our intervention at hand is a type of `cross-grade ability grouping' or `regrouping' \citep{slavin:1987} that has been termed as the Joplin Plan \citep{floyd:1954} after the city in Missouri where it was first piloted. The Joplin Plan creates mixed classrooms by regrouping students for reading based on their reading achievement instead of their grades or age. Once the reading class is over, students return to their original grades for other subjects. Multiple studies have tried to evaluate the impact of the Joplin Plan. Although most studies in the meta-analysis by \cite{slavin:1987} report a positive impact or a zero impact \citep{carson/thompson:1964,powell:1964}. However, according to s0me, the overall positive effect of the Joplin Plan documented in \cite{slavin:1987} rests on assumptions about the nature of the interventions studied and may not necessarily hold up. 
+
+%To the best of our knowledge, ours is the first study that uses random assignment to test the impact of the Joplin Plan in two developing country settings.
+
+%Misclassification has been noted as a potential problem for tracking \citep{betts:2011} [need more cites for this]. Add paragraph using Piopiunik (2013), Brunello, Giannini and Ariga (2007), Bedard (1997), Allen and Barnsley (1993) - maybe Bergman et al (2021) has something regarding prediction analytics for tracking. Also check Diris (2012)
+\end{comment}
+
+
+\section{Background}
+\label{sec:back}
+This research was carried out in primary schools managed by Bridge Liberia, a part of NewGlobe. NewGlobe runs private schools in several countries including India, Kenya, Nigeria, Liberia, and Uganda, and also supports public school systems in Nigeria and Rwanda with materials and training. 
+
+A key aspect of Bridge's approach is the application of modern management techniques for quality assurance. Teachers use standardized lesson plans developed centrally and delivered via digital tablets. These plans, in line with the national curriculum, are created by a team based in the United States and the country  and are remotely synchronized to the teachers' tablets.
+
+Teacher guides used by Bridge are comprehensive, covering every aspect of classroom instruction, from introducing new topics to guiding problem-solving and overseeing individual or group work. They instruct teachers to ensure student engagement, lead activities at the front of the class, and provide positive reinforcement, such as classroom cheers. NewGlobe emphasizes strict adherence to these scripts, with teachers trained in using tablet e-readers and monitored by academy managers to ensure compliance. While lesson completion, tracked through tablets, is not tied to performance-based pay, it is crucial for feedback and professional development; non-compliance could lead to dismissal. Despite this structured approach, the guides do allow some teacher discretion, especially in modules for individual student work, where teachers can independently engage with students, backed by training in providing feedback and correct answers.
+
+Students undergo regular assessments in each subject, using standardized tests to track progress. Additionally, Bridge mandates regular parent-teacher meetings, primarily focusing on student performance. Previous experimental results have shown that Bridge schools significantly enhance test scores, cognitive skills, and parental involvement in education \citep{gray2022can, romero2020outsourcing}.
+
+In the treatment schools, students were divided into either lower or upper reading groups based on their performance in these tests. In grades 1-2, students scoring above 23 total points in a combined English and literacy test were placed in the upper group, while in grades 3-4, the threshold was 14 points. Figure \ref{bldist} shows that there is considerable overlap between the ability distribution in the lower and upper grades, which is necessary for this intervention to work effectively. 
+
+Once assigned, students in the treated schools received 90 minutes of daily instruction in their respective reading groups for approximately a three-month period. In contrast, control schools continued their usual practice of 90 minutes of grade-based instruction. The assignment of treatment was stratified at the student cohort year , ensuring a balanced and representative distribution across different cohorts. 
+
+\section{Data and summary statistics}
+\label{sec:data}
+
+The data for this study, provided by Bridge, includes a pre-test used for student assignment to the treatment groups. For the endline evaluation, data were collected through a literacy and English test. This test, administered after the intervention period, aimed to assess the effectiveness of the reading group intervention in improving literacy and English proficiency among the students. The analysis of this endline data forms the basis for evaluating the impact of the reading group intervention on student learning outcomes.
+
+Student and school characteristics are balanced across treatment and control schools. On average, a classroom in our sample has 22.36 student. There is no statistically significant difference in pretest scores between the control and treatment schools. Further, the baseline characteristics do not jointly predict the treatment (see Table 1). 
+
+Approximately  59 percent of the students were administered an assessment at
+the endline (the main outcome), and this follow up rate is balanced across students in treatment
+and control schools. The follow up rate in the upper grade is slightly higher (61 percent) than that in the higher grade (56 percent) but there is no evidence of any differential attrition between treatment and control groups (Table 2). 
+
+We estimate reliability of the pretest (baseline) by regressing the endline assessment score on the baseline assessment in the control group. The $R^2$ is approximately 7.26 percent, which suggests a low reliability. Similarly, the $R^2$ between the endline and a midline assessment in the control group is 9.68 percent and between the midline and baseline in the control group is 4.19 percent. Given the low reliability of the pretest, we construct a measure of predicted student ability using empirical bayes. This procedure combined individual-level baseline scores and (control) group-level midline scores. Shrinkage weights were calculated based on the inverse variance of the baseline and control group midline test scores, assigning higher weight to the more reliable (lower
+variance) measure. For cases where midline scores were missing, individual baseline scores were used as a fallback (see Figure \ref{figeb}). 
+
+\section{Empirical Strategy}
+\label{sec:empirical}
+
+To measure the overall impact of the intervention on test scores, we will run regressions of the form:
+\[ y_{ij} = \alpha + \beta T_j + \gamma x_{ij}  + \rho_t +\epsilon_{ij}  \]
+where $y_{ij}$ is a test score outcome of student $i$ in school $j$ at endline, $T_j \in \{0,1\}$ indicates  treatment assignment of school $j$, and $X_{ij}$ denotes predicted ability of the student. $\rho_t$ is a linear probability control for treatment assignment strata. Unless specified otherwise, standard errors are clustered at the grade-group level (i.e., grades 1-2 or grades 3-4 within each school). Because assignment to the tracking program was randomized, ordinary least squares (OLS) regression identifies $\beta$. %The intervention was conducted for both the first and the second grade, I will also estimate the overall effect of tracking by restricting the data to students enrolled in the lower and upper grade separately.
+
+We employ a linear control of the probability of assignment to treatment instead of using strata fixed effects to effectively increase the degrees of freedom in the regression specifications. Accounting for the treatment assignment probability is sufficient to maintain the assumption of unconfoundedness, as discussed in \cite{abdulkadirouglu2017research}. The results are virtually the same when strata fixed effects are included, although the standard errors are larger.
+
+We further test if there are differential effects on students who are streamed into the higher track. We employ a modified version of the first specification and interact the treatment with a indicator of whether the student scored above the cutoff in the pretest. We estimate the following: 
+
+\[ y_{ij} = \alpha + \beta_1 T_j + \beta_2 T_j \times H_j + \beta_3 H_j + \rho_t +\epsilon_{ij}  \]
+where $H_j$ denotes whether the student scored above the cutoff to be streamed in the higher track.
+
+Finally, individual outcomes from the treatment may be mediated by heterogeneous impacts of the tracking intervention on classroom characteristics, including the ability of assigned peers, the distance between a student's initial literacy level and the level of instruction of their class, and the class size. We leverage variation in these characteristics arising from random assignment. The discussion is based on \cite{angrist/gray-lobe/idoux/pathak:2022}. We estimate the following model:
+ \[ y_{ij} = \alpha + \beta_1 P_i + \beta_2 M_i + \beta_3 C_i + \gamma_1\text{E}[P_i|\theta]  + \gamma_2\text{E}[M_i|\theta]  + \gamma_3 \text{E}[C_i| \theta]  + \gamma x_{ij}  + \rho_t +  \varepsilon_{ij}  \]
+where $y_{ij}$ is a test score outcome of student $i$ in school $j$ at endline, $P_i$, $M_i$, and $C_i$ denote the mean peer ability, distance from median instruction (or ability) in the classroom, and class size respectively. $\mathbb{E}[. | \theta]$ is the expected value of these treatments for student $i$. Conditioning on the expected value of treatment eliminates selection bias by controlling for the variation in treatment that is nonrandom \citep{borusyak2020non, hirano2004propensity, rosenbaum1983central}.
+
+\section*{Results}
+\label{sec:results}
+
+The results of this study shows that the tracking intervention had a negative impact of student achievement with an overall impact of -0.25 SD. When we separate these results by grade group, we find that that the impact is driven by a large negative effect of a magnitude of -0.40 SD in grades 3-4. The effect in grades 1-2 also negative but is smaller with a magnitude of -0.10 SD and noisily estimated (Table 3).
+
+Table 4 shows that this negative effect is driven by students who are tracked to the higher ability group. Our study estimates a differential impact of -0.37 SD on students assigned to the higher ability track. Separating by grade groups, we find suggestive evidence that this effect is mostly driven by grades 3-4 with an effect of -0.42 SD compared to an effect of -0.14 SD in grades 1-2, although neither of these estimates is statistically significant at conventional levels. 
+
+Table 5 presents the impact of the intervention on the dispersion of student achievement within classes. The outcome measured is the absolute deviation of each student's standardized test score from the classroom mean. The estimates show that contrary to the goal of ability grouping, the intervention led to increase in the dispersion of student achievement within classes. This may suggest that the diagnostic test used to assign students to ability groups likely contained errors, undermining the goal of reducing within-class variation in achievement through ability grouping.
+
+Finally, our design allows us to simultaneously estimate the impact of the different sub-treatments of the tracking intervention - the impact of peers, distance from optimal instruction, and the class size. The random assignment leads to (partially-) exogenous variation in these characteristics. We find a that a one point increase in mean peer ability is associated with an increase of 0.013 SD in endline achievement. We also estimate that a one point increase in distance from the median instruction (or median student student ability) is associated with a decrease of 0.056 SD in endline achievement. Class size shows a negligible impact on endline achievement. These results are again driven by the impacts in grade 3-4, where mean peer ability has an impact of 0.020 SD and distance from median instruction has an impact of -0.10 SD on endline achievement. While the direction of effects in grades 1-2 is the same as the rest of the estimates, the point estimates are much smaller and noisily estimated (Table 6). 
+
+
+\section{Conclusion}
+\label{sec:discuss}
+
+This study evaluates the impact of a tracking intervention in low-cost public-private partnership schools in Liberia, providing new evidence on the effects of ability grouping in low-income settings. While the intervention aimed to improve literacy outcomes by tailoring instruction to student ability, it produced unintended consequences. The tracking program resulted in a negative overall impact on student achievement (-0.25 SD), with effects more pronounced in higher grades (-0.40 SD for grades 3-4) compared to lower grades (-0.10 SD for grades 1-2). Furthermore, the intervention increased within-class dispersion in achievement, suggesting that errors in the diagnostic assessment used for track placement may have undermined its efficacy. These results call into question the feasibility of using such tools in settings with high variability in student learning levels.
+
+Our findings highlight important mechanisms that contributed to the observed outcomes. Students placed in higher ability groups experienced disproportionately negative impacts, suggesting that instructional alignment played a key role. While higher mean peer ability was associated with small positive effects on achievement, misalignment between students’ abilities and the level of instruction produced larger, negative effects. This misalignment was particularly evident in higher grades, where the distribution of student learning levels was broader. Class size, in contrast, showed negligible effects, underscoring the relative importance of instructional quality and peer dynamics in shaping learning outcomes.
+
+This study contributes to the broader literature on ability grouping and tracking by providing experimental evidence in a low-income context, where the variability in student learning levels and resource constraints present unique challenges. Unlike prior studies, our design mitigated concerns about equity by limiting the duration of the intervention and returning students to their original grade cohorts after reading sessions. However, the findings underscore the risks of implementing tracking programs without robust diagnostic tools and careful consideration of contextual factors. Misclassification and misalignment of instruction can exacerbate existing inequities and reduce the effectiveness of educational interventions.
+
+\clearpage
+\singlespacing
+\bibliography{bib}
+\doublespacing
+
+\section*{Tables and Figures}
+
+\begin{center}
+\input{Replication_Liberia/baseline_balance}
+\label{blb}
+\end{center}
+
+\begin{center}
+\input{Replication_Liberia/attrition}
+\label{attr}
+\end{center}
+
+
+\begin{table}[H]
+	\input{Liberia2024/test_score_effects_lib24}
+\end{table}
+
+\begin{table}[H]
+\input{Liberia2024/effect_leveled_index_lib}
+\end{table}
+
+
+\begin{table}[H]
+\input{Liberia2024/dispersion_effects_lib}
+\end{table}
+
+\begin{table}[H]
+	\input{Liberia2024/distance_median_lib}
+\end{table}
+
+\begin{figure}[ht!]
+        \centering
+       \caption{Distribution of Baseline Test Scores}\label{bldist}     
+        \includegraphics[width = 5in]{Liberia2024/bxplt_lib.pdf}
+\end{figure}
+
+\begin{figure}[ht!]
+        \centering
+       \caption{Endline achievement by predicted ability deciles (Grades 3-4)}        
+        \includegraphics[width = 5in]{Liberia2024/q_34_lib.pdf}
+\end{figure}
+
+\begin{figure}[ht!]
+        \centering
+       \caption{Endline achievement by predicted ability deciles (Grades 1-2)}        
+        \includegraphics[width = 5in]{Liberia2024/q_12_lib.pdf}
+\end{figure}
+
+\begin{figure}[ht!]
+        \centering
+       \caption{Distribution of predicted ability (Grades 3-4)}        
+        \includegraphics[width = 5in]{Liberia2024/ability_dist34_lib.pdf}
+\end{figure}
+
+\begin{figure}[ht!]
+        \centering
+       \caption{Distribution of predicted ability (Grades 1-2)}        
+        \includegraphics[width = 5in]{Liberia2024/ability_dist12_lib.pdf}
+\end{figure}
+
+\begin{figure}[ht!]
+        \centering
+       \caption{Predicted ability (Empirical Bayes) vs. test scores}\label{figeb}      
+        \includegraphics[width = 5in]{Liberia2024/corr_bl_eb.pdf}
+\end{figure}
+
+
+
+\end{document}

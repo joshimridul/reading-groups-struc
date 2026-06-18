@@ -1,0 +1,12 @@
+Archived on 2026-06-06 from stata_output after superseded entrypoints were
+moved out of the Overleaf project root:
+
+- ke_balance.tex
+- lib_balance.tex
+
+Reason:
+
+These retained candidate balance tables were referenced only by main3.tex.
+After main3.tex was archived as a superseded root entrypoint, the tables were no
+longer referenced by any remaining root-level TeX entrypoint. They are preserved
+here reversibly rather than deleted.

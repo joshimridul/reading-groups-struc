@@ -11,7 +11,7 @@ if [[ ! -x "$STATA" ]]; then
   exit 1
 fi
 
-echo "== reading-groups-struc replication audit draft =="
+echo "== AbilityGrouping replication audit draft =="
 echo "Repo root: $ROOT"
 echo
 echo "This runner is intentionally conservative."

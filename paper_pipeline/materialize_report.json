@@ -1,9 +1,9 @@
 {
-  "timestamp_utc": "2026-06-18T05:28:02.648750+00:00",
-  "manuscript": "/Users/mriduljoshi/Github/reading-groups-struc/main_3country_new.structural_edit.tex",
+  "timestamp_utc": "2026-06-08T04:03:49.530215+00:00",
+  "manuscript": "/Users/mriduljoshi/Github/reading-groups-struc/main_3country_new.tex",
   "check_only": false,
   "keep_stale": false,
-  "artifact_count": 90,
+  "artifact_count": 85,
   "missing_source_count": 0,
   "missing_sources": [],
   "stale_file_count": 0,
@@ -77,7 +77,7 @@
       "repo_target": "structural_output/tab_struct_tau_sensitivity.tex",
       "generator": "3_Python/structural_blockwise_redesign.py",
       "status": "materialized",
-      "sha256": "8290906ef993ecc3835381e131b1c6f79c552981568550c8d6738840201e4568",
+      "sha256": "bbc3853a49289a4ac7262df9a221286dc5797f801821ec2bca0fd443238353fb",
       "note": "Structural LaTeX table"
     },
     {
@@ -87,7 +87,7 @@
       "repo_target": "structural_output/tab_structural_params.tex",
       "generator": "3_Python/structural_blockwise_redesign.py",
       "status": "materialized",
-      "sha256": "15b8d1849721b59e493f9f517e004cfeb0eba45aca858d7851ec763f9f5b8061",
+      "sha256": "8f5f401f885ba2bce821f9792e5e80c6fcd8d7edd6d0ba2a9e5bb9ade3d675f7",
       "note": "Structural LaTeX table"
     },
     {
@@ -97,7 +97,7 @@
       "repo_target": "structural_output/tab_moment_fit.tex",
       "generator": "3_Python/structural_blockwise_redesign.py",
       "status": "materialized",
-      "sha256": "1000d59ccee8f5ee29bf4326d5bd7c5fa0b25d84bb0cc295dae0c3f2c1d2992e",
+      "sha256": "772686d7a679fdafe7c1bf8d9885fb50d63ac0dd7697887dfa68818a6d94e85d",
       "note": "Structural LaTeX table"
     },
     {
@@ -107,7 +107,7 @@
       "repo_target": "structural_output/tab_struct_validation_checks.tex",
       "generator": "3_Python/structural_blockwise_redesign.py",
       "status": "materialized",
-      "sha256": "3ce5d30ed467b87287c1e0a4737392810baa551dce315241b031532ba833d63d",
+      "sha256": "b3fe72848698ebdce996410355dfe40f900580e9ccb61f5ef3c6d8518c3c9c92",
       "note": "Structural LaTeX table"
     },
     {
@@ -117,7 +117,7 @@
       "repo_target": "structural_output/tab_counterfactuals.tex",
       "generator": "3_Python/structural_blockwise_redesign.py",
       "status": "materialized",
-      "sha256": "c610496b1ed4ae87cc5e6c154d11ee1282ce044a6ff53ddc2b43ebfcc1ee9c9e",
+      "sha256": "27ca78ee9ed9fc27cfb0bce016c93b4f61d643bfddeb10069f2d05c50d6fc3ce",
       "note": "Structural LaTeX table"
     },
     {
@@ -127,7 +127,7 @@
       "repo_target": "structural_output/tab_struct_component_decomp.tex",
       "generator": "3_Python/structural_blockwise_redesign.py",
       "status": "materialized",
-      "sha256": "0ddfac61f47babbaf5852a9ecd6d62414df564450229967e71d2f6d12dc99c2f",
+      "sha256": "376c2f432d1aaf59de2123fc129dbad6d7d44ba65da55431a1ca066735bbbc2f",
       "note": "Structural LaTeX table"
     },
     {
@@ -137,7 +137,7 @@
       "repo_target": "structural_output/tab_struct_complementarity.tex",
       "generator": "3_Python/structural_blockwise_redesign.py",
       "status": "materialized",
-      "sha256": "867936424c3af4945c38850cb233053311b6ce0cb82a6685ca9752289741d34d",
+      "sha256": "dd4fb85e204404c8f8a6f45bc030faaaf0443f65fc5e12badaf46de6e076785e",
       "note": "Structural LaTeX table"
     },
     {
@@ -147,7 +147,7 @@
       "repo_target": "structural_output/tab_struct_signal_delivery_margins.tex",
       "generator": "3_Python/structural_blockwise_redesign.py",
       "status": "materialized",
-      "sha256": "a3bf9dd8927774e0332e31be13c575455941da86a4596630cfad574e564d73a2",
+      "sha256": "9719401e812f680e2081871846aa31dcc39c6bdc390918df950ff8fb226d20be",
       "note": "Structural LaTeX table"
     },
     {
@@ -157,7 +157,7 @@
       "repo_target": "structural_output/tab_struct_delivery_thresholds.tex",
       "generator": "3_Python/structural_blockwise_redesign.py",
       "status": "materialized",
-      "sha256": "72246954eb530c11e09754f2c8e3d24d0a11d1a94e5e59943c9083fdc2e499e6",
+      "sha256": "3e37f937f1100cb503f27563fcf5130ad586d861d43390a6190ed468542b1575",
       "note": "Structural LaTeX table"
     },
     {
@@ -167,7 +167,7 @@
       "repo_target": "structural_output/tab_struct_regularization_sensitivity.tex",
       "generator": "3_Python/structural_blockwise_redesign.py",
       "status": "materialized",
-      "sha256": "98d44fca6ab25e4f52e729f0344098b4c2aa4ed59c1569d54c1c80db784a6344",
+      "sha256": "d590821fb8d389d573e3537005d963eabbb564ade0854d7e28ced92c8ff256d2",
       "note": "Structural LaTeX table"
     },
     {
@@ -177,17 +177,7 @@
       "repo_target": "structural_output/tab_struct_assignment_value_sensitivity.tex",
       "generator": "3_Python/structural_blockwise_redesign.py",
       "status": "materialized",
-      "sha256": "da2b18792246ec9d552ca4f3150591739a01cb83d4bcf26bfdc59c924f961f00",
-      "note": "Structural LaTeX table"
-    },
-    {
-      "kind": "table",
-      "manuscript_path": "structural_output/tab_struct_nigeria_endpoint_sensitivity.tex",
-      "source_path": "3_Python/output/structural_smm/latex/tab_struct_nigeria_endpoint_sensitivity.tex",
-      "repo_target": "structural_output/tab_struct_nigeria_endpoint_sensitivity.tex",
-      "generator": "3_Python/structural_blockwise_redesign.py",
-      "status": "materialized",
-      "sha256": "1eb74f22e507b25272dfaeeea28a439d9650150b9303a06111003c0e67dba72a",
+      "sha256": "50ce66de9a191095e2fbc649fa1a7d3e41c9120bf4d8d4643f8c5a08eeaff9cc",
       "note": "Structural LaTeX table"
     },
     {
@@ -197,7 +187,7 @@
       "repo_target": "stata_output/tab_pooled_itt.tex",
       "generator": "4_Stata2 pipeline; see paper_pipeline/README.md",
       "status": "materialized",
-      "sha256": "8018eb815429bbca3a05ee9d0b4cc72151fb71d83223829694e1b00ea9571a5b",
+      "sha256": "54d0dab31d0bb5cf61751c82c8a53554bfabef9ddf28ac910b988ab715a080c8",
       "note": "Stata manuscript table"
     },
     {
@@ -217,7 +207,7 @@
       "repo_target": "stata_output/tab_pooled_upper_lower.tex",
       "generator": "4_Stata2 pipeline; see paper_pipeline/README.md",
       "status": "materialized",
-      "sha256": "3f74226518a9827213a39d2d2b678f09670d6eafffc4a36fc64f8d5647438c2b",
+      "sha256": "51eaede88b0fd837ac710c469b1373f62b185cd045657a9bd378699bcbcc2ebe",
       "note": "Stata manuscript table"
     },
     {
@@ -237,7 +227,7 @@
       "repo_target": "stata_output/tab_pooled_dispersion.tex",
       "generator": "4_Stata2 pipeline; see paper_pipeline/README.md",
       "status": "materialized",
-      "sha256": "71d3b46e6f346bc1503c28852abd52a9baa88af4974f0952a3dd1bc4251b58b1",
+      "sha256": "da3d7af791e8de7ae2b52b8407082552c8e667b644a4067d567d32a6cefcb64e",
       "note": "Stata manuscript table"
     },
     {
@@ -247,7 +237,7 @@
       "repo_target": "stata_output/tab_assignment_payoff_kenya.tex",
       "generator": "4_Stata2 pipeline; see paper_pipeline/README.md",
       "status": "materialized",
-      "sha256": "a2b7d1ec7f4134dfb6ad4715750252e5e8d1a6cb84d2af34de7c880edb55b333",
+      "sha256": "a7f09f9aa594e5ec79cd4302726d82fb102107e605550d67e28da00684d22c11",
       "note": "Stata manuscript table"
     },
     {
@@ -287,7 +277,7 @@
       "repo_target": "stata_output/tab_balance_1do.tex",
       "generator": "4_Stata2 pipeline; see paper_pipeline/README.md",
       "status": "materialized",
-      "sha256": "1fde9d0ec4179b5f11df838060944fa8ab4ed66ad7b4c179deb1dae2d3ae3517",
+      "sha256": "93cd5109efb566c2e162dfe73e12b5add9e8f300ccac95009f525ab211924084",
       "note": "Stata manuscript table"
     },
     {
@@ -297,7 +287,7 @@
       "repo_target": "stata_output/tab_ng_balance.tex",
       "generator": "4_Stata2 pipeline; see paper_pipeline/README.md",
       "status": "materialized",
-      "sha256": "33fa8882801f32dd929d256921efc927e84e90338a7daf9667dbaf9faeca7e24",
+      "sha256": "443579ce3dbf205d77d4e226e86374966aba463e3b4a21d77d4954d5b0b88475",
       "note": "Stata manuscript table"
     },
     {
@@ -307,7 +297,7 @@
       "repo_target": "stata_output/tab_attrition_1do.tex",
       "generator": "4_Stata2 pipeline; see paper_pipeline/README.md",
       "status": "materialized",
-      "sha256": "68050c8d1e74615160b44875371b615f33dfc03b2ba3bdc925c40493c381dff6",
+      "sha256": "afa161f8a64ce8106d136df8d5382203ddec0e8dd4dad30bdf37c89950d7af3f",
       "note": "Stata manuscript table"
     },
     {
@@ -317,7 +307,7 @@
       "repo_target": "stata_output/tab_ng_attrition.tex",
       "generator": "4_Stata2 pipeline; see paper_pipeline/README.md",
       "status": "materialized",
-      "sha256": "ae6cea5f1b1b73aea71f675d4ecdb0e791b94b591c6d3d10eff8246fba657258",
+      "sha256": "d140b3778f3272985febec410d34faf7f94f7e5a450cda6eaa7887ebf5f9ba60",
       "note": "Stata manuscript table"
     },
     {
@@ -357,7 +347,7 @@
       "repo_target": "stata_output/tab_ng_t2_ete.tex",
       "generator": "4_Stata2 pipeline; see paper_pipeline/README.md",
       "status": "materialized",
-      "sha256": "accd99a5457c4db222352fb4056831b3e83c7b5b91b27c05a80799a98638df74",
+      "sha256": "6c502f2ddd5c0c5444c0929269ee2f7b987a0739736b092f96b21d7b11e8f7c2",
       "note": "Stata manuscript table"
     },
     {
@@ -367,7 +357,7 @@
       "repo_target": "stata_output/tab_ng_t3_ete.tex",
       "generator": "4_Stata2 pipeline; see paper_pipeline/README.md",
       "status": "materialized",
-      "sha256": "81864716ac1e4501ec43205cb95b007b02b3faf233865e6d1694e85993bd6a52",
+      "sha256": "88d7765d862e57edcd441f1ed817e12a772946672a844667f3f6402482d85062",
       "note": "Stata manuscript table"
     },
     {
@@ -377,7 +367,7 @@
       "repo_target": "stata_output/tab_ng_over_terms.tex",
       "generator": "4_Stata2 pipeline; see paper_pipeline/README.md",
       "status": "materialized",
-      "sha256": "672b35d69d2e626c00d1c5a1d31f2d8c6ba9270a1b423678f7274174d3d7eebf",
+      "sha256": "a19111badfdf4a0fcbc71d96697d0cca8b05651b3ed38c0deb336fd0bd8f8a3e",
       "note": "Stata manuscript table"
     },
     {
@@ -387,7 +377,7 @@
       "repo_target": "stata_output/tab_ng_over_terms_interact.tex",
       "generator": "4_Stata2 pipeline; see paper_pipeline/README.md",
       "status": "materialized",
-      "sha256": "81e57e4ab990eec92d9cd46468586d989d343e713e41625b7644e4ab08f54521",
+      "sha256": "78ed85a7f224cadbd60e970f9f9a0deabdc6e82cd3354e6c6cf6a865070e39fe",
       "note": "Stata manuscript table"
     },
     {
@@ -502,16 +492,6 @@
     },
     {
       "kind": "table",
-      "manuscript_path": "stata_output/tab_assignment_payoff_kenya_power.tex",
-      "source_path": "4_Stata2/output/tab_assignment_payoff_kenya_power.tex",
-      "repo_target": "stata_output/tab_assignment_payoff_kenya_power.tex",
-      "generator": "4_Stata2 pipeline; see paper_pipeline/README.md",
-      "status": "materialized",
-      "sha256": "6f6f76a6fc88c6d8f8af8edc5ecc2a3d306c363b14a63ef6e407957b2c1fa487",
-      "note": "Stata manuscript table"
-    },
-    {
-      "kind": "table",
       "manuscript_path": "stata_output/tab_lesson_completion.tex",
       "source_path": "4_Stata2/output/tab_lesson_completion.tex",
       "repo_target": "stata_output/tab_lesson_completion.tex",
@@ -537,7 +517,7 @@
       "repo_target": "stata_output/tab_ng_peer_effects.tex",
       "generator": "4_Stata2 pipeline; see paper_pipeline/README.md",
       "status": "materialized",
-      "sha256": "917dae2295c0fe09a98edfb270a1049f36712658a7ee734a5f5317b7fe84f29b",
+      "sha256": "666b907faa41ef1eab2564d961786dad68e0d1309f719e241fa65f422b129799",
       "note": "Stata manuscript table"
     },
     {
@@ -547,7 +527,7 @@
       "repo_target": "stata_output/tab_pooled_peer_effects.tex",
       "generator": "4_Stata2 pipeline; see paper_pipeline/README.md",
       "status": "materialized",
-      "sha256": "068a62ed7fcf49f4ec0d8de2c03668554f93fa4ace17b6ff3209f65766037376",
+      "sha256": "2c792a47f922a657ec7840c6ebf23c35d7cbccd5cbb7e637d1b967240163c78a",
       "note": "Stata manuscript table"
     },
     {
@@ -567,7 +547,7 @@
       "repo_target": "stata_output/tab_suffstat_kenya.tex",
       "generator": "4_Stata2 pipeline; see paper_pipeline/README.md",
       "status": "materialized",
-      "sha256": "c96f65601910941dd477eb5a2289def819b87f1e4d03da07228525846e838b20",
+      "sha256": "cb88f456b43b78a25cfdf1db76b3c5334ae1a2acf9062dbb90798b276d853281",
       "note": "Stata manuscript table"
     },
     {
@@ -577,7 +557,7 @@
       "repo_target": "stata_output/tab_suffstat_liberia.tex",
       "generator": "4_Stata2 pipeline; see paper_pipeline/README.md",
       "status": "materialized",
-      "sha256": "07e54b36ca6492c62f0ad156019907c128438e627be573f29d919aba99998df2",
+      "sha256": "3bd0c2396eb55c2175d6b2663373362bde179eb10c46fd79eaaccf890e84a857",
       "note": "Stata manuscript table"
     },
     {
@@ -587,7 +567,7 @@
       "repo_target": "stata_output/tab_ng_suffstat.tex",
       "generator": "4_Stata2 pipeline; see paper_pipeline/README.md",
       "status": "materialized",
-      "sha256": "5fba021c5baee3802a1bcf4fee564a4902e787e37588f005b0ec3a2048957e5e",
+      "sha256": "12aadde6dc8430a16a10fa673e4ad4de4f9f01fdc51e051e3beb4984fabfdc9c",
       "note": "Stata manuscript table"
     },
     {
@@ -607,7 +587,7 @@
       "repo_target": "stata_output/tab_ng_density_decomp.tex",
       "generator": "4_Stata2 pipeline; see paper_pipeline/README.md",
       "status": "materialized",
-      "sha256": "353c39b90feaf6c6139962963db658b126e09779f3dbaf4ed09155bf5097db27",
+      "sha256": "d236968010eedba29d1e3c61e9d2394ae8bfc98c9566edc13d6a1582176760e8",
       "note": "Stata manuscript table"
     },
     {
@@ -617,37 +597,7 @@
       "repo_target": "stata_output/tab_spec_robust.tex",
       "generator": "4_Stata2 pipeline; see paper_pipeline/README.md",
       "status": "materialized",
-      "sha256": "301661624437710677682c39a8711cee328268c9c8648905654245474a07f5c7",
-      "note": "Stata manuscript table"
-    },
-    {
-      "kind": "table",
-      "manuscript_path": "stata_output/tab_rnr_inference_checks.tex",
-      "source_path": "4_Stata2/output/tab_rnr_inference_checks.tex",
-      "repo_target": "stata_output/tab_rnr_inference_checks.tex",
-      "generator": "4_Stata2 pipeline; see paper_pipeline/README.md",
-      "status": "materialized",
-      "sha256": "08b34945fd7745b280aa602a7a689179c7219e3f3093d238b243022e751efe38",
-      "note": "Stata manuscript table"
-    },
-    {
-      "kind": "table",
-      "manuscript_path": "stata_output/tab_rnr_attrition_bounds.tex",
-      "source_path": "4_Stata2/output/tab_rnr_attrition_bounds.tex",
-      "repo_target": "stata_output/tab_rnr_attrition_bounds.tex",
-      "generator": "4_Stata2 pipeline; see paper_pipeline/README.md",
-      "status": "materialized",
-      "sha256": "80c5e16cc1c006d0a0a4647c82e31f0ae39b5bb70ad872a7483a0039da4a2fe7",
-      "note": "Stata manuscript table"
-    },
-    {
-      "kind": "table",
-      "manuscript_path": "stata_output/tab_multiplicity_disclosure.tex",
-      "source_path": "4_Stata2/output/tab_multiplicity_disclosure.tex",
-      "repo_target": "stata_output/tab_multiplicity_disclosure.tex",
-      "generator": "4_Stata2 pipeline; see paper_pipeline/README.md",
-      "status": "materialized",
-      "sha256": "6138f4ab4e0f5321c1f199606a1947a7e78dece8edd34f922aa80dc00e9f6f0f",
+      "sha256": "dd4bfa0488085fe59fad910ab646107b3dab4b4333fede7dacb6e71b1954456a",
       "note": "Stata manuscript table"
     },
     {
@@ -737,7 +687,7 @@
       "repo_target": "structural_output/tab_struct_local_identification.tex",
       "generator": "3_Python/structural_blockwise_redesign.py",
       "status": "materialized",
-      "sha256": "b3a3ff83648e30bd3d929809e1a2a0a98035e637d096e332a22be0e8fe83958c",
+      "sha256": "5c183cd62133f7998094d83ad2c4ed3bc7e2610ebe0bb6506125d00fef2c43f9",
       "note": "Structural LaTeX table"
     },
     {
@@ -747,7 +697,7 @@
       "repo_target": "structural_output/tab_struct_stage4_param_uncertainty.tex",
       "generator": "3_Python/structural_blockwise_redesign.py",
       "status": "materialized",
-      "sha256": "5f5089bf93f30a9f722b8ccd996cd0d6f534ad8e7ef498a53e63cca8bf4a4151",
+      "sha256": "81e0158410e11ad82e1d8ae352640dfed41ec61fd51028409b8a52d48ed6fc02",
       "note": "Structural LaTeX table"
     },
     {
@@ -757,7 +707,7 @@
       "repo_target": "structural_output/tab_struct_social_channel_sensitivity.tex",
       "generator": "3_Python/structural_blockwise_redesign.py",
       "status": "materialized",
-      "sha256": "579dcdb0ee990735df8ab95114813d624899c2f0df98e5a7e439d4d69bcf94a3",
+      "sha256": "619fa10b2f1f11c1f881c18139b86c1951ff4a737adc080dff71d020cd233693",
       "note": "Structural LaTeX table"
     },
     {
@@ -767,7 +717,7 @@
       "repo_target": "structural_output/tab_struct_stage4_discipline.tex",
       "generator": "3_Python/structural_blockwise_redesign.py",
       "status": "materialized",
-      "sha256": "5f9b960e6ac7e391a27e37378299ec6baa235bd598c39b194b1be7e4c0eb416a",
+      "sha256": "648e538845ca80bc3bba5c99eda50254100a415de2787df9237d575e12a32621",
       "note": "Structural LaTeX table"
     },
     {
@@ -777,7 +727,7 @@
       "repo_target": "structural_output/tab_struct_stage4_normalizations.tex",
       "generator": "3_Python/structural_blockwise_redesign.py",
       "status": "materialized",
-      "sha256": "748477539c00db495936554188b1c3191b624226c6e65e64a2817bb11e168135",
+      "sha256": "407e5c235ab1f21f9f96b98574fa8d420cad4cd4ae8d8a86681ad7544eb719a7",
       "note": "Structural LaTeX table"
     },
     {
@@ -787,7 +737,7 @@
       "repo_target": "structural_output/tab_struct_resid_sensitivity.tex",
       "generator": "3_Python/structural_blockwise_redesign.py",
       "status": "materialized",
-      "sha256": "540980203d08205555c6b031c996f24007835b70d6ffb2ec01954f73c5bfe26e",
+      "sha256": "9609179163a83b3d2f9b39e0ca29e7654d75930d7eada0469224c3dc7c04075b",
       "note": "Structural LaTeX table"
     },
     {
@@ -797,7 +747,7 @@
       "repo_target": "structural_output/tab_struct_influence.tex",
       "generator": "3_Python/structural_blockwise_redesign.py",
       "status": "materialized",
-      "sha256": "7dfc071365b81a731570e39b597420293aaf2e9b37fda0039435c1bd60972287",
+      "sha256": "340f76135b58a6aa8ecdbf09d11ce8b32c72bb05eabfe82625c8f6452cd97147",
       "note": "Structural LaTeX table"
     },
     {
@@ -807,7 +757,7 @@
       "repo_target": "structural_output/tab_struct_market_influence.tex",
       "generator": "3_Python/structural_blockwise_redesign.py",
       "status": "materialized",
-      "sha256": "313982b76a62d1f43b95ed4f661a5c34a980fc5c123f5d8aa32be2aa6f7beaa2",
+      "sha256": "b87ea8d4fcd6a0d7ebf26eae2ed53725e9cbe97d23593ae525b036c5fa218df9",
       "note": "Structural LaTeX table"
     },
     {
@@ -817,7 +767,7 @@
       "repo_target": "structural_output/tab_struct_primitive_sensitivity.tex",
       "generator": "3_Python/structural_blockwise_redesign.py",
       "status": "materialized",
-      "sha256": "c1f1db4b41fd2f1538dea5a63249f1d159439e3ec8dd25c9722debdbee78d129",
+      "sha256": "96bdde287f6b9984b650e209b2b25014b189a020b9380523d784ea3c0a11359c",
       "note": "Structural LaTeX table"
     },
     {
@@ -827,7 +777,7 @@
       "repo_target": "structural_output/tab_struct_primitive_uncertainty.tex",
       "generator": "3_Python/structural_blockwise_redesign.py",
       "status": "materialized",
-      "sha256": "1a0c5960c92cc56c3d304ac8abcf15d39c1bcae27ab17e03215e68dd585d9104",
+      "sha256": "a0b8f55a3b47c2d16341a907188e72b7aaba9383d3dbba7dcfa1e24640507af1",
       "note": "Structural LaTeX table"
     },
     {
@@ -837,7 +787,7 @@
       "repo_target": "structural_output/tab_struct_combined_uncertainty.tex",
       "generator": "3_Python/structural_blockwise_redesign.py",
       "status": "materialized",
-      "sha256": "914a36a941cce33e3252f0269ac33413159e52303e76ce3bddb963072581fbdd",
+      "sha256": "ca05298f48e6648ccea8c05d4c3b77c8529f560d15e7959f6b3a7b119c0dd619",
       "note": "Structural LaTeX table"
     },
     {
@@ -847,7 +797,7 @@
       "repo_target": "structural_output/tab_struct_delivery_activation.tex",
       "generator": "3_Python/structural_blockwise_redesign.py",
       "status": "materialized",
-      "sha256": "e3f719825084b0ec7093d8cbd612b6376ccb04b0ffdc4068873abefd183b9599",
+      "sha256": "274a3541822310708ba9dc3b5e4dea2bba13bc3dbf5c182fa3ac5aeecd154b2e",
       "note": "Structural LaTeX table"
     },
     {
@@ -857,7 +807,7 @@
       "repo_target": "structural_output/fig_experiment_map.pdf",
       "generator": "3_Python/make_paper_summary_figures.py",
       "status": "materialized",
-      "sha256": "15889118241cf1f0ef284adc326ba1a792bc9ccffb852f5337bc53432d437019",
+      "sha256": "4a32da12e5d3f787032cc84252a96ba6207562cbbe7389327f100a931ed5b914",
       "note": "Structural or paper-summary figure"
     },
     {
@@ -867,7 +817,7 @@
       "repo_target": "structural_output/fig_firststage_payoff.pdf",
       "generator": "3_Python/make_paper_summary_figures.py",
       "status": "materialized",
-      "sha256": "969792fba4155d9bdb214fc90e077789e49f90a04cdf5bc69279be0561b63686",
+      "sha256": "3228cb144cbf6f895907142cf3be3682d828529123253679c24e7213a0040af1",
       "note": "Structural or paper-summary figure"
     },
     {
@@ -877,7 +827,7 @@
       "repo_target": "structural_output/fig_struct_complementarity_surface.pdf",
       "generator": "3_Python/structural_blockwise_redesign.py",
       "status": "materialized",
-      "sha256": "2b3fdb213be5a56973d8143bd490611cbadb320516e170b866291a478f267bcd",
+      "sha256": "e9b680f96f74368457db415545b4f4d4f1ca44b8b93871485aec3834451a325e",
       "note": "Structural or paper-summary figure"
     },
     {
@@ -887,7 +837,7 @@
       "repo_target": "structural_output/fig_counterfactual_ladder.pdf",
       "generator": "3_Python/make_paper_summary_figures.py",
       "status": "materialized",
-      "sha256": "ccf0b30f4e5138ac46e8960971c253ca8054ba37f05a55fb059a14c117b3be0d",
+      "sha256": "7c2cf4dbc98f06eef5f06b02c4f0523e52f64d7fc0428b4ccb2ea358bebbee59",
       "note": "Structural or paper-summary figure"
     },
     {
@@ -907,7 +857,7 @@
       "repo_target": "structural_output/fig_track_position_allcountries.pdf",
       "generator": "3_Python/make_paper_summary_figures.py",
       "status": "materialized",
-      "sha256": "87b22336c87305fe345a9598ff634620b8046a6fe6de74aa3221aca3b72d9df8",
+      "sha256": "5d1f4d368b2dc5211fa8a039290291e9470a6ce31d9f2b3b8e0f5d4e4bc87867",
       "note": "Structural or paper-summary figure"
     }
   ]

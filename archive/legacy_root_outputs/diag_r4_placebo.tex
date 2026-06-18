@@ -1,0 +1,23 @@
+\begin{table}[htbp]
+\centering\small
+\caption{Placebo Checks: Treatment on Pre-Treatment Variables}
+\label{tab:placebo}
+\begin{tabular}{llccr}
+\toprule
+Study & Outcome & Coefficient & SE & $N$ \\
+\midrule
+Liberia & Std. baseline score & -0.172 & (0.126) & 4,783 \\
+ & Has baseline (indicator) & -0.043 & (0.036) & 7,584 \\
+ & Upper group (placebo) & -0.050 & (0.039) & 7,584 \\
+\addlinespace
+Kenya Y1 & Std. baseline score & 0.093 & (0.075) & 7,102 \\
+ & Has baseline (indicator) & -0.052 & (0.049) & 9,718 \\
+ & Upper group (placebo) & -0.005 & (0.040) & 9,718 \\
+\addlinespace
+Kenya Y2 & Std. baseline score & 0.057 & (0.063) & 11,788 \\
+ & Has baseline (indicator) & 0.032 & (0.024) & 13,791 \\
+ & Upper group (placebo) & -0.019 & (0.029) & 13,791 \\
+\bottomrule
+\end{tabular}
+\par\smallskip\noindent{\small OLS with strata FE and cluster-robust SEs. All outcomes are pre-treatment; significant coefficients would indicate balance failures.}
+\end{table}

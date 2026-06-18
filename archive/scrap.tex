@@ -1,0 +1,28 @@
+In school $s$, potential class size varies depending on whether the school is assigned to the tracking condition or not. In a school $s$, let $N_{zsc}$ represent the class size in school $s$ and class $c$ under tracking condition $z$.  
+\[N_{1sc} = \sum_{i \in \mathcal{I}_s} \mathbbm{1}\{ r_i \in \bar{r}_c \} \]
+\[N_{0sc} = \sum_{i \in \mathcal{I}_s} \mathbbm{1}\{ a_i=c \} \]
+\[N_{1sci} = \sum_{c \in \{0,1\}} N_{1sc} \mathbbm{1}\{r_i \in \bar{r}_c\} \]
+\[N_{0sci} = \sum_{c \in \{0,1\}} N_{0sc} \mathbbm{1}\{a_i = c\} \]
+where $r_i$ is the assignment score, and $a_i$ is the baseline grade of student $i$. Given a probability $p_{sci} = E[Z_{sci}|s]$, the expected classize for individual $i$ is therefore
+\[ \mu_{Ni} = p_{sci} N_{0sci} + (1-p_{sci}) N_{1sci} \]
+and the actual class size for student $i$ reflects the realized tracking status
+\[ N_{sci} = N_{0sci} + Z_i ( N_{1sci} - N_{0sci} )\]
+
+We want to estimate the following linear structural equation for test scores as a function of class size
+\[ Y_{sci} = \beta N_{sci} + X_{sci}' \Gamma + \varepsilon_i \]
+We are able to estimate 
+\[ Y_{sci} = \beta N_{sci} + \lambda \mu_{Ni} + \eta_i \]
+Identification is a consequence of the following conditional independence property:
+\[E[Y_{0i}|\mu_{Ni},N_{sci}] = E\left[Y_{0i} | Z_i\right] \]
+\[ W_{sci} = N_{0sc} + Z_i ( )\]
+
+To measure the overall impact of the intervention on test scores, we will run regressions of the form
+\[ y_{ij} = \alpha T_j + X_{ij} \beta + \epsilon_{ij} \]
+Where $y_{ij}$ is a test score outcome $T_j \in \{0,1\}$ indicates  treatment assignment of school $j$, and $X_{ij}$ is a vector of individual and school level characteristics, as well as a constant. $X_{ij}$ may include baseline test score controls.
+
+Because the intervention was conducted for both Standards 1 and 2, we will also explore whether the intervention's impact was different in each grade.
+
+To identify the potential differential effects for children assigned to the lower (blue) and upper (purple) group, we also will run specifications of the form
+
+\[ y_{ij} = \alpha T_j + \gamma T_j \times P_{i} + X_{ij} \beta + \epsilon_{ij} \]
+Where $P_i$ indicates that a student passed the grade specific threshold for entry into the upper (purple) group. 

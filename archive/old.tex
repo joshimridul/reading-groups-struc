@@ -1,0 +1,256 @@
+\documentclass[10pt]{article}
+\title{The Promise and Peril of Cross Grade Ability Grouping \\ Evidence from Kenya and Liberia}
+\author{Guthrie Gray-Lobe}
+\date{}
+%\usepackage[utf8]{inputenc}
+%\usepackage[margin=1 in]{geometry}
+\usepackage[letterpaper,top=1in,right=1in,left=1in,bottom=1in]{geometry}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{graphics}
+\usepackage{graphicx}
+\usepackage{placeins}
+\usepackage{float}
+\usepackage{subfigure}
+\usepackage{lscape}
+\usepackage{pdflscape}
+\usepackage{setspace}
+\usepackage{standalone}
+\usepackage{fancyhdr}
+\usepackage{framed}
+%\pagestyle{fancy}
+\usepackage{color}
+\usepackage{tikz}
+\usepackage{pgfplots}
+\usepackage{longtable}
+\usepackage{booktabs,caption}
+\usepackage[draft]{todonotes}
+\usepackage{booktabs,caption}
+\usepackage[flushleft]{threeparttable}
+\usepackage{bbm}
+\usepackage{multirow}
+\usepackage{lineno}
+\usepackage{titlesec}
+\usepackage{hyperref}
+\usepackage{natbib}
+\bibliographystyle{unsrtnat}
+
+\setcounter{secnumdepth}{4}
+\titleformat{\paragraph}
+{\normalfont\normalsize\bfseries}{\theparagraph}{1em}{}
+\titlespacing*{\paragraph}
+{0pt}{3.25ex plus 1ex minus .2ex}{1.5ex plus .2ex}
+
+\pgfplotsset{compat=1.15}
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{assumption}{Assumption}[section]
+
+
+\linenumbers 
+
+\begin{document}
+
+
+\begin{titlepage}
+\author{Guthrie Gray-Lobe\footnote{University of Chicago, email: \protect\href{mailto:graylobe@uchicago.edu }{graylobe@uchicago.edu}} \and Mridul Joshi \and Michael Kremer\footnote{University of Chicago, email: \protect\href{mailto:kremer.m@gmail.com}{kremer.m@gmail.com}} \and Joost de Laat \footnote{Utrecht University, email: \protect\href{mailto: joostdelaat@gmail.com}{joostdelaat@gmail.com}}}
+
+\date{PLEASE DO NOT CIRCULATE \\ \today \\}
+\maketitle
+
+\begin{abstract}
+Cross grade ability grouping within schools may provide a way to more directly tailor instruction to a pupil's ability level. This study examines the impact of a cross-grade ability grouping intervention in schools operated by Bridge International Academies in Kenya. The program tracked students in Standards 1 and 2 into one of two English language reading groups based on performance on a baseline test. The unique setting allows for greater control over the instructional level than previous studies. This feature allows for direct evaluation of the effects of mismatched instructional level. Students in the treatment group perform better on later tests of language and literacy skills, but the effects are not statistically significant. Students in the middle of the distribution are harmed by grouping while students at the tails experience large positive effects. The program lifts test scores of students at the tails of the baseline distribution, but students in the middle of the test score distribution do not appear to benefit from the program, presumably because the status quo instructional level is more suited to their needs. In Standard 1, we find no effect of being assigned to the group with higher performing peers and in Standard 2 we find a large negative effect of being assigned to the group with higher peers, suggesting that the cut-off was misaligned for that group.
+\end{abstract}
+\setcounter{page}{0}
+\thispagestyle{empty}
+\end{titlepage}
+\doublespacing
+
+\section{Introduction}
+
+
+Cross-grade ability grouping. The observation that students may benefit more from instruction that is targeted at their baseline level has motivated tracking and reading group programs in schools, the teaching at the right level (TARL) approach pioneered by Pratham in India, and recent technological developments in adaptive learning. This study examines the impact of a reading group intervention in schools operated by Bridge International Academies in Kenya. The program tracks students in Standards 1 and 2 into one of two reading groups based on performance on literacy and English tests. The unique setting allows for greater control over the instructional level than previous studies. This feature allows for direct evaluation of the effects of mismatched instructional level. 
+
+Grouping children by level of achievement instead of age is an increasingly popular idea both rich and developing countries. Programs grouping children between Kindergarten and third grade are increasingly being experimented with in schools in the United States (\cite{edweek20191106})
+While tracking with targeted instruction does appear to lift test scores moderately, the results are mixed. The program lifts test scores of students at the tails of the baseline distribution, but students in the middle of the test score distribution do not appear to benefit from the program, presumably because the status quo instructional level is more suited to their needs. These results seem to strongly confirm standard models of the instructional level targeting in which there are match specific interactions between baseline student ability and classroom instructional level.\footnote{Such as Duflo, Dupas, and Kremer (2011).} As such, these results provide new evidence on the production of classroom effects.
+
+The results suggest that targeted instruction interventions have promise, but that such interventions may have important distributional consequences. Attention must be paid to identifying students in need of remedial education. Teaching at the right level (TARL) interventions may be effective overall, but some students may be hurt if they receive remedial sessions that they do not need, or advanced sessions that they are not prepared for.
+
+Using the discontinuity in the assignment rule, we find that students around the threshold seem to benefit equally from the blue and purple group. However, in STD 2, we find that the assignment to the purple group is very harmful for students around the cut-off. One likely explanation is that STD 2 students did not need to score very high to be assigned to the purple group.\footnote{However, the tests used for assignment in STD 1 and STD 2 are different, so it is not possible to say whether this rule resulted in lower ``ability'' students being assigned to the purple group in STD 2}
+
+
+Future work should also examine the problem of targeting this intervention using prediction algorithms.
+
+
+
+This study examines whether an education intervention that tracks students in early primary school generates learning gains. Because this experiment was administered in schools operated by Bridge International Academies, a system that provides control over instructional design, the intervention allows for greater control over instructional level than earlier evidence. Additionally, using data on lesson completion that is unique to the Bridge environment, this study is able to test whether the intervention led to an increase in lesson completion rates to better understand how tracking affected the classroom environment. 
+
+[Not sure if we'll go into this question:]
+Tracking interventions typically rely on student test scores to determine which ``reading group" students should be assigned to. While reading group interventions may be effective overall, there is a risk of misclassification, and in those cases, students may receive inappropriate instructional levels. This study will explore the risk of misclassification by identifying students for whom the score used for tracking my contain important measurement error. First, test scores of students who enter Bridge improve rapidly over the first year of their exposure to the new schools. While there are many potential explanations for this, what is important for the problem of misclassification is that, for students who have entered Bridge recently and are improving rapidly, the test score is less informative about what the student's ability likely is at endline. To explore whether this type of misclassification affects the intervention, I compare the performance of students who have entered recently to students who have been in Bridge for several years. These results indicate that the 
+
+\section{Experiment}
+
+In August 2018, Bridge selected 50 academies out of the 300 academies that it was operating in Kenya to receive the reading group intervention.  The 300 academies represented nearly all of the schools currently being operated in Kenya at that time. 
+
+In June 2018, prior to assignment, baseline literacy and English tests were administered in 292 schools, including all 50 schools in the treatment. In treated academies, students in Standards 1 and 2 were assigned to either a Blue or Purple reading group. In treated schools, Standard 1 students were assigned to the Purple group if they scored above 40 total points on a combined test of English and Literacy, whereas Standard 2 students were assigned to the Purple group if they scored above a 35. The test used for assignment was different in each grade and the tests administered at endline are different, so it is not possible to say whether this choice actually led to lower ``ability'' students being assigned to the purple group in STD 2.
+
+After assignment, students in treated schools then received 90 minutes of instruction with their color group each day for Term 3 (approximately 3 months) of 2018. In control schools, students received the status quo: 90 minutes of instruction according to grade.
+
+Treatment assignment was stratified at the province level. 
+
+\input{tables/groupassignment.tex}
+
+The intervention lasted from September until the end of the 2018 school year in December. 
+
+\section{Data}
+
+[An issue: According to the Bridge files that cannot be linked directly to these data, only 40 percent of students are in the Blue group, whereas according to the data using June 2018 test scores, 35 percent of students are in the blue group. ]
+
+Bridge has provided the data used for assignment, the term 2 mid-term literacy and English tests. Additionally, historical data are available for some students in other subjects including mathematics, language, and Kiswahili. 
+
+For all baseline tests, including the test scores used to assign students, students in standard 1 and 2 took different tests.\footnote{The tracking literacy test has ID 75010 for STD2 and 75002 for STD1.}
+
+In addition to test score, data, data is available on lesson completion rates, teacher attendance, and duration of operation of academies.
+
+Endline data consist of a Literacy and English test. It appears that STD 1 and STD 2 students also took different endline tests (78888 and 78896 for STD2 and STD1 respectively), but I may be mistaken.
+
+Table \ref{tab:attrition} presents evidence on differential attrition. Endline follow-up is low and there is evidence that treatment may have resulted in lower attrition, especially for the endline English test. 
+
+\input{tables/attrition.tex}
+
+Although rates of attrition are high and there is evidence that treatment may be correlated with attrition, this does not appear to have influenced balance on treatment assignment. Conditioning on having observed a student at endline, the p-value from a joint test F-test is $0.457$. These results suggest that differential attrition has not induced a selection effect because observable characteristics are still comparable even after conditioning on endline follow-up. However, it is still possible that there has been selection on unobservable characteristics. 
+
+
+Additionally, There is substantial imbalance on baseline language scores. Language scores were not included in the June tests. Language scores come from February and April 2018 test dates. 
+
+While there is substantial imbalance on language tests, the joint test still does not reject the null hypothesis. 
+
+\begin{landscape}
+\input{tables/balance.tex}
+\end{landscape}
+
+Because the point estimate on the balance test conditonal on follow-up is large in some cases (~0.1 SDs for some subject tests), we prefer estimates that control for these baseline characteristics. 
+
+\section{Empirical Strategy}
+
+To measure the overall impact of the intervention on test scores, we will run regressions of the form
+\[ y_{ij} = \alpha T_j + X_{ij} \beta + \epsilon_{ij} \]
+Where $y_{ij}$ is a test score outcome $T_j \in \{0,1\}$ indicates  treatment assignment of school $j$, and $X_{ij}$ is a vector of individual and school level characteristics, as well as a constant. $X_{ij}$ may include baseline test score controls.
+
+Because the intervention was conducted for both Standards 1 and 2, we will also explore whether the intervention's impact was different in each grade.
+
+To identify the potential differential effects for children assigned to the lower (blue) and upper (purple) group, we also will run specifications of the form
+
+\[ y_{ij} = \alpha T_j + \gamma T_j \times P_{i} + X_{ij} \beta + \epsilon_{ij} \]
+Where $P_i$ indicates that a student passed the grade specific threshold for entry into the upper (purple) group. 
+
+\textit{Measuring the Impact of Assignment to Lower and Upper Section}. - The discontinuity in assignment around the threshold for assignment to the upper (purple) group allows for a regression discontinuity design to evaluate the effect of assignment to the upper section for students with baseline academic performance in an area around the cut-off. 
+
+Because the tests and cut-offs used for assignment into the blue and purple groups were different for each grade, this analysis will be conducted separately by grade. Figure \ref{fig:bsbyt1} shows combined endline scores STD 1 students as function of the score used for assignment. Figure \ref{fig:bsbyt2} shows analogous results for STD 2. 
+
+We will start by testing for an effect of assignment into the upper (purple) group using the following form:
+
+\[ y_{i} = \delta P_i + \lambda r_i + \epsilon_{i} \]
+
+We will also report results using polynomial expansions, academy dummy controls. We will also report results where relationship between the assignment score $r_i$ and the endline score $y_i$ are allowed to vary between the lower and upper group.
+
+
+\section{Results}
+
+Table \ref{tab:overall} shows that the effects of treatment on the overall population are relatively small only marginally statistically significant, if at all. 
+
+
+\input{tables/effects.tex}
+
+Without any test controls, the effects of treatment are marginally statistically significant (column 2) in table \ref{tab:overall}. This effect appears to come primarily from an effect on Literacy outcomes. Once controls are added, the effect is still positive and the standard error of the estimate is reduced, but the estimated effect is smaller 0.074 SDs, below the minimum detectable effect of the experiment. 
+
+Given that the balance checks in table \ref{tab:balance} indicate that treated schools have higher test scores by about 0.1 SDs, we think it is important to include a test score control. For the specifications that follow, we will include the assignment score, interacted with the student's grade, as controls.
+
+\input{tables/effectsbygrade.tex}
+
+Table \ref{tab:effectsbygrade} compares effects across grades. There is some evidence that the program has a larger effect on STD 1 students; however, we cannot reject the null that the effects are all the same.
+
+\input{tables/effectsbygroup.tex}
+
+Panel A of Table \ref{tab:effectsbygroup} compare effects across reading groups. Table suggests that the intervention may be less effective for students in the purple reading group, although in no case can we reject the null hypothesis that the effects are equal. Effects on literacy for lower (blue) group students are large, but still insignificant. This might be taken as evidence that the intervention was an effective remedial program for low-performing students, but that it fais to serve advanced students.
+
+Because many below median students in STD 2 were assigned to the upper (purple) group, scoring above the assignment threshold in STD 2 may be a poor measure of baseline performance as it includes many lower performing students. For this reason, Panel B of Table \ref{tab:effectsbygroup} also includes results from a test of an interaction effect with a dummy indicating that a student was above median within their grade at baseline. This specification paints a slightly different picture. Above median students appear to benefit more than below median students on all outcomes. In the case of the combined outcome, it is possible to reject the null hypothesis of no effect for above median students at the 10 percent level.
+
+The effect on the overall population conceals heterogeneity in effects across students. Following Kremer et al., we hypothesize that in the absence of instruction targeted to the tails of the distribution, that the middle of the distribution may not experience large gains from tracking. 
+
+Testing this hypothesis we identify those students who are in the middle of the test score distribution. We identify the half of students in the middle of the distribution of test scores. Let $M_i$ indicate that a student is in the middle of the distribution. We then estimate
+
+\[ y_{ij} = \alpha T_i + \gamma_2 T_i \times M_i + X_{ij} \beta + \epsilon_{ij} \]
+Where $X_{ij}$ is a vector baseline covariates, including $M_i$, and, potentially, baseline test scores.
+
+The results of this test are given in Table \ref{tab:effectsmed}. These results indicate that the small effects reported in Table \ref{tab:overall} are an average of, on the one hand, a larger positive effects for students at the tails of the baseline distribution and, on the other hand, zero (or sometimes negative) effects for students in the middle of the distribution.
+
+\begin{landscape}
+\input{tables/effectsmed.tex}
+\end{landscape}
+
+\subsection{The effect of purple group assignment}
+
+This section examines whether being assigned the upper (purple) group itself had an effect on student test scores for students near the cut-off. 
+
+Students in STD 1 and STD 2 were assigned using different tests and with different cut-offs. Only the bottom percent of STD 2 students were assigned to the lower (blue) group compared to 51 percent of STD 1 students. The median STD 2 student was therefore assigned to the purple group, whereas the median STD 1 student was assigned to the blue group. 
+
+
+\begin{figure}
+    \centering
+    \includegraphics[width = 5in]{figures/bsbyt1.png}
+    \caption{Binned scatterplot of combined endline test score given running score}
+    \label{fig:bsbyt1}
+\end{figure}
+
+\begin{figure}
+    \centering
+    \includegraphics[width = 5in]{figures/bsbyt2.png}
+    \caption{Binned scatterplot of combined endline test score given running score}
+    \label{fig:bsbyt2}
+\end{figure}
+
+Around the cutoff, students in STD 1 may benefit from assignment to the purple group, whereas students in STD 2 seem to be harmed by assigned to the purple group.
+
+\begin{landscape}
+\input{tables/discontinuity.tex}
+
+\end{landscape}
+
+
+\section{Effect on lesson completion}
+[Right now I'm a little unclear about what the lesson completion data represent. There are approximately 4 observations per school. Each grade-school combination has 2 observations, apparently representing two separate subjects: Literacy Revision 1 and Literacy Revision 2. If these represent lesson plan completion in the reading groups, it seems that the value should be the same in treated schools, but it is not. Perhaps this data are from some other literacy activities in which the classrooms are not tracked. If that's the case, the interpretation of the results would change.]
+
+
+\section{Conclusion}
+
+These results provide strong support for a model in which the interaction of baseline student achievement and instructional level are direct complements.
+
+
+\pagebreak
+\bibliography{bib.bib}
+
+\pagebreak
+\appendix
+
+\section{Figures}
+
+\begin{figure}
+    \centering
+    \includegraphics[width = 5in]{figures/bsbygc.png}
+    \caption{Binned scatterplot of combined endline test score given running score}
+    \label{fig:bsbygc}
+\end{figure}
+
+\begin{figure}
+    \centering
+    \includegraphics[width = 5in]{figures/bsbygt.png}
+    \caption{Binned scatterplot of combined endline test score given running score}
+    \label{fig:bsbygt}
+\end{figure}
+
+
+
+
+
+\end{document}

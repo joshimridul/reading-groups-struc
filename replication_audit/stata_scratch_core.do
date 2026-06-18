@@ -12,7 +12,7 @@ set matsize 5000
 version 19
 set scheme s1mono
 
-global root "/Users/mriduljoshi/Github/reading-groups-struc"
+global root "/Users/mriduljoshi/Github/AbilityGrouping"
 global raw  "$root/2_Data/1_Raw"
 global do   "$root/4_Stata2"
 global out  "$root/replication_audit/stata_scratch"
