@@ -2,7 +2,7 @@
 
 Mridul Joshi
 
-This repository contains a public-facing exhibit from an ongoing research project on ability grouping and instructional assignment.
+This repository contains a public-facing exhibit from an ongoing research project on instructional assignment.
 
 The full draft, replication package, and underlying research materials are available on request.
 
